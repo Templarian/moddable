@@ -1,0 +1,9 @@
+{
+	"modules": {
+		"embedded:sensor/Joycon": "$(MODDABLE)/modules/drivers/sensors/joycon/joycon"
+	},
+	"preload": [
+		"embedded:sensor/Joycon"
+	]
+}
+

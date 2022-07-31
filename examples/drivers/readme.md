@@ -240,6 +240,7 @@ A set of examples for the following sensors, written in the TC53 [IO Class Patte
 - `ccs811`
 - `hmc5883`
 - `htu21d`
+- `joycon`
 - `l3gd20`
 - `lis3dh`
 - `lm75`
