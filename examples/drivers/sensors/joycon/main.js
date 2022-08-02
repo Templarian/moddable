@@ -16,7 +16,7 @@ import baseDevice from "embedded:provider/builtin";
 import Joycon from "embedded:sensor/Joycon";
 import Timer from "timer";
 
-// Move to helper
+// Shouldn't this be shared?
 class Button {
 	#io;
 	#onPush;
@@ -78,7 +78,7 @@ device.peripheral = {
 					io: device.io.Digital,
 					pin: device.pin.joystickButton,
 					mode: device.io.Digital.InputPullUp,
-					invert: false
+					invert: true
 				});
 			}
 		}
@@ -101,6 +101,14 @@ sensor.configure({
 	deadzone: 50
 });
 
+new device.peripheral.button.Joystick({
+	onPush() {
+		if (this.pressed) {
+			trace('Joystick pressed!\n');
+		}
+	}
+});
+
 Timer.repeat(() => {
 	// x, y = 1 to -1, 0 = center
 	// xRaw, yRaw = 0 to 1023
@@ -108,9 +116,3 @@ Timer.repeat(() => {
 	trace(`x: ${x.toFixed(2)}, y: ${y.toFixed(2)}\n`);
 	trace(`- Raw X: ${xRaw}, Raw Y: ${yRaw}\n`);
 }, 100); // 10ms is ideal for real world joystick usage
-
-new device.peripheral.button.Joystick({
-	onPush() {
-		trace('Joystick pushed down!');
-	}
-});
