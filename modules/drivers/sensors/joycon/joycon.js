@@ -32,10 +32,10 @@ class Joycon {
 	constructor(options) {
 		this.#x = new options.x.io(options.x);
 		this.#y = new options.y.io(options.y);
-		this.#xMin = 200;
+		this.#xMin = 150;
 		this.#xMax = 800;
 		this.#xCenter = 500;
-		this.#yMin = 200;
+		this.#yMin = 150;
 		this.#yMin = 800;
 		this.#yCenter = 500;
 		this.#deadzone = 50;
@@ -82,9 +82,9 @@ class Joycon {
 			&& xRaw <= xMaxCenter)
 			x = 0;
 		else if (xRaw < xMinCenter)
-			x = (xRaw - xMinZone) / (xMinCenter - xMinZone);
+			x = -1 * (1 + ((xMinZone - xRaw) / (xMinCenter - xMinZone)));
 		else
-			x = (xRaw - xMaxZone) / (xMaxZone - xMaxCenter);
+			x = 1 - ((xMaxZone - xRaw) / (xMaxZone - xMaxCenter));
 		if (yRaw <= yMinZone)
 			y = -1;
 		else if (yRaw >= yMaxZone)
@@ -93,9 +93,9 @@ class Joycon {
 			&& yRaw <= yMaxCenter)
 			y = 0;
 		else  if (yRaw < yMinCenter)
-			y = (yRaw - yMinZone) / (yMinCenter - yMinZone);
+			y = -1 * (1 + ((yMinZone - yRaw) / (yMinCenter - yMinZone)));
 		else
-			y = (yRaw - yMaxZone) / (yMaxZone - yMaxCenter);
+			y = 1 - ((yMaxZone - yRaw) / (yMaxZone - yMaxCenter));
 		// x, y = -1 to 1, center 0
 		// xRaw, yRaw = 0 to 1023
 		return { x, y, xRaw, yRaw };

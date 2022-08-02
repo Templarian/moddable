@@ -12,16 +12,53 @@
  *
  */
 
-import device from "embedded:provider/builtin";
+import baseDevice from "embedded:provider/builtin";
 import Joycon from "embedded:sensor/Joycon";
 import Timer from "timer";
 
-Object.assign(device.pin, {
+// Move to helper
+class Button {
+	#io;
+	#onPush;
+
+	constructor(options) {
+		options = {...options};
+		if (options.onReadable || options.onWritable || options.onError)
+			throw new Error;
+
+		if (options.target)
+			this.target = options.target;
+
+		const Digital = options.io;
+		if (options.onPush) {
+			this.#onPush = options.onPush; 
+			options.onReadable = () => this.#onPush();
+			options.edge = Digital.Rising | Digital.Falling;
+		}
+
+		this.#io = new Digital(options);
+		this.#io.pressed = options.invert ? 0 : 1;
+	}
+	close() {
+		this.#io?.close();
+		this.#io = undefined;
+	}
+	get pressed() {
+		return (this.#io.read() === this.#io.pressed) ? 1 : 0;
+	}
+}
+
+const device = {
+	io: { ...baseDevice.io }
+};
+device.pin = {
+	...baseDevice.pin,
 	joystickX: 36,
 	joystickY: 37,
 	joystickButton: 27
-});
-Object.assign(device.Analog || (device.Analog = {}), {
+};
+device.Analog = {
+	...baseDevice.Analog,
 	joystickX: {
 		io: device.io.Analog,
 		pin: device.pin.joystickX
@@ -30,21 +67,23 @@ Object.assign(device.Analog || (device.Analog = {}), {
 		io: device.io.Analog,
 		pin: device.pin.joystickY
 	}
-});
-const peripheral = device.peripheral || (device.peripheral = {});
-Object.assign(peripheral || (peripheral.button = {}), {
-	Joystick: class {
-		constructor(options) {
-			return new Button({
-				...options,
-				io: Digital,
-				pin: device.pin.joystickButton,
-				mode: Digital.InputPullUp,
-				invert: true
-			});
+};
+device.peripheral = {
+	...baseDevice.peripheral,
+	button: {
+		Joystick: class {
+			constructor(options) {
+				return new Button({
+					...options,
+					io: device.io.Digital,
+					pin: device.pin.joystickButton,
+					mode: device.io.Digital.InputPullUp,
+					invert: false
+				});
+			}
 		}
 	}
-});
+};
 
 const sensor = new Joycon({
 	x: device.Analog.joystickX,
@@ -53,10 +92,10 @@ const sensor = new Joycon({
 
 // A calibration UI is recommended
 sensor.configure({
-	xMin: 200,
+	xMin: 150,
 	xMax: 800,
 	xCenter: 500,
-	yMin: 200,
+	yMin: 150,
 	yMax: 800,
 	yCenter: 500,
 	deadzone: 50
@@ -70,7 +109,7 @@ Timer.repeat(() => {
 	trace(`- Raw X: ${xRaw}, Raw Y: ${yRaw}\n`);
 }, 100); // 10ms is ideal for real world joystick usage
 
-device.peripheral.button.Joystick({
+new device.peripheral.button.Joystick({
 	onPush() {
 		trace('Joystick pushed down!');
 	}
