@@ -105,6 +105,8 @@ new device.peripheral.button.Joystick({
 	onPush() {
 		if (this.pressed) {
 			trace('Joystick pressed!\n');
+		} else {
+			trace('Joystick released!\n');
 		}
 	}
 });
@@ -115,4 +117,4 @@ Timer.repeat(() => {
 	const { x, y, xRaw, yRaw } = sensor.sample();
 	trace(`x: ${x.toFixed(2)}, y: ${y.toFixed(2)}\n`);
 	trace(`- Raw X: ${xRaw}, Raw Y: ${yRaw}\n`);
-}, 100); // 10ms is ideal for real world joystick usage
+}, 200); // 10ms is ideal for real world joystick usage
