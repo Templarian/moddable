@@ -22,11 +22,11 @@ class Joycon {
 	#x;
 	#y;
 	#xMin;
-    #xMax ;
-    #xCenter;
-    #yMin;
-    #yMax;
-    #yCenter;
+	#xMax;
+	#xCenter;
+	#yMin;
+	#yMax;
+	#yCenter;
 	#deadzone;
 
 	constructor(options) {
@@ -92,7 +92,7 @@ class Joycon {
 		else if (yRaw >= yMinCenter
 			&& yRaw <= yMaxCenter)
 			y = 0;
-		else  if (yRaw < yMinCenter)
+		else if (yRaw < yMinCenter)
 			y = -1 * (1 + ((yMinZone - yRaw) / (yMinCenter - yMinZone)));
 		else
 			y = 1 - ((yMaxZone - yRaw) / (yMaxZone - yMaxCenter));
