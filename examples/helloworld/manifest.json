@@ -1,8 +1,72 @@
 {
-	"include": "$(MODDABLE)/examples/manifest_base.json",
+	"include": [
+		"$(MODDABLE)/examples/manifest_base.json",
+		"$(MODULES)/base/worker/manifest.json",
+		"$(MODDABLE)/examples/manifest_commodetto.json",
+		"$(MODULES)/drivers/ls013b4dn04/manifest.json",
+		"$(MODULES)/pins/digital/manifest.json",
+		"$(MODULES)/pins/i2c/manifest.json",
+        "$(MODULES)/pins/i2s/manifest.json",
+		"$(MODULES)/drivers/mcp230xx/manifest.json"
+	],
 	"modules": {
+		"Resource": "$(MODDABLE)/modules/files/resource/Resource",
+		"commodetto/parseBMF": "$(COMMODETTO)/commodettoParseBMF",
+		"commodetto/parseBMP": "$(COMMODETTO)/commodettoParseBMP",
+		"commodetto/parseRLE": "$(COMMODETTO)/commodettoParseRLE",
+		"commodetto/Bitmap": "$(COMMODETTO)/commodettoBitmap",
+		"commodetto/Poco": "$(COMMODETTO)/commodettoPoco",
+		"commodetto/*": "$(COMMODETTO)/commodettoPocoBlit",
+		"commodetto/cfe": "$(COMMODETTO)/cfeBMF",
 		"*": [
 			"./main"
 		]
-	}
+	},
+	"config": {
+		"screen": "ls013b4dn04",
+		"touch": "",
+		"format": "Gray256"
+	},
+	"resources": {
+		"*": [
+			"./moddable-white",
+			"./board",
+			"./shade",
+			"./Bag1-1",
+			"./four",
+			"./iso4"
+		],
+		"*-mask": [
+			"$(MODDABLE)/examples/assets/fonts/myFont"
+	   	]
+	},
+	"defines": {
+		"ls013b4dn04": {
+			"width": 400,
+			"height": 240,
+			"cs_pin": 4,
+			"spi_port": "HSPI_HOST"
+		},
+		"spi": {
+			"miso_pin": 21,
+			"mosi_pin": 19,
+			"sck_pin": 5
+		},
+		"audioOut": {
+			"bitsPerSample": 16,
+			"numChannels": 1,
+			"sampleRate": 44100,
+			"volume_divider": 1,
+			"i2s": {
+				"bitsPerSample": 16,
+				"bck_pin": 13,
+				"dataout_pin": 27,
+				"lr_pin": 12
+			}
+		}
+	},
+	"preload": [
+		"Resource",
+		"main"
+	]
 }

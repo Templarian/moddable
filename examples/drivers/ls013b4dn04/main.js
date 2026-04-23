@@ -27,7 +27,7 @@ let SLEEP_MS = 5000;
 
 export default function() {
 	let logo = parseBMP(new Resource("moddable-white.bmp"));
-//	let sleep = new Sleep();
+	//	let sleep = new Sleep();
 
 	const width = 96, height = 96;
 	let render = new Poco(new LS013B4DN04({width: width, height: height}));
@@ -37,18 +37,18 @@ export default function() {
 
 	let index = 0;
 
-//	if (Sleep.getWakeupCause() != 3)
-//		index = Sleep.getPersistentValue(0) ? 1 : 0;
+	//	if (Sleep.getWakeupCause() != 3)
+	//		index = Sleep.getPersistentValue(0) ? 1 : 0;
 
-let timer = Timer.repeat(() => {
-	index ^= 1;
-	render.begin(0, 0, width, height);
-		render.fillRectangle(index ? white : black, 0, 0, width, height);
-		render.drawGray(logo, index ? black : white, 0, 30);
-	render.end();
-}, SLEEP_MS);
+	let timer = Timer.repeat(() => {
+		index ^= 1;
+		render.begin(0, 0, width, height);
+			render.fillRectangle(index ? white : black, 0, 0, width, height);
+			render.drawGray(logo, index ? black : white, 0, 30);
+		render.end();
+	}, SLEEP_MS);
 
-//	Sleep.setPersistentValue(0, index);
-//	Sleep.sleepEM4(SLEEP_MS);
+	//	Sleep.setPersistentValue(0, index);
+	//	Sleep.sleepEM4(SLEEP_MS);
 }
 

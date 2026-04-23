@@ -12,7 +12,6 @@
  *
  */
 import LS013B4DN04 from "ls013b4dn04";
-import { MCP23017 } from "MCP230XX";
 import Poco from "commodetto/Poco";
 import Resource from "Resource";
 import parseBMP from "commodetto/parseBMP";
@@ -56,6 +55,16 @@ const ALERTFLAG_RESET_INDICATOR = 0x01;
 const FREQUENCY = 1600; // Hz
 const PERIOD = 1 / FREQUENCY; // seconds
 
+// aPlus, aMinus, bPlus, bMinus
+function generateStepperPWM(t) {
+    // Base signals (sine waves shifted by 90 degrees)
+    return [
+        Math.sin(2 * Math.PI * PERIOD * t),
+        Math.sin(2 * Math.PI * PERIOD * t + Math.PI),
+        Math.sin(2 * Math.PI * PERIOD * t + Math.PI / 2),
+        Math.sin(2 * Math.PI * PERIOD * t + 3 * Math.PI / 2)
+    ].map(v => v > 0 ? v : 0); // Convert sine waves to PWM (0 to 1 range)
+}
 
 export default function () {
     trace('Starting...');
@@ -73,7 +82,6 @@ export default function () {
 
     //let logo = parseBMP(new Resource("moddable-white.bmp"));
     let board = parseBMP(new Resource("board.bmp"));
-    let iso4 = parseBMP(new Resource("iso4.bmp"));
     //let shade = parseBMP(new Resource("shade.bmp"));
     let font = parseBMF(new Resource("myFont.bf4"));
     //let bell = new Resource("Bag1-1.maud");
@@ -90,30 +98,13 @@ export default function () {
 
     let previous = 0;
     let state = true;
-
-    let leds = new MCP23017({
-        address: 0x20,
-        sda: 22,
-        scl: 20
-    }); // defaults to 0x20!
-    let mask = 0x8888;
-
-    Timer.repeat(() => {
-        trace(`${leds[0].read()}\n`);
-        /*mask = ((mask << 1) | (mask >> 15)) & 0xFFFF;
-
-        for (let i = 0; i < 16; i++) {
-        leds[i].write(mask & (1 << i) ? 1 : 0);
-        }*/
-    }, 50);
-/*
     Timer.repeat(() => {
         const current = button.read();
         if (current !== previous) {
             if (!current) {
                 trace("button pressed\n");
                 state = !state;
-                const i2c = new I2C({ sda: 22, scl: 20, address: 0x36, timeout: 50 });
+                /*const i2c = new I2C({ sda: 22, scl: 20, address: 0x36, timeout: 50 });
                 //i2c.write([0x5400]);
                 i2c.write(MAX1704X_SOC_REG);
                 let bytes = i2c.read(2);
@@ -125,7 +116,7 @@ export default function () {
                 let volts = Math.round((int16 * 78.125 / 1000000) * 100) / 100;
                 trace(`Percentage ${percent}%`);
                 percentage = `Percentage ${percent}% ${bytes[0]} ${bytes[1]}`;
-                voltage = `Volts ${volts} ${bytes2[0]} ${bytes2[1]}`;
+                voltage = `Volts ${volts} ${bytes2[0]} ${bytes2[1]}`;*/
 
                 // Voltage
                 //  * 78.125 / 1_000_000
@@ -137,7 +128,25 @@ export default function () {
                 //audio.enqueue(0, AudioOut.Volume, 256);
                 //audio.enqueue(0, AudioOut.Samples, bonfire, 2);
                 //audio.start();
-                
+                const PCA9685_ADDR = 0x40;
+                const MODE1 = 0x00;
+                const MODE2 = 0x01;
+                const PRESCALE = 0xFE;
+                const LED0_ON_L = 0x06;
+
+                // Mode 1 bits
+                const MODE1_RESTART = 0x80;
+                const MODE1_AI = 0x20;
+                const MODE1_SLEEP = 0x10;
+
+                // Mode 2 bits
+                const MODE2_OUTDRV = 0x04;
+
+                const i2cServo = new I2C({
+                    sda: 22,
+                    scl: 20,
+                    address: PCA9685_ADDR
+                });
 
                 function write8(reg, value) {
                     i2cServo.write(Uint8Array.of(reg, value));
@@ -149,6 +158,98 @@ export default function () {
                     i2cServo.read(result);
                     return result[0];
                 }
+/*
+                function reset() {
+                    // Reset the chip
+                    write8(MODE1, MODE1_RESTART);
+                    Timer.delay(10);
+                    
+                    // Setup default mode - Similar to Adafruit implementation
+                    write8(MODE1, MODE1_AI); // Auto-increment on
+                    Timer.delay(1);
+                    
+                    // Set totem pole output
+                    write8(MODE2, MODE2_OUTDRV);
+                }
+
+                function setFrequency() {
+                    let prescale = 3;
+                    
+                    // Read old mode
+                    let oldmode = read8(MODE1);
+                    
+                    // Go to sleep
+                    let newmode = (oldmode & ~MODE1_RESTART) | MODE1_SLEEP;
+                    write8(MODE1, newmode);
+                    
+                    // Set prescale
+                    write8(PRESCALE, prescale);
+                    
+                    // Restore old mode
+                    write8(MODE1, oldmode);
+                    
+                    // Wait 500us for oscillator
+                    Timer.delay(1);
+                    
+                    // Restart with auto-increment enabled
+                    write8(MODE1, oldmode | MODE1_RESTART | MODE1_AI);
+                }
+
+                reset();
+                setFrequency();
+*/
+                /**
+                 * Set PWM
+                 * @param {number} servoIndex 
+                 * @param {number} value 
+                 */
+                /*function setPWM(servoIndex = 0, value = 0) {
+                    const max = 4095;
+                    const off = Math.round(max * value);
+
+                    let buffer = new Uint8Array([
+                        LED0_ON_L + 4 * servoIndex,
+                        0 & 0xFF,
+                        (0 >> 8) & 0xFF,
+                        off & 0xFF,
+                        (off >> 8) & 0xFF
+                    ]);
+                    i2cServo.write(buffer);
+                }*/
+/*
+                function startSineWave() {
+                    let phase = 0;
+                    Timer.repeat(() => {
+                        // Generate sine wave value (0-4095)
+                        let value = (Math.sin(phase) + 1) / 2;
+                        
+                        // Set PWM value for channel 0
+                        setPWM(0, value);
+                        
+                        // Increment phase (adjust for smoother animation)
+                        phase += 2 * Math.PI / 100; // Slower update for more visible effect
+                        if (phase >= 2 * Math.PI) phase -= 2 * Math.PI;
+                    }, 10); // 10ms interval
+                }
+                startSineWave();
+*/
+/*const iterations = 20;
+                for (let t = 0; t < FREQUENCY * iterations; ++t) { // Rotate 10 times
+                    let signals = generateStepperPWM(t);
+                    //trace(Math.round(4095 * signals[0]) + '\n');
+                    for (let signalIndex = 0; signalIndex < 4; ++signalIndex) {
+                        setPWM(signalIndex, signals[signalIndex]);
+                    }
+                    Timer.delay(1);
+                }*/
+
+                //for (let t = FREQUENCY * iterations; t > 0; --t) { // Rotate -10 times
+                //    let signals = generateStepperPWM(t);
+                //    for (let signalIndex = 0; signalIndex < 4; ++signalIndex) {
+                //        setPWM(signalIndex, signals[signalIndex]);
+                //    }
+                //    Timer.delay(2);
+                //}
                     
             } else {
                 trace("button released\n");
@@ -156,7 +257,7 @@ export default function () {
             previous = current;
         }
     }, 100);
-*/
+
     //	let sleep = new Sleep();
 
 
@@ -194,8 +295,7 @@ export default function () {
             render.fillRectangle(black, 397, 238, 1, 2);
             render.fillRectangle(black, 394, 239, 3, 1);
         }
-        //render.drawGray(board, state ? black : white, 0, 0);
-        render.drawGray(iso4, state ? black : white, 0, 0);
+        render.drawGray(board, state ? black : white, 0, 0);
 
         render.drawText(percentage, font, state ? black : white, 10, 198);
         render.drawText(voltage, font, state ? black : white, 10, 220);
