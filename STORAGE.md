@@ -418,71 +418,132 @@ function buildStore(entries: StoreEntry[]): void {
 
 ## PSRAM BMP Asset Index
 
-The same 4-byte key pattern applies to BMP asset management. Build an in-memory index at boot by scanning the SD card, then use it for O(1) asset lookups with lazy loading into PSRAM.
+Build an in-memory catalog at boot by scanning the SD card (path + size only), then use an LFU hot cache with lazy sliding-TTL expiry and periodic frequency halving to keep frequently-used buffers in PSRAM while naturally pruning forgotten ones.
+
+- **O(1) get/put/evict** via frequency bucket map (`freq → Set<key>`) + `minFreq` pointer
+- **Sliding TTL** — on every `getBmp` hit the `lastAccess` timestamp resets; expired entries are evicted lazily on the next access or eviction pass
+- **Dynamic aging** — a timer halves all frequency counts periodically so historically-popular but now-idle items decay toward eviction
 
 ```typescript
-interface BmpEntry {
-  path:   string;           // full path on SD
-  size:   number;           // file size in bytes
-  buffer: ArrayBuffer | null; // null until first access (lazy load)
+const MAX_HOT_ENTRIES    = 50;
+const HOT_TTL_MS         = 30_000;  // 30 s without access → eviction-eligible
+const HOT_AGING_INTERVAL = 60_000;  // frequency halving period (ms)
+
+interface BmpEntry  { path: string; size: number; }
+interface HotEntry  { buffer: ArrayBuffer; freq: number; lastAccess: number; }
+
+// Catalog — path/size only, no buffers. Buffers live in hotCache only.
+const bmpIndex:    Map<string, BmpEntry>     = new Map();
+const hotCache:    Map<string, HotEntry>     = new Map();
+const freqBuckets: Map<number, Set<string>>  = new Map();
+let   minFreq = 1;
+
+function promote(name: string, entry: HotEntry): void {
+  const oldFreq = entry.freq;
+  const bucket  = freqBuckets.get(oldFreq)!;
+  bucket.delete(name);
+  if (bucket.size === 0) {
+    freqBuckets.delete(oldFreq);
+    if (minFreq === oldFreq) minFreq++;  // safe: promoted item now lives at oldFreq+1
+  }
+  entry.freq++;
+  entry.lastAccess = Date.now();
+  if (!freqBuckets.has(entry.freq)) freqBuckets.set(entry.freq, new Set());
+  freqBuckets.get(entry.freq)!.add(name);
 }
 
-// In-memory asset catalog — lives in PSRAM
-const bmpIndex: Map<string, BmpEntry> = new Map();
+function evictOne(): void {
+  // Guard against stale minFreq left by lazy TTL removal
+  if (!freqBuckets.has(minFreq)) minFreq = Math.min(...freqBuckets.keys());
 
-// Hot cache — frequently accessed BMPs fully buffered
-const hotCache: Map<string, ArrayBuffer> = new Map();
-const MAX_HOT_ENTRIES = 50;
+  const bucket = freqBuckets.get(minFreq)!;
+  const now    = Date.now();
+
+  // Prefer TTL-expired entries in the lowest-freq bucket
+  for (const key of bucket) {
+    if (now - hotCache.get(key)!.lastAccess >= HOT_TTL_MS) {
+      bucket.delete(key);
+      hotCache.delete(key);
+      if (bucket.size === 0) freqBuckets.delete(minFreq);
+      return;
+    }
+  }
+
+  // No expired entries — evict true LFU item (oldest insertion at minFreq)
+  const key = bucket.values().next().value!;
+  bucket.delete(key);
+  hotCache.delete(key);
+  if (bucket.size === 0) freqBuckets.delete(minFreq);
+}
+
+function putHot(name: string, buffer: ArrayBuffer): void {
+  if (hotCache.size >= MAX_HOT_ENTRIES) evictOne();
+  hotCache.set(name, { buffer, freq: 1, lastAccess: Date.now() });
+  if (!freqBuckets.has(1)) freqBuckets.set(1, new Set());
+  freqBuckets.get(1)!.add(name);
+  minFreq = 1;
+}
 
 /**
- * Scans a directory on SD and builds the PSRAM BMP index.
+ * Scans a directory on SD and builds the PSRAM BMP catalog.
  * Runs at boot — one-time SD directory traversal cost (~50–200ms).
  */
 function buildBmpIndex(directory: string): void {
   const iter = new Directory(directory);
   let entry;
-
   while ((entry = iter.read())) {
     if (!entry.name.endsWith('.bmp')) continue;
-
-    const key = entry.name.replace('.bmp', ''); // use filename as key
-
-    bmpIndex.set(key, {
-      path:   `${directory}/${entry.name}`,
-      size:   entry.size,
-      buffer: null
+    bmpIndex.set(entry.name.replace('.bmp', ''), {
+      path: `${directory}/${entry.name}`,
+      size: entry.size
     });
   }
 }
 
 /**
  * Retrieves a BMP as an ArrayBuffer.
- * Checks hot cache first (~0.001ms), then lazy-loads from SD (~3–8ms).
- * Promotes loaded assets into hot cache up to MAX_HOT_ENTRIES.
+ *   - Hot cache hit + valid TTL:  ~0.001ms  (PSRAM, promotes freq)
+ *   - Hot cache hit + expired:    evicts entry, reloads from SD (~3–8ms)
+ *   - Cache miss:                 loads from SD, inserts into hot cache
  */
 function getBmp(name: string): ArrayBuffer | null {
-  // 1. Hot cache hit — fastest path
   const hot = hotCache.get(name);
-  if (hot) return hot;
+  if (hot) {
+    if (Date.now() - hot.lastAccess >= HOT_TTL_MS) {
+      // Lazy TTL expiry — remove from LFU structure, fall through to reload
+      const bucket = freqBuckets.get(hot.freq)!;
+      bucket.delete(name);
+      if (bucket.size === 0) freqBuckets.delete(hot.freq);
+      hotCache.delete(name);
+    } else {
+      promote(name, hot);
+      return hot.buffer;
+    }
+  }
 
-  // 2. Index lookup — PSRAM, O(1)
   const entry = bmpIndex.get(name);
   if (!entry) return null;
 
-  // 3. Cache miss — load from SD (~3–8ms)
-  if (!entry.buffer) {
-    const file    = new File(entry.path);
-    entry.buffer  = file.read(ArrayBuffer, entry.size) as ArrayBuffer;
-    file.close();
-  }
+  const file   = new File(entry.path);
+  const buffer = file.read(ArrayBuffer, entry.size) as ArrayBuffer;
+  file.close();
 
-  // 4. Promote to hot cache if space allows
-  if (hotCache.size < MAX_HOT_ENTRIES) {
-    hotCache.set(name, entry.buffer);
-  }
-
-  return entry.buffer;
+  putHot(name, buffer);
+  return buffer;
 }
+
+// Halve all frequency counts — stale-but-historically-popular items
+// decay toward minFreq and become eligible for eviction. O(n) on the
+// bounded cache size so effectively constant.
+Timer.repeat((): void => {
+  freqBuckets.clear();
+  for (const [key, entry] of hotCache) {
+    entry.freq = Math.max(1, entry.freq >> 1);
+    if (!freqBuckets.has(entry.freq)) freqBuckets.set(entry.freq, new Set());
+    freqBuckets.get(entry.freq)!.add(key);
+  }
+  if (hotCache.size > 0) minFreq = Math.min(...freqBuckets.keys());
+}, HOT_AGING_INTERVAL);
 ```
 
 ---
