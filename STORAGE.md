@@ -418,18 +418,22 @@ function buildStore(entries: StoreEntry[]): void {
 
 ## PSRAM BMP Asset Index
 
-Build an in-memory catalog at boot by scanning the SD card (path + size only), then use an LFU hot cache with lazy sliding-TTL expiry and periodic frequency halving to keep frequently-used buffers in PSRAM while naturally pruning forgotten ones.
+Build an in-memory catalog at boot by scanning the SD card (path + size only), then use an LFU hot cache with lazy sliding-TTL expiry and periodic frequency halving to keep frequently-used buffers in PSRAM while naturally pruning forgotten ones. A CRC16 checksum (Moddable SDK built-in) is computed for each BMP on first load and stored in the catalog entry, enabling fast server-driven asset verification without re-reading files.
 
 - **O(1) get/put/evict** via frequency bucket map (`freq → Set<key>`) + `minFreq` pointer
 - **Sliding TTL** — on every `getBmp` hit the `lastAccess` timestamp resets; expired entries are evicted lazily on the next access or eviction pass
 - **Dynamic aging** — a timer halves all frequency counts periodically so historically-popular but now-idle items decay toward eviction
+- **Lazy CRC16** — checksum computed once on first SD load, persists in `BmpEntry` across hotCache evictions
 
 ```typescript
+import CRC16 from "crc";
+
 const MAX_HOT_ENTRIES    = 50;
 const HOT_TTL_MS         = 30_000;  // 30 s without access → eviction-eligible
 const HOT_AGING_INTERVAL = 60_000;  // frequency halving period (ms)
 
-interface BmpEntry  { path: string; size: number; }
+interface BmpEntry  { path: string; size: number; hash: number; }
+// hash: 0 = not yet computed; populated on first SD load, survives hotCache eviction
 interface HotEntry  { buffer: ArrayBuffer; freq: number; lastAccess: number; }
 
 // Catalog — path/size only, no buffers. Buffers live in hotCache only.
@@ -495,7 +499,8 @@ function buildBmpIndex(directory: string): void {
     if (!entry.name.endsWith('.bmp')) continue;
     bmpIndex.set(entry.name.replace('.bmp', ''), {
       path: `${directory}/${entry.name}`,
-      size: entry.size
+      size: entry.size,
+      hash: 0
     });
   }
 }
@@ -528,6 +533,7 @@ function getBmp(name: string): ArrayBuffer | null {
   const buffer = file.read(ArrayBuffer, entry.size) as ArrayBuffer;
   file.close();
 
+  entry.hash = new CRC16(0x1021).checksum(buffer);  // CRC-16/XMODEM; persists across evictions
   putHot(name, buffer);
   return buffer;
 }
@@ -544,6 +550,84 @@ Timer.repeat((): void => {
   }
   if (hotCache.size > 0) minFreq = Math.min(...freqBuckets.keys());
 }, HOT_AGING_INTERVAL);
+```
+
+### Server-Driven Asset Verification
+
+The server sends a compact list of name/hash pairs. The device compares each against the CRC16 stored in `bmpIndex`. If a hash is not yet computed (asset hasn't been accessed since boot), `getBmp` is called to load it and populate the hash as a side effect. Names absent from `bmpIndex` are also flagged — they are assets the server has that the device does not.
+
+```typescript
+interface AssetRef { name: string; hash: number; }
+
+/**
+ * Compares server-provided CRC16 hashes against the device catalog.
+ * Returns names of assets that are missing or have a mismatched checksum.
+ * Triggers an SD load for any asset not yet accessed since boot.
+ */
+function checkForUpdates(serverAssets: AssetRef[]): string[] {
+  const stale: string[] = [];
+
+  for (const { name, hash } of serverAssets) {
+    const entry = bmpIndex.get(name);
+    if (!entry) {
+      stale.push(name);  // asset not present on device at all
+      continue;
+    }
+    if (entry.hash === 0) getBmp(name);  // populate hash as side effect
+    if (entry.hash !== hash) stale.push(name);
+  }
+
+  return stale;
+}
+```
+
+The server must compute its hashes with the same CRC16 variant used on the device: **CRC-16/XMODEM** (polynomial `0x1021`, initial value `0x0000`, no reflection, no final XOR). The Moddable SDK `crc` module requires the polynomial to be passed explicitly — `new CRC16(0x1021)` — with the remaining parameters defaulting to zero/false.
+
+The following Node.js implementation produces identical output. Verify with the standard test vector: `crc16(Buffer.from("123456789"))` must equal `0x31C3`.
+
+```typescript
+// Node.js build tool — CRC-16/XMODEM matching Moddable SDK CRC16(0x1021)
+
+const CRC16_TABLE: Uint16Array = (() => {
+  const table = new Uint16Array(256);
+  for (let i = 0; i < 256; i++) {
+    let crc = i << 8;
+    for (let j = 0; j < 8; j++) {
+      crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) & 0xFFFF : (crc << 1) & 0xFFFF;
+    }
+    table[i] = crc;
+  }
+  return table;
+})();
+
+function crc16(data: Buffer | Uint8Array): number {
+  let crc = 0x0000;
+  for (const byte of data) {
+    crc = ((crc << 8) ^ CRC16_TABLE[((crc >> 8) ^ byte) & 0xFF]) & 0xFFFF;
+  }
+  return crc;
+}
+
+// Verification
+console.assert(crc16(Buffer.from("123456789")) === 0x31C3, "CRC16 mismatch — check variant");
+
+// Build the manifest the server sends to the device
+import { readFileSync, readdirSync } from "fs";
+import { join, basename } from "path";
+
+interface AssetRef { name: string; hash: number; }
+
+function buildAssetManifest(directory: string): AssetRef[] {
+  return readdirSync(directory)
+    .filter(f => f.endsWith(".bmp"))
+    .map(f => ({
+      name: basename(f, ".bmp"),
+      hash: crc16(readFileSync(join(directory, f)))
+    }));
+}
+
+// Send to device over WiFi/BLE for verification
+const manifest = buildAssetManifest("./assets");
 ```
 
 ---
