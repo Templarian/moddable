@@ -1,0 +1,54 @@
+{
+	"include": [
+		"$(MODDABLE)/examples/manifest_base.json",
+		"$(MODULES)/base/worker/manifest.json",
+		"$(MODDABLE)/examples/manifest_commodetto.json",
+		"$(MODDABLE)/examples/manifest_net.json",
+		"$(MODDABLE)/modules/network/wifi/manifest.json",
+		"$(MODULES)/crypt/tls.json",
+		"$(MODULES)/network/http/manifest.json",
+		"$(MODULES)/drivers/ls013b4dn04/manifest.json",
+		"$(MODULES)/pins/digital/manifest.json",
+		"$(MODULES)/pins/i2c/manifest.json",
+		"$(MODULES)/drivers/mcp230xx/manifest.json"
+	],
+	"modules": {
+		"Resource": "$(MODDABLE)/modules/files/resource/Resource",
+		"commodetto/parseBMF": "$(COMMODETTO)/commodettoParseBMF",
+		"commodetto/parseBMP": "$(COMMODETTO)/commodettoParseBMP",
+		"commodetto/parseRLE": "$(COMMODETTO)/commodettoParseRLE",
+		"commodetto/Bitmap": "$(COMMODETTO)/commodettoBitmap",
+		"commodetto/Poco": "$(COMMODETTO)/commodettoPoco",
+		"commodetto/*": "$(COMMODETTO)/commodettoPocoBlit",
+		"commodetto/cfe": "$(COMMODETTO)/cfeBMF",
+		"*": [
+			"./main"
+		]
+	},
+	"config": {
+		"screen": "ls013b4dn04",
+		"touch": "",
+		"format": "Gray256",
+		"sntp": "pool.ntp.org"
+	},
+	"resources": {
+		"*-mask": [
+			"$(MODDABLE)/examples/assets/fonts/myFont"
+	   	],
+		"*": [
+			"$(MODULES)/crypt/data/ca109"
+		]
+	},
+	"defines": {
+		"ls013b4dn04": {
+			"width": 400,
+			"height": 240,
+			"cs_pin": 4,
+			"spi_port": "HSPI_HOST"
+		}
+	},
+	"preload": [
+		"Resource",
+		"main"
+	]
+}
