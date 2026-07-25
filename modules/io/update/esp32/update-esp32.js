@@ -12,6 +12,10 @@ class Update extends Native("xs_update_destructor") {
 		if (value != "buffer")
 			throw new RangeError("invalid");
 	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 function open(options, prototype) { return native("xs_update_open").call(this, options, prototype); }

@@ -82,28 +82,24 @@ void xs_spi_constructor(xsMachine *the)
 	if ((hz < 1) || (hz > 40000000))
 		xsRangeError("invalid hz");
 
-	if (xsmcHas(xsArg(0), xsID_out)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_out);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_out)) {
 		mosi = builtinGetPin(the, &xsVar(0));
 		if (!builtinIsPinFree(mosi))
 			xsUnknownError("in use");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_in)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_in);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_in)) {
 		miso = builtinGetPin(the, &xsVar(0));
 		if (!builtinIsPinFree(miso))
 			xsUnknownError("in use");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_select)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_select);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_select)) {
 		select = builtinGetPin(the, &xsVar(0));
 		if (!builtinIsPinFree(select))
 			xsUnknownError("in use");
 
-		if (xsmcHas(xsArg(0), xsID_active)) {
-			xsmcGet(xsVar(0), xsArg(0), xsID_active);
+		if (xsmcGet(xsVar(0), xsArg(0), xsID_active)) {
 			active = xsmcToInteger(xsVar(0));
 			if ((0 != active) && (1 != active))
 				xsRangeError("invalid active");
@@ -112,8 +108,7 @@ void xs_spi_constructor(xsMachine *the)
 			xsTrace("WARNING: SPI used with default active (0). Please confirm that is intended.\n");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_mode)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_mode);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_mode)) {
 		tmp = xsmcToInteger(xsVar(0));
 		if (tmp & ~3)
 			xsRangeError("invalid mode");

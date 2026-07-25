@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025  Moddable Tech, Inc.
+ * Copyright (c) 2025-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -29,6 +29,10 @@ class Ethernet extends Native("xs_ethernet_destructor"){
 	get connection() { return native("xs_ethernet_connection_get").call(this); }
 	get address() { return native("xs_ethernet_address_get").call(this); }
 	get MAC() { return native("xs_ethernet_MAC_get").call(this); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 };
 
 export default Ethernet;

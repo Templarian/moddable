@@ -75,4 +75,3 @@ export default class RSA {
 	};
 };
 
-Object.freeze(RSA.prototype);

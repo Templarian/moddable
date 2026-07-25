@@ -36,16 +36,14 @@ void xs_qrcode(xsMachine *the)
 
 	xsmcVars(3);
 
-	if (xsmcHas(xsArg(0), xsID_maxVersion)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_maxVersion);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_maxVersion)) {
 		maxVersion = xsmcToInteger(xsVar(0));
 		if ((maxVersion > qrcodegen_VERSION_MAX) || (maxVersion < qrcodegen_VERSION_MIN))
 			xsRangeError("invalid");
 	}
 
 	uint8_t padding = 0;
-	if (xsmcHas(xsArg(0), xsID_bitmap)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_bitmap);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_bitmap)) {		
 		if (xsBooleanType == xsmcTypeOf(xsVar(0))) {
 			if (xsmcTest(xsVar(0)))
 				padding = 8;
@@ -59,8 +57,7 @@ void xs_qrcode(xsMachine *the)
 	}
 
 	uint16_t fit = 0;
-	if (padding && xsmcHas(xsArg(0), xsID_fit)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_fit);
+	if (padding && xsmcGet(xsVar(0), xsArg(0), xsID_fit)) {
 		int t = xsmcToInteger(xsVar(0));
 		if ((t <= 0) || (t > 32767))
 			xsRangeError("invalid");

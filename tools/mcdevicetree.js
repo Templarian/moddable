@@ -119,32 +119,32 @@ export default class extends TOOL {
 		const parser = new DTSParser();
 		const parsed = parser.parse(dts);
 
-    const compatible = new Map;
-    const bindingDirectory = this.resolveDirectoryPath(this.getenv("ZEPHYR_BASE") + "/dts/bindings");
-    for (const kind of this.enumerateDirectory(bindingDirectory)) {
-        if ("." === kind.startsWith("."))
-            continue;
-        if (this.isDirectoryOrFile(bindingDirectory + "/" + kind) >= 0)
-            continue;
-        compatible.set(kind, this.enumerateDirectory(bindingDirectory + "/" + kind).filter(name => {
-            if (name.startsWith("."))
-              return;
-            if (!name.includes(","))
-              return;
+		const compatible = new Map;
+		const bindingDirectory = this.resolveDirectoryPath(this.getenv("ZEPHYR_BASE") + "/dts/bindings");
+		for (const kind of this.enumerateDirectory(bindingDirectory)) {
+			if ("." === kind.startsWith("."))
+				continue;
+			if (this.isDirectoryOrFile(bindingDirectory + "/" + kind) >= 0)
+				continue;
+			compatible.set(kind, this.enumerateDirectory(bindingDirectory + "/" + kind).filter(name => {
+				if (name.startsWith("."))
+				  return;
+				if (!name.includes(","))
+				  return;
 
-            if ("st,dsi-lcd-qsh-030.yaml" === name)   //@@ hack so stm32u5a9j_dk links
-              return;
-            if (("nordic,nrf-gpio-forwarder.yaml" === name) || ("nordic,nrf-gpiote.yaml" === name))   //@@ hack so raytac_mdbt53 links
-              return;
-            if ("arduino,uno-adc.yaml" === name)   //@@ hack so nrf52840dk links
-              return;
-            if (("raspberrypi,pico-gpio.yaml" === name) || ("raspberrypi,pico-header.yaml" === name))  //@@ hack so pico_plus2 links
-              return;
+				if ("st,dsi-lcd-qsh-030.yaml" === name)   //@@ hack so stm32u5a9j_dk links
+				  return;
+				if (("nordic,nrf-gpio-forwarder.yaml" === name) || ("nordic,nrf-gpiote.yaml" === name))   //@@ hack so raytac_mdbt53 links
+				  return;
+				if ("arduino,uno-adc.yaml" === name)   //@@ hack so nrf52840dk links
+				  return;
+				if (("raspberrypi,pico-gpio.yaml" === name) || ("raspberrypi,pico-header.yaml" === name))  //@@ hack so pico_plus2 links
+				  return;
 
-            return name.endsWith(".yaml");
-        }).map(name => name.substring(0, name.length - 5)));
-    }
-
+				return name.endsWith(".yaml");
+			}).map(name => name.substring(0, name.length - 5)));
+		}
+ 
 		const state = {
 			cCode: "",
 			hCode: "",
@@ -153,8 +153,8 @@ export default class extends TOOL {
 			aliasTable: new Map,
 			zephyrConfig: this.zephyrConfig,
 			defines: this.defines,
-      compatible
-		}
+			compatible
+		};
 
 		state.hCode +=
 `#ifndef __MC_ZEPHYR_H__
@@ -183,10 +183,10 @@ const device = {
 		doBus(state, parsed, {
 			binding: "i2c",
 			name: "I2C",
-      hostProviderName: "i2c",
+			hostProviderName: "i2c",
 			header: "#include <zephyr/drivers/i2c.h>",
-      moduleSpecifier: "embedded:io/i2c",
-      moduleDefault: "I2C",
+			moduleSpecifier: "embedded:io/i2c",
+			moduleDefault: "I2C",
 			static:
 `import I2C from "embedded:io/i2c";
 device.io.I2C = I2C;
@@ -200,10 +200,10 @@ device.i2c = {};
 		doBus(state, parsed, {
 			binding: "serial",
 			name: "Serial",
-      hostProviderName: "serial",
+			hostProviderName: "serial",
 			header: "#include <zephyr/drivers/uart.h>",
-      moduleSpecifier: "embedded:io/serial",
-      moduleDefault: "Serial",
+			moduleSpecifier: "embedded:io/serial",
+			moduleDefault: "Serial",
 			static:
 `import Serial from "embedded:io/serial";
 device.io.Serial = Serial;
@@ -212,17 +212,17 @@ device.serial = {};
 `
 		});
 
-    const user = parsed.nodes['/'].children["zephyr,user"];
-    const hasIOChannels = undefined !== user?.properties["io-channels"];
+		const user = parsed.nodes['/'].children["zephyr,user"];
+		const hasIOChannels = undefined !== user?.properties["io-channels"];
 
 		if (("y" === state.zephyrConfig.get("CONFIG_ADC")) && hasIOChannels) {
 			doBus(state, parsed, {
 				binding: "adc",
 				name: "Analog",
-        hostProviderName: "analog",
+				hostProviderName: "analog",
 				header: "#include <zephyr/drivers/adc.h>",
-        moduleSpecifier: "embedded:io/analog",
-        moduleDefault: "Analog",
+				moduleSpecifier: "embedded:io/analog",
+				moduleDefault: "Analog",
 				static:
 `import Analog from "embedded:io/analog";
 device.io.Analog = Analog;
@@ -235,10 +235,10 @@ device.analog = {};
 		doBus(state, parsed, {
 			binding: "pwm",
 			name: "PWM",
-      hostProviderName: "pwm",
+			hostProviderName: "pwm",
 			header: "#include <zephyr/drivers/pwm.h>",
-      moduleSpecifier: "embedded:io/pwm",
-      moduleDefault: "PWM",
+			moduleSpecifier: "embedded:io/pwm",
+			moduleDefault: "PWM",
 			static:
 `import PWM from "embedded:io/pwm";
 device.io.PWM = PWM;
@@ -247,21 +247,20 @@ device.pwm = {};
 `
 		});
 
-    if ("y" === state.zephyrConfig.get("CONFIG_RTC")) {
-      let rtcs = doBus(state, parsed, {
-          binding: "rtc",
-          name: "RTC",
-          header: "#include <zephyr/drivers/rtc.h>",
-          js: false,
-        });
+		if ("y" === state.zephyrConfig.get("CONFIG_RTC")) {
+			let rtcs = doBus(state, parsed, {
+				binding: "rtc",
+				name: "RTC",
+				header: "#include <zephyr/drivers/rtc.h>",
+				js: false,
+			});
 
-  
-      if (rtcs?.length) {
-        state.jsCode += `
+			if (rtcs?.length) {
+				state.jsCode += `
 import RTC from "embedded:RTC/zephyr-builtin";
 device.rtc = Object.freeze({io: RTC, port: "${rtcs[0].label}"});
 `;
-        state.tsCode += `
+				state.tsCode += `
 declare module "embedded:provider/builtin" {
 	import RTC from "embedded:RTC"
 
@@ -276,26 +275,26 @@ declare module "embedded:provider/builtin" {
 	}
 }
 `;
-      }
-    }
+		  }
+		}
 
-    if ("y" === state.zephyrConfig.get("CONFIG_DISPLAY")) {
-      doBus(state, parsed, {
-        binding: "display",
-        name: "Display",
-        hostProviderName: "display",
-        header: "#include <zephyr/drivers/display.h>",
-        moduleSpecifier: "embedded:display",
-        moduleDefault: "Display",
-        tsDeviceIO: false,
-        static:
+		if ("y" === state.zephyrConfig.get("CONFIG_DISPLAY")) {
+			doBus(state, parsed, {
+				binding: "display",
+				name: "Display",
+				hostProviderName: "display",
+				header: "#include <zephyr/drivers/display.h>",
+				moduleSpecifier: "embedded:display",
+				moduleDefault: "Display",
+				tsDeviceIO: false,
+				static:
 `import Display from "embedded:display/zephyr";
 device.display = {};
-`
-      });
-    }
+	`
+		  });
+		}
 
-    doNetworkInterfaces(state, parsed);
+		doNetworkInterfaces(state, parsed);
 
 /*
 doBus(state, parsed, {
@@ -315,16 +314,16 @@ device.spi = {};
 */
 
 
-    if ("y" === state.zephyrConfig.get("CONFIG_FILE_SYSTEM"))
-      doFileSystems(state, parsed);
+		if ("y" === state.zephyrConfig.get("CONFIG_FILE_SYSTEM"))
+			doFileSystems(state, parsed);
 
-    if (("y" === state.zephyrConfig.get("CONFIG_FLASH")) && state.defines.get("MODDEF_ECMA419_FLASH"))
-      doFlash(state, parsed);
+		if (("y" === state.zephyrConfig.get("CONFIG_FLASH")) && state.defines.get("MODDEF_ECMA419_FLASH"))
+			doFlash(state, parsed);
 
-    if ("y" === state.zephyrConfig.get("CONFIG_SETTINGS"))
-      doKeyValue(state, parsed);
+		if ("y" === state.zephyrConfig.get("CONFIG_SETTINGS"))
+			doKeyValue(state, parsed);
 
-      state.hCode +=
+		state.hCode +=
 `
 #endif /* __MC_ZEPHYR_H__ */
 `;
@@ -333,36 +332,36 @@ device.spi = {};
 export default device;
 `;
 
-if (state.tsDeviceIO || state.tsDeviceNetworkInterface) {
-  state.tsCode += `declare module "embedded:provider/builtin" {\n`;
-  state.tsCode += `\tinterface Device {\n`;
-  if (state.tsDeviceIO)
-    state.tsCode += `\t\tio: DeviceIO;\n`;
-  if (state.tsDeviceNetworkInterface) {
-    state.tsCode += `\t\tnetwork: {\n`;
-    state.tsCode += `\t\t\tinterface: DeviceNetworkInterface;\n`;
-    state.tsCode += `\t\t}\n`;
-  }
-  state.tsCode += `\t}\n`;
-  state.tsCode += `}\n`;
-}
+		if (state.tsDeviceIO || state.tsDeviceNetworkInterface) {
+			state.tsCode += `declare module "embedded:provider/builtin" {\n`;
+			state.tsCode += `\tinterface Device {\n`;
+			if (state.tsDeviceIO)
+				state.tsCode += `\t\tio: DeviceIO;\n`;
+			if (state.tsDeviceNetworkInterface) {
+				state.tsCode += `\t\tnetwork: {\n`;
+				state.tsCode += `\t\t\tinterface: DeviceNetworkInterface;\n`;
+				state.tsCode += `\t\t}\n`;
+			}
+			state.tsCode += `\t}\n`;
+			state.tsCode += `}\n`;
+		}
 
-state.tsCode += `
+		state.tsCode += `
 declare module "embedded:provider/builtin" {
   const device: Device
   export default device;
 }
 `;
 
-const parts = {
-				name: "mc.devicetree",
-				directory: this.outputDirectory,
+		const parts = {
+			name: "mc.devicetree",
+			directory: this.outputDirectory,
 		};
 
 		["h", "c", "js", "ts"].forEach(extension => {
-      const value = state[extension + "Code"];
-      if ("ts" === extension) extension = "d.ts";
-			parts.extension = "." + extension;
+		  const value = state[extension + "Code"];
+		  if ("ts" === extension) extension = "d.ts";
+				parts.extension = "." + extension;
 			const output = new FILE(this.joinPath(parts), "wb");
 			output.writeString(value);
 			output.close();
@@ -582,15 +581,15 @@ device.${kindName}.${gpio.name} = class {${gpio.userName ? " // " + gpio.userNam
 	});
 
 
-if (leds.size) {
+	if (leds.size) {
 		state.tsCode += `
   type DeviceLEDOptions = Omit<ConstructorParameters<typeof Digital>[0], 'pin' | 'mode' | 'port'>;
   interface DeviceLEDs {
 `;
-    leds.forEach(value => {
-      state.tsCode += `    ${value}: new (options?: DeviceLEDOptions) => InstanceType<typeof Digital>\n`;
-    });
-    state.tsCode +=`  }\n`;
+		leds.forEach(value => {
+			state.tsCode += `    ${value}: new (options?: DeviceLEDOptions) => InstanceType<typeof Digital>\n`;
+		});
+		state.tsCode +=`  }\n`;
 	}
 
 	if (buttons.size) {
@@ -600,22 +599,22 @@ if (leds.size) {
   }
   interface DeviceButtons {
 `;
-    buttons.forEach(value => {
-      state.tsCode += `    ${value}: new (options?: DeviceButtonOptions) => InstanceType<typeof Digital>\n`;
-    });
-    state.tsCode +=`  }\n`;
+		buttons.forEach(value => {
+			state.tsCode += `    ${value}: new (options?: DeviceButtonOptions) => InstanceType<typeof Digital>\n`;
+		});
+		state.tsCode +=`  }\n`;
 	}
 
-  if (leds.size || buttons.size) {
+	if (leds.size || buttons.size) {
 		state.tsCode += `\n  interface Device {\n`;
-    if (leds.size)
-  		state.tsCode += `    leds: DeviceLEDs\n`;
-    if (buttons.size)
-  		state.tsCode += `    buttons: DeviceButtons\n`;
+	if (leds.size)
+		state.tsCode += `    leds: DeviceLEDs\n`;
+	if (buttons.size)
+		state.tsCode += `    buttons: DeviceButtons\n`;
 		state.tsCode += `  }\n`;
-  }
+	}
 
-  state.tsCode +=
+	state.tsCode +=
 `}
 `;
 }
@@ -632,7 +631,7 @@ function doBus(state, dts, options) {
 
 	let busSpecific = "";
 	if ("spi" === options.binding)
-			busSpecific = "\n	struct gpio_dt_spec cs;"
+		busSpecific = "\n	struct gpio_dt_spec cs;"
 
 	state.hCode += `
 ${options.header}
@@ -654,14 +653,13 @@ static const struct modZephyr${options.name} g${options.name}[] = {
 	nodes.forEach((node, index) => {
 		busSpecific = "";
 		if ("spi" === options.binding) {
-				const cs = node.properties["cs-gpios"]?.value?.value;
-				if (cs) {
-					busSpecific = `\n		.cs.port = DEVICE_DT_GET(DT_NODELABEL(${cs[0].slice(1)})),
+			const cs = node.properties["cs-gpios"]?.value?.value;
+			if (cs) {
+				busSpecific = `\n		.cs.port = DEVICE_DT_GET(DT_NODELABEL(${cs[0].slice(1)})),
 		.cs.pin = ${parseInt(cs[1])},
 		.cs.dt_flags = ${parseInt(cs[2])},`; 
-				}
+			}
 		}
-
 
 		state.cCode += `	{
 		.label = "${node.label}",
@@ -684,13 +682,13 @@ const struct modZephyr${options.name} *modZephyrGet${options.name}(const char *l
 }
 `;
 
-  if (false === options.js)
-      return nodes;
+	if (false === options.js)
+		return nodes;
 
-  state.jsCode += "\n" + options.static;
-  const hostProviderName = options.hostProviderName ?? options.name;
+	state.jsCode += "\n" + options.static;
+	const hostProviderName = options.hostProviderName ?? options.name;
 
-  nodes.forEach(node => {
+	nodes.forEach(node => {
 		let additional = "";
 		if ("serial" === options.binding) {
 			const baud = node.properties["current-speed"]?.value?.value?.[0];
@@ -702,57 +700,57 @@ const struct modZephyr${options.name} *modZephyrGet${options.name}(const char *l
 			state.jsCode += `device.${hostProviderName}.${node.labels[i]} = device.${hostProviderName}.${node.label};\n`;
 	});
 
-  // use first one as default - just a guess. always correct when there is just one bus. is there a "chosen" for this??
-  let defaultLabel = nodes[0].label;
+	// use first one as default - just a guess. always correct when there is just one bus. is there a "chosen" for this??
+	let defaultLabel = nodes[0].label;
 	const chosen = dts.nodes['/'].children.chosen;
 
-  if ("display" === options.binding) {
-    const t = chosen?.properties["zephyr,display"];
-    if ("reference" === t?.value.type)
-        defaultLabel = t.value.value;
-  }
+	if ("display" === options.binding) {
+		const t = chosen?.properties["zephyr,display"];
+		if ("reference" === t?.value.type)
+			defaultLabel = t.value.value;
+	  }
 
 	state.jsCode += `device.${hostProviderName}.default = device.${hostProviderName}.${defaultLabel};\n`;
 
-  if (!options.moduleDefault || !options.moduleSpecifier)
-    return nodes;   //@@
+	if (!options.moduleDefault || !options.moduleSpecifier)
+		return nodes;   //@@
 
-  state.tsCode += `declare module "embedded:provider/builtin" {\n`;
-  state.tsCode += `\timport ${options.moduleDefault} from "${options.moduleSpecifier}"\n`;
-  state.tsCode += "\n";
-  if (options.tsDeviceIO ?? true) {
-    state.tsCode += "\tinterface DeviceIO {\n";
-    state.tsCode += `\t\t${options.moduleDefault}: typeof ${options.moduleDefault}\n`;
-    state.tsCode += "\t}\n";
-    state.tsCode += "\n";
-    state.tsDeviceIO = true;
-  }
-  state.tsCode += `\ttype ${options.moduleDefault}Options = ConstructorParameters<typeof ${options.moduleDefault}>[0] & {\n`;
-  state.tsCode += `\t\tio: typeof ${options.moduleDefault}\n`;
-  state.tsCode += "\t}\n";
-  state.tsCode += "\n";
-  state.tsCode += "\tinterface Device {\n";
-  state.tsCode += `\t\t${hostProviderName}: {\n`;
-  const tsType = `${options.moduleDefault}Options`;
-  state.tsCode += `\t\t\tdefault: ${tsType};\n`;
-  nodes.forEach(node => {
+	state.tsCode += `declare module "embedded:provider/builtin" {\n`;
+	state.tsCode += `\timport ${options.moduleDefault} from "${options.moduleSpecifier}"\n`;
+	state.tsCode += "\n";
+	if (options.tsDeviceIO ?? true) {
+		state.tsCode += "\tinterface DeviceIO {\n";
+		state.tsCode += `\t\t${options.moduleDefault}: typeof ${options.moduleDefault}\n`;
+		state.tsCode += "\t}\n";
+		state.tsCode += "\n";
+		state.tsDeviceIO = true;
+	}
+	state.tsCode += `\ttype ${options.moduleDefault}Options = ConstructorParameters<typeof ${options.moduleDefault}>[0] & {\n`;
+	state.tsCode += `\t\tio: typeof ${options.moduleDefault}\n`;
+	state.tsCode += "\t}\n";
+	state.tsCode += "\n";
+	state.tsCode += "\tinterface Device {\n";
+	state.tsCode += `\t\t${hostProviderName}: {\n`;
+	const tsType = `${options.moduleDefault}Options`;
+	state.tsCode += `\t\t\tdefault: ${tsType};\n`;
+	nodes.forEach(node => {
 		state.tsCode += `\t\t\t${node.label}: ${tsType};\n`;
 		for (let i = 1; i < node.labels?.length; i++) 
-      state.tsCode += `\t\t\t${node.labels[i]}: ${tsType};\n`;
-  });
-  state.tsCode += "\t\t}\n";
-  state.tsCode += "\t}\n";
-  state.tsCode += "}\n";
+			state.tsCode += `\t\t\t${node.labels[i]}: ${tsType};\n`;
+	});
+	state.tsCode += "\t\t}\n";
+	state.tsCode += "\t}\n";
+	state.tsCode += "}\n";
 
-  return nodes;
+	return nodes;
 }
 
 function doFileSystems(state, dts) {
 	const root = dts.nodes['/'];
 	const fstab = root.children.fstab;
-  const nodes = []
-  for (const name in fstab?.children)
-    nodes.push(fstab.children[name]);
+	const nodes = []
+	for (const name in fstab?.children)
+		nodes.push(fstab.children[name]);
 
 	state.hCode += `
 #define kModZephyrFSCount (${nodes.length})
@@ -774,17 +772,17 @@ extern const struct modZephyrFS *modZephyrGetFS(const char *label);
 
 `;
 
-  state.hCode += `
+	state.hCode += `
 #ifndef MODDEF_ZEPHYR_FILESYSTEM_DEFAULT
 	#define MODDEF_ZEPHYR_FILESYSTEM_DEFAULT "${nodes[0].label}"
 #endif
 `;
 
-  nodes.forEach(node => {
-    state.cCode += `
+	nodes.forEach(node => {
+		state.cCode += `
 FS_FSTAB_DECLARE_ENTRY(DT_NODELABEL(${node.label}));
 `;
-  });
+	});
 
 	state.cCode +=`
 static const struct modZephyrFS gFS[] = {
@@ -812,7 +810,7 @@ const struct modZephyrFS *modZephyrGetFS(const char *label)
 }
 `;
 
-  state.jsCode += `
+	state.jsCode += `
 import Modules from "modules";
 Object.defineProperty(device, "files", {
 	get() {
@@ -821,7 +819,7 @@ Object.defineProperty(device, "files", {
 });
 `;
 
-  state.tsCode += `
+	state.tsCode += `
 declare module "embedded:provider/builtin" {
 	import {Directory} from "embedded:storage/files"
 
@@ -833,12 +831,12 @@ declare module "embedded:provider/builtin" {
 }
 
 function doFlash(state, dts) {
-  state.jsCode += `
+	state.jsCode += `
 import flash from "embedded:storage/flash";
 device.flash = flash;
 `;
 
-  state.tsCode += `
+	state.tsCode += `
 declare module "embedded:provider/builtin" {
 	import flash from "embedded:storage/flash";
 
@@ -850,12 +848,12 @@ declare module "embedded:provider/builtin" {
 }
 
 function doKeyValue(state, dts) {
-  state.jsCode += `
+	state.jsCode += `
 import keyValue from "embedded:storage/key-value";
 device.keyValue = keyValue;
 `;
 
-  state.tsCode += `
+	state.tsCode += `
 declare module "embedded:provider/builtin" {
 	import keyValue from "embedded:storage/key-value";
 
@@ -871,48 +869,48 @@ declare module "embedded:provider/builtin" {
 */
 function doNetworkInterfaces(state, dts) {
 	const root = dts.nodes['/'];
-  const nics = [];
+	const nics = [];
 
-  if (root.children.wifi && ("y" === state.zephyrConfig.get("CONFIG_WIFI"))) {
-    const status = root.children.wifi.properties.status?.value?.value ?? "okay";
-    if ("okay" === status) {
-      nics.push({
-        label: root.children.wifi.label,
-        kind: "wifi",
-        name: `WiFi`,
-        import: "embedded:network/interface/wifi",
-      });
-    }
-  }
+	if (root.children.wifi && ("y" === state.zephyrConfig.get("CONFIG_WIFI"))) {
+		const status = root.children.wifi.properties.status?.value?.value ?? "okay";
+		if ("okay" === status) {
+			nics.push({
+				label: root.children.wifi.label,
+				kind: "wifi",
+				name: `WiFi`,
+				import: "embedded:network/interface/wifi",
+			});
+		}
+	}
 
-  if (root.children.eth && ("y" === state.zephyrConfig.get("CONFIG_NET_L2_ETHERNET"))) {
-    const status = root.children.wifi.properties.status?.value?.value ?? "okay";
-    if ("okay" === status) {
-      nics.push({
-        label: root.children.eth.label,
-        kind: "ethernet",
-        name: `Ethernet`,
-        import: "embedded:network/interface/ethernet",
-      });
-    }
-  }
+	if (root.children.eth && ("y" === state.zephyrConfig.get("CONFIG_NET_L2_ETHERNET"))) {
+		const status = root.children.wifi.properties.status?.value?.value ?? "okay";
+		if ("okay" === status) {
+			nics.push({
+				label: root.children.eth.label,
+				kind: "ethernet",
+				name: `Ethernet`,
+				import: "embedded:network/interface/ethernet",
+			});
+		}
+	}
 
-  if (0 === nics.length)
-    return;
+	if (0 === nics.length)
+		return;
 
-  state.jsCode +=
+	state.jsCode +=
 `device.network ??= {};
 device.network.interface ??= {};
 `;
 
-  nics.forEach(nic => {
-    state.jsCode += `
+	nics.forEach(nic => {
+		state.jsCode += `
 import ${nic.name} from "${nic.import}";
 device.network.interface.${nic.label} = Object.freeze({io: ${nic.name}, kind: "${nic.kind}"});
 
 `;
 
-    state.tsCode += `
+	state.tsCode += `
 declare module "embedded:provider/builtin" {
   import ${nic.name} from "${nic.import}";
 	import type {PortSpecifier} from "embedded:io/_common";
@@ -922,8 +920,8 @@ declare module "embedded:provider/builtin" {
   }
 }
 `;
-  });
-  state.tsDeviceNetworkInterface = true;
+	});
+	state.tsDeviceNetworkInterface = true;
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021  Moddable Tech, Inc.
+ * Copyright (c) 2017-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -67,8 +67,7 @@ void xs_dither(xsMachine *the)
 	dither.width = (uint16_t)width;
 
 	dither.blit = commodettoDitherAtkinson;
-	xsmcGet(xsVar(0), xsArg(0), xsID_algorithm);
-	if (xsUndefinedType != xsmcTypeOf(xsVar(0))) { 
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_algorithm)) { 
 		char *ditherName = xsmcToString(xsVar(0));
 		if (!c_strcmp(ditherName, "none"))
 			dither.blit = commodettoDitherNone;

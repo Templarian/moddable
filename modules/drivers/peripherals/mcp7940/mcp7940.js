@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Moddable Tech, Inc.
+ * Copyright (c) 2021-2026 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -128,6 +128,10 @@ class MCP7940 {
 		}
 
 		io.writeBuffer(Register.TIME, reg);		// enable is included
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

@@ -36,5 +36,6 @@ declare class Compass {
   configure(options: CompassConfigureOptions): void;
   sample(): CompassSample;
 }
+interface Compass extends Disposable {}
 
 export default Compass;

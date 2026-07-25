@@ -31,8 +31,10 @@ declare module "embedded:io/pwm" {
     readonly resolution: number;
     readonly hz: number;
     write(value: number): void;
+    close(): void;
     get format(): "number"
     set format(value: "number")
   }
+  interface PWM extends Disposable {}
   export default PWM;
 }

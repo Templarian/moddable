@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025  Moddable Tech, Inc.
+ * Copyright (c) 2024-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -31,6 +31,10 @@ class AudioIn extends Native("xs_audioin_destructor") {
 	get channels() { return native("xs_audioin_get_numChannels").call(this); };
 	get sampleRate() { return native("xs_audioin_get_sampleRate").call(this); };
 	get audioType() { return "LPCM" }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 AudioIn.Async = class extends AudioIn {

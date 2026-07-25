@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022  Moddable Tech, Inc.
+ * Copyright (c) 2022-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -166,6 +166,10 @@ class Resolver {
 			}
 			this.#send(request);
 		}
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
  }
 

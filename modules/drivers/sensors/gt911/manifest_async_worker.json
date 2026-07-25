@@ -1,0 +1,15 @@
+{
+	"include": [
+		"$(MODULES)/base/worker/manifest.json"
+	],
+	"modules": {
+		"embedded:sensor/Touch/GT911": "./gt911_async_worker",
+		"gt911/#worker": "./gt911_worker",
+		"gt911/#sync": "./gt911"
+	},
+	"preload": [
+		"embedded:sensor/Touch/GT911",
+		"gt911/#worker",
+		"gt911/#sync"
+	]
+}

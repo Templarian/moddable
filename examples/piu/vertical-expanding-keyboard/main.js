@@ -97,7 +97,6 @@ class KeyboardAppBehavior extends Behavior {
 		}
 	}
 }
-Object.freeze(KeyboardAppBehavior.prototype);
 
 const KeyboardApp = Application.template($ => ({
 	active:true, Skin:BackgroundSkin,

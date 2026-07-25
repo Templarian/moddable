@@ -34,5 +34,6 @@ declare class Battery {
   configure(options: {}): void;
   sample(): BatterySample;
 }
+interface Battery extends Disposable {}
 
 export default Battery;

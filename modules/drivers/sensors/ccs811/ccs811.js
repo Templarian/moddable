@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022  Moddable Tech, Inc.
+ * Copyright (c) 2019-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK.
  *
@@ -174,6 +174,10 @@ class CCS811  {
 		ret.current = vBuf[6] >> 2;
 		ret.rawADC = ((vBuf[6] & 3) << 8) | vBuf[7];
 		return ret;
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

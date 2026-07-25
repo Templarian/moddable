@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Moddable Tech, Inc.
+ * Copyright (c) 2023-2026 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -92,6 +92,10 @@ class BM8563 {
     b[6] = decToBcd(year % 100);
 
     this.#io.writeBuffer(Register.SECONDS, b);
+  }
+
+  static {
+    this.prototype[Symbol.dispose] = this.prototype.close;
   }
 }
 

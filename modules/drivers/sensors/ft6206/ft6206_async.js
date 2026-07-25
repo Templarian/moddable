@@ -19,7 +19,6 @@ class FT6206  {
 	#timer;
 	#onError;
 	#onSample;
-	#onLength;
 	#onPoints;
 
 	constructor(options) {
@@ -31,7 +30,7 @@ class FT6206  {
 		});
 		this.#onError = onError;
 		this.#onSample = onSample;
-		io.buffer = new Uint8Array(12);		// two touch points
+		io.buffer = new Uint8Array(13);		// status byte + two touch points
 		io.configure = {
 			active: false,
 			threshold: 128,
@@ -81,12 +80,24 @@ class FT6206  {
 			})
 		};
 
-		let length;
 		this.#onPoints = () => {
 			const io = this.#io, data = io.buffer;
+			const length = data[0] & 0x0F;			// number of touches
+			if (!length) {
+				if (this.#timer)
+					Timer.schedule(this.#timer, 50, 50);
+				if (io.none)
+					return;
+				io.sample = [];
+				io.none = true;
+				this.#onSample?.();
+				return;
+			}
+			delete io.none;
+
 			const result = new Array(length);
 			for (let i = 0; i < length; i++) {
-				const offset = i * 6;
+				const offset = i * 6 + 1;
 				const id = data[offset + 2] >> 4;
 				if (id && (1 === io.length))
 					continue;
@@ -114,22 +125,6 @@ class FT6206  {
 			if (this.#timer)
 				Timer.schedule(this.#timer, 17, 17);		// higher polling frequency while touch active
 			this.#onSample?.();
-		}
-
-		this.#onLength = (error, value) => {
-			length = value & 0x0F;			// number of touches
-			if (!length) {
-				if (this.#timer)
-					Timer.schedule(this.#timer, 50, 50);
-				if (this.#io.none)
-					return;
-				this.#io.sample = [];
-				this.#io.none = true;
-				this.#onSample?.();
-				return;
-			}
-			delete this.#io.none;
-			this.#io.readBuffer(0x03, this.#io.buffer, this.#onPoints);
 		};
 
 		if (reset) {
@@ -148,8 +143,7 @@ class FT6206  {
 	close(callback) {
 		this.#io?.reset?.close();
 		this.#io?.interrupt?.close();
-		if (callback && this.#io)
-			this.#io.close(error => callback(error));
+		this.#io?.close(error => callback?.(error));
 		this.#io = undefined;
 		Timer.clear(this.#timer);
 		this.#timer = undefined;
@@ -157,7 +151,7 @@ class FT6206  {
 	configure(options) {
 		const io = this.#io;
 		if (io.configure) {
-			io.configure = {...options, ...io.configure};
+			io.configure = {...io.configure, ...options};
 			return;
 		}
 
@@ -207,7 +201,7 @@ class FT6206  {
 	#doSample() {
 		if (this.#timer)
 			Timer.schedule(this.#timer);
-		this.#io.readUint8(0x02, this.#onLength);
+		this.#io.readBuffer(0x02, this.#io.buffer, this.#onPoints);
 	}
 	get configuration() {
 		return {

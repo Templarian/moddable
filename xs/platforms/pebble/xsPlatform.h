@@ -54,9 +54,7 @@
 
 //#define mxReport 1
 //#define mxDebug 1
-#ifdef mxDebug
-	#define mxNoConsole 1
-#endif
+#define mxNoConsole 1
 // #define mxUseFreeRTOSTasks	1
 // #define mxUseGCCAtomics		1		// undefine
 

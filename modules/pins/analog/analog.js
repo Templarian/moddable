@@ -29,6 +29,5 @@ Analog.CrossingUp = 0;
 Analog.CrossingDown = 1;
 Analog.CrossingUpDown = 2;
 
-Object.freeze(Analog.prototype);
 
 export default Analog;

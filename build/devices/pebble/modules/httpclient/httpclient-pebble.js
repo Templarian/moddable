@@ -336,6 +336,10 @@ class HTTPClient {
 		this.#state = "connected";
 		this.#next();
 	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default HTTPClient;

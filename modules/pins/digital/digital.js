@@ -39,6 +39,5 @@ Digital.WakeOnFall = (1 << 7);
 Digital.Output = 8;
 Digital.OutputOpenDrain = 9;
 
-Object.freeze(Digital.prototype);
 
 export default Digital;

@@ -232,6 +232,7 @@ INC_DIRS = \
  	-I$(IDF_PATH)\components \
  	-I$(IDF_PATH)\components\bootloader_support\include \
  	-I$(IDF_PATH)\components\bt\include \
+ 	-I$(IDF_PATH)\components\bt\porting\include \
 	-I$(IDF_PATH)\components\bt\include\$(ESP32_BT_SUBCLASS)\include \
  	-I$(IDF_PATH)\components\bt\host\bluedroid\api\include \
  	-I$(IDF_PATH)\components\bt\host\bluedroid\api\include\api \

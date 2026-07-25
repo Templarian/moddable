@@ -77,11 +77,9 @@ void xs_dictation(xsMachine *the)
 		xsUnknownError("no memory");
 
 	uint32_t byteLength = 0;
-	if (xsmcHas(xsArg(0), xsID_byteLength)) {
-		xsSlot tmp;
-		xsmcGet(tmp, xsArg(0), xsID_byteLength);
+	xsSlot tmp;
+	if (xsmcGet(tmp, xsArg(0), xsID_byteLength))
 		byteLength = xsmcToInteger(tmp);
-	}
 	dt->session = dictation_session_create(byteLength, dictationCallback, dt);
 	if (C_NULL == dt->session) {
 		c_free(dt);
@@ -114,15 +112,11 @@ void xs_dictation_configure(xsMachine *the)
 	xsDictation dt = xsmcGetHostDataValidate(xsThis, (void *)&xsDictationHooks);
 	xsSlot tmp;
 
-	if (xsmcHas(xsArg(0), xsID_confirm)) {
-		xsmcGet(tmp, xsArg(0), xsID_confirm);
+	if (xsmcGet(tmp, xsArg(0), xsID_confirm))
 		dictation_session_enable_confirmation(dt->session, xsmcToBoolean(tmp));
-	}
 
-	if (xsmcHas(xsArg(0), xsID_errorDialogs)) {
-		xsmcGet(tmp, xsArg(0), xsID_errorDialogs);
+	if (xsmcGet(tmp, xsArg(0), xsID_errorDialogs))
 		dictation_session_enable_error_dialogs(dt->session, xsmcToBoolean(tmp));
-	}
 }
 
 void xs_dictation_start(xsMachine *the)

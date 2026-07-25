@@ -321,6 +321,8 @@ class WebSocket {
 		WebSocket.prototype.OPEN = WebSocket.OPEN;
 		WebSocket.prototype.CLOSING = WebSocket.CLOSING;
 		WebSocket.prototype.CLOSED = WebSocket.CLOSED;
+
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

@@ -1,0 +1,6 @@
+{
+	"modules": {
+		"pebble/health": "./pebble-health"
+	},
+	"preload": "pebble/health"
+}

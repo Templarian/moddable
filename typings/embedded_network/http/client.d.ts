@@ -44,10 +44,12 @@ declare module "embedded:network/http/client" {
     write(value: ByteBuffer|undefined): void;
   }
 
-  export default class HTTPClient {
+  class HTTPClient {
     constructor(options: ClientOptions)
     request(options: RequestOptions): HTTPRequest
     close(): void
   }
+  interface HTTPClient extends Disposable {}
+  export default HTTPClient;
 
 }

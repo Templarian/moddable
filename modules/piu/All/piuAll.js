@@ -70,7 +70,6 @@ export class Skin extends Native("PiuSkinDelete") {
 		}
 	}
 }
-Object.freeze(Skin.prototype);
 globalThis.Skin = Skin;
 
 // PiuStyle.c
@@ -110,14 +109,12 @@ export class Style extends Native("PiuStyleDelete") {
 		}
 	}
 }
-Object.freeze(Style.prototype);
 globalThis.Style = Style;
 
 // BEHAVIOR
 
 export class Behavior {
 }
-Object.freeze(Behavior.prototype);
 globalThis.Behavior = Behavior;
 
 // DISPATCH
@@ -408,7 +405,6 @@ globalThis.Scroller = Scroller;
 export class DeferLink extends Native("PiuDeferLinkDelete") {
 	constructor() { super(); native("PiuDeferLinkCreate").call(this); }
 }
-Object.freeze(DeferLink.prototype);
 globalThis.DeferLink = DeferLink;
 
 // TOUCH
@@ -418,7 +414,6 @@ export class TouchLink extends Native("PiuTouchLinkDelete") {
 	get length() { return native("PiuTouchLink_get_length").call(this); }
 	peek(index) { return native("PiuTouchLink_peek").call(this, index); }
 }
-Object.freeze(TouchLink.prototype);
 globalThis.TouchLink = TouchLink;
 
 // TRANSITION
@@ -439,7 +434,6 @@ export class Transition extends Native("PiuTransitionDelete") {
 	onStep(/* fraction */) {
 	}
 }
-Object.freeze(Transition.prototype);
 globalThis.Transition = Transition;
 
 // LOCALS
@@ -452,5 +446,4 @@ export class Locals  extends Native("PiuLocalsDelete") {
 	set language(it) { native("PiuLocals_set_language").call(this, it); }
 	get() { return native("PiuLocals_get").call(this); }
 }
-Object.freeze(Locals.prototype);
 globalThis.Locals = Locals;

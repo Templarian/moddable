@@ -29,9 +29,11 @@ declare module "embedded:io/socket/listener" {
       target?: any;
     })
     read(): TCP | undefined
+    close(): void;
     get format(): "socket/tcp"
     set format(value: "socket/tcp")
     readonly port: number;
   }
+  interface Listener extends Disposable {}
   export default Listener;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025  Moddable Tech, Inc.
+ * Copyright (c) 2021-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -36,6 +36,10 @@ class SPI extends Native("xs_spi_destructor") {
 
 	// experimental, to support Display
 	set transform(value) { native("xs_spi_set_transform").call(this, value); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default SPI;

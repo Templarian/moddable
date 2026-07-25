@@ -177,15 +177,13 @@ void xs_serial_constructor(xsMachine *the)
 
 	xsmcVars(2);
 
-	if (xsmcHas(xsArg(0), xsID_transmit)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_transmit);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_transmit)) {
 		transmitPin = builtinGetPin(the, &xsVar(0));
 		if (!builtinIsPinFree(transmitPin))
 			xsUnknownError("in use");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_receive)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_receive);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_receive)) {
 		receivePin = builtinGetPin(the, &xsVar(0));
 		if (!builtinIsPinFree(receivePin))
 			xsUnknownError("in use");
@@ -193,10 +191,8 @@ void xs_serial_constructor(xsMachine *the)
 	else if (kInvalidPin == transmitPin)
 		xsUnknownError("invalid");		// need at least one of tx or rx
 
-	if (xsmcHas(xsArg(0), xsID_receivePullup)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_receivePullup);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_receivePullup))
 		receivePullup = xsmcToInteger(xsVar(0));
-	}
 
 	xsmcGet(xsVar(0), xsArg(0), xsID_baud);
 	baud = xsmcToInteger(xsVar(0));
@@ -255,15 +251,13 @@ void xs_serial_constructor(xsMachine *the)
 			break;
 	}
 
-	if (xsmcHas(xsArg(0), xsID_data)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_data);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_data)) {
 		data = xsmcToInteger(xsVar(0));
 		if ((7 != data) && (8 != data))
 			xsRangeError("invalid data");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_parity)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_parity);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_parity)) {
 		char *p = xsmcToString(xsVar(0));
 		if (!c_strcmp(p, "odd"))
 			parity = 1;
@@ -285,13 +279,10 @@ void xs_serial_constructor(xsMachine *the)
 		if (!builtinIsPinFree(txActivePin))
 			xsUnknownError("in use");
 		
-		if (xsmcHas(xsVar(0), xsID_active)) {
-			xsmcGet(xsVar(1), xsVar(0), xsID_active);
+		if (xsmcGet(xsVar(1), xsVar(0), xsID_active))
 			txActiveEnable = xsmcToInteger(xsVar(1));
-		}
 
-		if (xsmcHas(xsVar(0), xsID_mode)) {
-			xsmcGet(xsVar(1), xsVar(0), xsID_mode);
+		if (xsmcGet(xsVar(1), xsVar(0), xsID_mode)) {
 			txActiveMode = xsmcToInteger(xsVar(1));
 			if ((kDigitalOutput != txActiveMode) || (kDigitalOutputOpenDrain != txActiveMode))
 				xsUnknownError("invalid mode");

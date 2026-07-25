@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 Moddable Tech, Inc.
+ * Copyright (c) 2019-2026 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -165,7 +165,10 @@ class MPU6050 {
 
 		return ret;
 	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
-Object.freeze(MPU6050.prototype);
 
 export { MPU6050 as default, MPU6050, Config };

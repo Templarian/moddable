@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Moddable Tech, Inc.
+ * Copyright (c) 2022-2026 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -381,6 +381,10 @@ class VL6180 {
     let highValue = (value >> 8) & 0xFF;
 
     this.#io.write(Uint8Array.of(highByte, lowByte, highValue, lowValue));
+  }
+
+  static {
+    this.prototype[Symbol.dispose] = this.prototype.close;
   }
 }
 

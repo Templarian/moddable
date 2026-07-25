@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 Moddable Tech, Inc.
+ * Copyright (c) 2019-2026 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -183,7 +183,10 @@ class MPU9250 {
 		ret.gyroscope.z = this.#gyroView.getInt16(4) / GYRO_SCALER[this.#gyroRange];
 		return ret;
 	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
-Object.freeze(MPU9250.prototype);
 
 export default MPU9250;

@@ -77,17 +77,14 @@ void _xs_i2c_constructor(xsMachine *the)
 
 	xsmcVars(2);
 
-	if (!xsmcHas(xsArg(0), xsID_port))
+	if (!xsmcGet(tmp, xsArg(0), xsID_port))
 		xsRangeError("port required");
-	if (!xsmcHas(xsArg(0), xsID_address))
-		xsRangeError("address required");
-
-	xsmcGet(tmp, xsArg(0), xsID_port);
 	const struct modZephyrI2C *port = modZephyrGetI2C(xsmcToString(tmp));
 	if (NULL == port)
 		xsRangeError("bad port");
 
-	xsmcGet(xsVar(0), xsArg(0), xsID_address);
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_address))
+		xsRangeError("address required");
 	address = builtinGetPin(the, &xsVar(0));
 	if ((address < 0) || (address > 127))
 		xsRangeError("invalid address");
@@ -102,10 +99,8 @@ void _xs_i2c_constructor(xsMachine *the)
 	config = hz_bit(hz);
 	config |= I2C_MODE_CONTROLLER;
 
-	if (xsmcHas(xsArg(0), xsID_timeout)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_timeout);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_timeout))
 		timeout = xsmcToInteger(xsVar(0));
-	}
 
 	builtinInitializeTarget(the);
 	if (kIOFormatBuffer != builtinInitializeFormat(the, kIOFormatBuffer))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021  Moddable Tech, Inc.
+ * Copyright (c) 2021-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -189,7 +189,9 @@ class HMC5883 {
 		return (val > 32768) ? -(65535 - val + 1) : val;
 	}
 
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
-Object.freeze(HMC5883.prototype);
 
 export {HMC5883 as default, HMC5883, Config};

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2023  Moddable Tech, Inc.
+ * Copyright (c) 2019-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -160,6 +160,10 @@ class SMBus {
 	writeBlock(register, buffer) {
 		trace("writeBlock renamed to writeBuffer\n");
 		this.writeBuffer(register, buffer);
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

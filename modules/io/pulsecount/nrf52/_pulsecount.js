@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025  Moddable Tech, Inc.
+ * Copyright (c) 2021-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -33,6 +33,9 @@ class PulseCount extends Native("xs_pulsecount_destructor_") {
             throw new RangeError;
     }
 
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 };
 
 export default PulseCount;

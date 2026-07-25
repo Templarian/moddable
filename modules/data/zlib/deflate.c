@@ -53,22 +53,19 @@ void xs_deflate(xsMachine *the)
 	z_stream *zlib;
 
 	xsmcVars(1);
-	if (xsmcHas(xsArg(0), xsID_windowBits)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_windowBits);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_windowBits)) {
 		windowBits = xsmcToInteger(xsVar(0));
 		if ((15 != windowBits) && (-15 != windowBits))
 			xsRangeError("invalid windowBits");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_level)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_level);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_level)) {
 		level = xsmcToInteger(xsVar(0));
 		if ((level < -1) || (level > 10))
 			xsRangeError("invalid level");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_strategy)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_strategy);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_strategy)) {
 		strategy = xsmcToInteger(xsVar(0));
 		if ((strategy < 0) || (strategy > 4))
 			xsRangeError("invalid strategy");

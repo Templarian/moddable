@@ -24,6 +24,5 @@ class OTA @ "xs_ota_destructor" {
 	cancel() @ "xs_ota_cancel"
 	complete() @ "xs_ota_complete"
 }
-Object.freeze(OTA.prototype);
 
 export default OTA;

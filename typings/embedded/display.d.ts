@@ -63,6 +63,7 @@ declare module "embedded:display" {
 		get width(): number;
 		get height(): number;
 	}
+	interface Display extends Disposable {}
 
 	export default Display;
 }

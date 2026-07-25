@@ -43,7 +43,7 @@ class Screen extends config.Screen {
 			return;
 		}
 		if (this.#touch) {
-			this.#touch.context = context;
+			this.#touch.context = value;
 			return;
 		}		
 
@@ -66,6 +66,8 @@ class Screen extends config.Screen {
 			const points = touch.sample();
 			if (!points) return;
 
+			const ticks = points.ticks ?? Time.ticks;
+
 			let mask = (1 << touchCount) - 1;
 			for (let i = 0, length = points.length; i < length; i++) {
 				const point = points[i];
@@ -77,11 +79,11 @@ class Screen extends config.Screen {
 				if (last) {
 					last.x = point.x;
 					last.y = point.y;
-					touch.context.onTouchMoved(id, point.x, point.y, Time.ticks);
+					touch.context.onTouchMoved(id, point.x, point.y, ticks);
 				}
 				else {
 					touch.points[id] = {x: point.x, y: point.y};
-					touch.context.onTouchBegan(id, point.x, point.y, Time.ticks);
+					touch.context.onTouchBegan(id, point.x, point.y, ticks);
 				}
 			}
 
@@ -90,7 +92,7 @@ class Screen extends config.Screen {
 					const last = touch.points[i];
 					if (last) {
 						touch.points[i] = undefined;
-						touch.context.onTouchEnded(i, last.x, last.y, Time.ticks);
+						touch.context.onTouchEnded(i, last.x, last.y, ticks);
 					}
 				}
 			}

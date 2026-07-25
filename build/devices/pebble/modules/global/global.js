@@ -39,6 +39,7 @@ const events = Object.freeze([
 		"willFocus",
 		"didFocus",
 		"wakeup",
+		"health",
 ]);
 
 const offset = 50;		// Pebble Timer callbacks can be early... that's really bad for a watchface. So, we schedule them late by this number of milliseconds to ensure they fall in the next interval (usually second)
@@ -46,6 +47,7 @@ function connected() { return native("xs_global_connected").call(this); };
 function obstructed() { return native("xs_global_obstructed").call(this); };
 function focus() { return native("xs_global_focus").call(this); };
 function wakeup() { return native("xs_global_wakeup").call(this); };
+function health() { return native("xs_global_health").call(this); };
 
 export class Pebble {
 	#events = new Map;
@@ -79,6 +81,10 @@ export class Pebble {
 
 			case 8:		// "wakeup":
 				wakeup(true);
+				break;
+
+			case 9:		// "health":
+				health(true);
 				break;
 
 			default:
@@ -150,6 +156,10 @@ export class Pebble {
 
 			case "wakeup":
 				wakeup(false);
+				break;
+
+			case "health":
+				health(false);
 				break;
 
 			default:

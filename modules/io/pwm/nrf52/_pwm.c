@@ -209,8 +209,7 @@ void xs_pwm_constructor_(xsMachine *the)
 
 	xsmcVars(2);
 
-    if (xsmcHas(xsArg(0), xsID_from)) {
-		xsmcGet(xsVar(1), xsArg(0), xsID_from);
+    if (xsmcGet(xsVar(1), xsArg(0), xsID_from)) {
 		pwm = xsmcGetHostDataValidate(xsVar(1), xs_pwm_destructor_);
 		pin = pwm->pin;
 		port = pwm->port;
@@ -226,8 +225,7 @@ void xs_pwm_constructor_(xsMachine *the)
 		if (!builtinIsPinFree(pin))
 			xsUnknownError("in use");
 
-		if (xsmcHas(xsArg(0), xsID_port)) {
-			xsmcGet(xsVar(0), xsArg(0), xsID_port);
+		if (xsmcGet(xsVar(0), xsArg(0), xsID_port)) {
 			port = builtinGetSignedInteger(the, &xsVar(0));
 			if ((port < 0) || (port >= MOD_PWM_PORTS))
 				xsRangeError("invalid port");
@@ -236,8 +234,7 @@ void xs_pwm_constructor_(xsMachine *the)
 		}
 	}
 
-    if (xsmcHas(xsArg(0), xsID_hz)) {
-        xsmcGet(xsVar(0), xsArg(0), xsID_hz);
+    if (xsmcGet(xsVar(0), xsArg(0), xsID_hz)) {
         hz = xsmcToInteger(xsVar(0));
         if (hz <= 0)
 			xsRangeError("invalid hz");
@@ -247,8 +244,7 @@ void xs_pwm_constructor_(xsMachine *the)
 	if (-1 == nrfHz)
 		xsUnknownError("bad frequency");
 
-    if (xsmcHas(xsArg(0), xsID_resolution)) {
-        xsmcGet(xsVar(0), xsArg(0), xsID_resolution);
+    if (xsmcGet(xsVar(0), xsArg(0), xsID_resolution)) {
         resolution = xsmcToInteger(xsVar(0));
         if ((resolution <= 0) || (resolution > NRF52_PWM_RESOLUTION_MAX))
 			xsRangeError("invalid resolution");
@@ -256,10 +252,8 @@ void xs_pwm_constructor_(xsMachine *the)
 
 #if NRF52_CUSTOM_PWM_FREQ
 	int top_value = -1;
-	if (xsmcHas(xsArg(0), xsID_top_value)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_top_value);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_top_value))
 		top_value = xsmcToInteger(xsVar(0));
-	}
 #endif
 
 	if (kIOFormatNumber != builtinInitializeFormat(the, kIOFormatNumber))

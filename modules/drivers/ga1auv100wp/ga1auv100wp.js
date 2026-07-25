@@ -168,6 +168,5 @@ class GA1AUV100WP extends SMBus {
 		throw new Error("can't read when shutdown");
 	}
 }
-Object.freeze(GA1AUV100WP.prototype);
 
 export {GA1AUV100WP as default, GA1AUV100WP, Measurable, MeasureTime, Interval};

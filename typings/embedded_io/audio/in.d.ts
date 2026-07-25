@@ -45,6 +45,7 @@ declare module "embedded:io/audio/in" {
     get format(): "buffer"
     set format(value: "buffer")
   }
+  interface AudioIn extends Disposable {}
 
   export { AudioIn as default };
 }

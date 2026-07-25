@@ -264,18 +264,12 @@ void xs_camera_constructor(xsMachine *the)
 		format = builtinInitializeFormat(the, format);
 		if ((kIOFormatBuffer != format) && (kIOFormatBufferDisposable != format))
 			xsRangeError("invalid format");
-		if (xsmcHas(xsArg(0), xsID_width)) {
-			xsmcGet(xsVar(0), xsArg(0), xsID_width);
+		if (xsmcGet(xsVar(0), xsArg(0), xsID_width))
 			width = xsmcToInteger(xsVar(0));
-		}
-		if (xsmcHas(xsArg(0), xsID_height)) {
-			xsmcGet(xsVar(0), xsArg(0), xsID_height);
+		if (xsmcGet(xsVar(0), xsArg(0), xsID_height))
 			height = xsmcToInteger(xsVar(0));
-		}
-		if (xsmcHas(xsArg(0), xsID_imageType)) {
-			xsmcGet(xsVar(0), xsArg(0), xsID_imageType);
+		if (xsmcGet(xsVar(0), xsArg(0), xsID_imageType))
 			imageType = xsmcToInteger(xsVar(0));
-		}
 		if (imageType == kCommodettoBitmapRGB565LE)
 			converter = CommodettoPixelsConverterGet(kCommodettoBitmap24RGB, kCommodettoBitmapRGB565LE);
 		else if (imageType == kCommodettoBitmapRGB565BE)
@@ -541,20 +535,17 @@ void xs_camera_configure(xsMachine *the)
 {
     Camera camera = xsmcGetHostDataValidate(xsThis, (void *)&xsCameraHooks);
     xsmcVars(1);
-	if (xsmcHas(xsArg(0), xsID_brightness)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_brightness);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_brightness)) {
 		camera->brightness = xsmcToInteger(xsVar(0));
 		if (camera->filter)
 			camera->filter.brightness = ((double)camera->brightness) / 100.0;
 	}
-	if (xsmcHas(xsArg(0), xsID_contrast)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_contrast);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_contrast)) {
 		camera->contrast = xsmcToInteger(xsVar(0));
 		if (camera->filter)
 			camera->filter.contrast = 1.0 + (((double)camera->contrast) / 100.0);
 	}
-	if (xsmcHas(xsArg(0), xsID_saturation)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_saturation);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_saturation)) {
 		camera->saturation = xsmcToInteger(xsVar(0));
 		if (camera->filter)
 			camera->filter.saturation = 1.0 + (((double)camera->saturation) / 100.0);

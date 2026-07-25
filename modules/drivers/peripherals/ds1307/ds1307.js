@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Moddable Tech, Inc.
+ * Copyright (c) 2021-2026 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -95,6 +95,10 @@ class DS1307 {
 
 		this.#io.writeBuffer(Register.TIME, b);
 	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 function decToBcd(d) {
@@ -111,5 +115,4 @@ function bcdToDec(b) {
 	return v;
 }
 
-Object.freeze(DS1307.prototype);
 export default DS1307;

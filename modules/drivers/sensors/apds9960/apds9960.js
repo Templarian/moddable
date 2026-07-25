@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Moddable Tech, Inc.
+ * Copyright (c) 2023-2026 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -543,6 +543,10 @@ class Sensor {
       model: "Broadcom APDS-9960",
       classification: "AmbientLight-Gesture-Proximity"
     }
+  }
+
+  static {
+    this.prototype[Symbol.dispose] = this.prototype.close;
   }
 }
 

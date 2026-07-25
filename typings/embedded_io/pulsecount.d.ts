@@ -31,9 +31,11 @@ declare module "embedded:io/pulsecount" {
     });
     read(): number;
     write(count: number): void;
+    close(): void;
     get format(): "number";
     set format(value: "number");
   }
+  interface PulseCount extends Disposable {}
 
   export default PulseCount;
 }

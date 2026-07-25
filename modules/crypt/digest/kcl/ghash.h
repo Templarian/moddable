@@ -52,9 +52,12 @@ typedef struct ghash {
 	uint128_t y0;
 	size_t len;
 	size_t aad_len;
+	uint8_t partial[GHASH_BLKSIZE];
+	uint8_t partial_len;
 } ghash_t;
 
 extern void _ghash_create(ghash_t *ghash);
 extern void _ghash_update(ghash_t *ghash, const void *data, size_t sz);
 extern void _ghash_fin(ghash_t *ghash, uint8_t *result);
+extern void _ghash_flush_partial(ghash_t *ghash);
 extern void _ghash_fix128(uint128_t *v);

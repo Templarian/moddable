@@ -1,6 +1,6 @@
 # Using XS Preload to Optimize Applications
-Copyright 2019-2023 Moddable Tech, Inc.<BR>
-Revised: October 1, 2024
+Copyright 2019-2026 Moddable Tech, Inc.<BR>
+Revised: June 18, 2026
 
 Preloading of modules is a unique feature of the XS JavaScript engine. Preloading executes parts of a JavaScript application during the the build process, before the application is downloaded to the target device. This has two major benefits:
 
@@ -68,7 +68,7 @@ Note that when `CountingDateLog` is preloaded, `CountingLog` is also preloaded w
 The JavaScript language allows objects to be changed at any time. Preloading puts objects into flash memory and flash memory is, for practical purposes, read-only memory. The XS engine allows objects stored in flash to be modified by storing the modifications in RAM. It achieves this by maintaining a pointer in RAM for each object in ROM that may be modified. Each pointer takes up 4 bytes on a typical 32-bit microcontroller.
 
 ### Freezing Classes
-Because XS allows objects stored in flash to be modified, code that modifies the prototype of a class works, as in the following example.
+XS automatically freezes the prototypes of preloaded classes. Once `CountingLog` has been preloaded, the following code fails.
 
 ```js
 import CountingLog from "countinglog";
@@ -78,27 +78,9 @@ CountingLog.prototype.reset = function() {
 }
 ```
 
-Assuming the above module is not preloaded, the `reset` property and the function object it references is stored in RAM. In some cases, that is desirable behavior. However, to enable that behavior XS must reserve a four byte pointer in RAM for `CountingLog` to allow it to be patched. In many, if not most, cases developers of modules do not want to have their objects modified in this way because it can lead to reliability problems and security issues.
+It fails because XS performs the equivalent of calling the `Object.freeze` function which prevents changes to existing properties and the addition of new properties
 
-The JavaScript language provides the `Object.freeze` function to prevent changes to existing properties and to prevent the addition of new properties. Here is the `CountingLog` module modified to use `Object.freeze` on its prototype.
-
-```js
-class CountingLog {
-	constructor() {
-		this.count = 1;
-	}
-	log(msg) {
-		trace(`${this.count++}: ${msg}\n`);
-	}
-}
-Object.freeze(CountingLog.prototype);
-
-export default CountingLog;
-```
-
-With this change, the code above that patches the prototype to add the `reset` function throws an exception. The `CountingDateLog` example continues to work as it subclasses `CountingLog` which references `CountingLog.prototype` but does not change it.
-
-The XS engine recognizes that objects which have been frozen cannot be modified, and therefore does not allocate a four byte pointer for them, reducing runtime RAM use. While four bytes may seem like a small benefit, on a device with just a few dozen KB of RAM in a project with a large number of classes, the impact is meaningful.
+The XS engine recognizes that objects which have been frozen cannot be modified, and therefore does not allocate a pointer for them, reducing runtime RAM use. While saving a pointer (typically four bytes on a microcontroller) may seem like a small benefit, on a device with just a few dozen KB of RAM in a project with a large number of classes, the impact is meaningful.
 
 ### Freezing Data
 JavaScript applications often use objects to store data. Here's an example from a script that runs in a light bulb.
@@ -163,8 +145,9 @@ Hardened JavaScript formalizes recursive freeze as the `harden()` global functio
 ### Automatic Freezing of Built-ins
 Following the preload build phase, the XS linker freezes the following:
 
-- The prototypes of built-in objects -- e.g. `Object`, `Math`, `Date`, `Proxy`, etc -- are frozen.
+- The prototypes of built-in objects -- e.g. `Object`, `Math`, `Date`, `Proxy`, etc.
 - All functions, both built-in and part of preloaded modules. This include class constructors.
+- The prototypes of all preloaded classes.
 
 The result of this step generates a runtime environment with characteristics in common with the [Frozen Realms proposal](https://github.com/tc39/proposal-frozen-realms). In addition to memory savings already explained, it provides a reliable execution environment because scripts know the built-in objects are those defined by the JavaScript language specification and that will not change during execution due to runtime patching. Eliminating patching of runtime objects also contributes to providing a secure execution environment.
 

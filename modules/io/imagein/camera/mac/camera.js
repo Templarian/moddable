@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025  Moddable Tech, Inc.
+ * Copyright (c) 2024-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -33,6 +33,10 @@ class Camera extends Native("xs_camera_destructor") {
 	get identification() { return native("xs_camera_get_identification").call(this); };
 	get configuration() { return native("xs_camera_get_configuration").call(this); };
 	configure(options) { return native("xs_camera_configure").call(this, options); };
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default Camera;

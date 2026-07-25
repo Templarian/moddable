@@ -42,4 +42,3 @@ Ethernet.lostIP = "lostIP";
 Ethernet.connected = "connect";
 Ethernet.disconnected = "disconnect";
 
-Object.freeze(Ethernet.prototype);

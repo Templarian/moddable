@@ -42,5 +42,6 @@ declare class Accelerometer {
   configure(options: AccelerometerConfigureOptions): void;
   sample(): AccelerometerSample;
 }
+interface Accelerometer extends Disposable {}
 
 export default Accelerometer;

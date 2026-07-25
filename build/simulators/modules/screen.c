@@ -143,10 +143,16 @@ void fxAbort(xsMachine* the, int status)
 			screen = the->context;
 		xsStringValue why = fxAbortString(status);
 #ifdef mxDebug
-			if ((XS_DEAD_STRIP_EXIT == status) && the->debugEval)
-				mxUnknownError(why);
+		if ((XS_DEAD_STRIP_EXIT == status) && the->debugEval)
+			mxUnknownError(why);
 #endif
-		xsLog("XS abort: %s\n", why);
+		xsLog("# XS abort: %s\n", why);
+		if (XS_INCOMPATIBLE_MOD_EXIT == status) {
+			txByte* a = (txByte*)screen->archive;
+			xsLog("# - mod version: %d.%d.%d\n", a[9], a[10], a[11]);
+			xsLog("# - min version: %d.%d.%d\n", XS_MOD_COMPATIBLE_MAJOR_VERSION, XS_MOD_COMPATIBLE_MINOR_VERSION, XS_PATCH_VERSION);
+			xsLog("# - max version: %d.%d.%d\n", XS_MAJOR_VERSION, XS_MINOR_VERSION, XS_PATCH_VERSION);
+		}
 
 #if MODDEF_XS_ABORTHOOK
 		if ((XS_JAVASCRIPT_STACK_OVERFLOW_EXIT != status) && (XS_NATIVE_STACK_OVERFLOW_EXIT != status) && (XS_DEBUGGER_EXIT != status)) {

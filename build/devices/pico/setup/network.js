@@ -35,8 +35,10 @@ export default function (done) {
 			if (connection < 500) {
 				if (connection >= 400)
 					trace(`Wi-Fi connected to "${this.SSID}"\n`);
-				else if (connection <= 200)
+				else if (connection <= 200) {
 					trace(`Wi-Fi disconnected\n`);		//@@ password rejected?
+					done();
+				}
 				return;
 			}
 

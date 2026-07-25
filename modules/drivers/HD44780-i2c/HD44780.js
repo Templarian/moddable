@@ -174,7 +174,6 @@ class HD44780 extends I2C {
 		return this.write8(LCD.DISPLAYCONTROL, LCD.CMD);
 	}
 }
-Object.freeze(HD44780.prototype);
 
 export {
 	HD44780 as

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2025  Moddable Tech, Inc.
+ * Copyright (c) 2016-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Tools.
  * 
@@ -32,6 +32,10 @@ extern void fxRejectModuleFile(txMachine* the);
 extern void fxRunLoop(txMachine* the);
 extern void fxRunModuleFile(txMachine* the, txString path);
 extern void fxRunProgramFile(txMachine* the, txString path, txUnsigned flags);
+extern int fxBundleIs(const char *buffer, size_t size);
+extern int fxBundleLoad(txMachine *the, txSlot *module, txID moduleID);
+extern void fxBundleMapReset(void);
+extern void fxBundleRun(txMachine *the, char *buffer, size_t size);
 extern int main262(int argc, char* argv[]);
 
 struct sxJob {
@@ -52,6 +56,7 @@ struct sxSharedTimer {
 };
 
 static void fxPrintUsage();
+static int fxRunBundle(const char* path);
 
 static void fx_agent_broadcast(xsMachine* the);
 static void fx_agent_getReport(xsMachine* the);
@@ -93,6 +98,7 @@ int main(int argc, char* argv[])
 	int argi;
 	int option = 0;
 	int profiling = 0;
+	int bundle = 0;
 	char path[C_PATH_MAX];
 	char* dot;
 #if mxWindows
@@ -153,10 +159,25 @@ int main(int argc, char* argv[])
 			option = 3;
 		else if (!strcmp(argv[argi], "-v"))
 			printf("XS %d.%d.%d, slot %zu bytes, ID %zu bytes\n", XS_MAJOR_VERSION, XS_MINOR_VERSION, XS_PATCH_VERSION, sizeof(txSlot), sizeof(txID));
+		else if (!strcmp(argv[argi], "--bundle"))
+			bundle = 1;
 		else {
 			fxPrintUsage();
 			return 1;
 		}
+	}
+	if (bundle && (option != 5)) {
+		for (argi = 1; argi < argc; argi++) {
+			if (argv[argi][0] == '-') {
+				// consume flags that take a following value
+				if (!strcmp(argv[argi], "-i") || !strcmp(argv[argi], "-o"))
+					argi++;
+				continue;
+			}
+			int r = fxRunBundle(argv[argi]);
+			if (r) error = r;
+		}
+		return error;
 	}
 	if (option == 0) {
 		if (c_realpath(harnessPath, path))
@@ -277,6 +298,89 @@ int main(int argc, char* argv[])
 		}
 		xsDeleteMachine(machine);
 	}
+	return error;
+}
+
+int fxRunBundle(const char* path)
+{
+	int error = 0;
+	FILE* file = C_NULL;
+	char* buffer = C_NULL;
+	size_t size = 0;
+	char resolved[C_PATH_MAX];
+
+	if (!c_realpath(path, resolved)) {
+		fprintf(stderr, "file not found: %s\n", path);
+		return 1;
+	}
+	file = fopen(resolved, "r");
+	if (!file) {
+		fprintf(stderr, "can't open file: %s\n", resolved);
+		return 1;
+	}
+	fseek(file, 0, SEEK_END);
+	size = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	buffer = c_malloc(size + 1);
+	if (!buffer) {
+		fclose(file);
+		fprintf(stderr, "not enough memory\n");
+		return 1;
+	}
+	if (size != fread(buffer, 1, size, file)) {
+		fclose(file);
+		c_free(buffer);
+		fprintf(stderr, "can't read file: %s\n", resolved);
+		return 1;
+	}
+	buffer[size] = 0;
+	fclose(file);
+
+	xsCreation _creation = {
+		16 * 1024 * 1024, 	/* initialChunkSize */
+		16 * 1024 * 1024, 	/* incrementalChunkSize */
+		1 * 1024 * 1024, 	/* initialHeapCount */
+		1 * 1024 * 1024, 	/* incrementalHeapCount */
+		256 * 1024, 		/* stackCount */
+		1024, 				/* initialKeyCount */
+		1024,				/* incrementalKeyCount */
+		1993, 				/* nameModulo */
+		127, 				/* symbolModulo */
+		64 * 1024,			/* parserBufferSize */
+		1993,				/* parserTableModulo */
+	};
+	xsMachine* machine = xsCreateMachine(&_creation, "xst", NULL);
+	xsBeginMetering(machine, NULL, 0);
+	{
+	xsBeginHost(machine);
+	{
+		xsVars(1);
+		xsTry {
+			fxBuildAgent(machine);
+			fxBuildFuzz(machine);
+			xsVar(0) = xsUndefined;
+			the->rejection = &xsVar(0);
+			fxBundleRun(the, buffer, size);
+			fxRunLoop(the);
+			if (xsTest(xsVar(0)))
+				xsThrow(xsVar(0));
+		}
+		xsCatch {
+			fprintf(stderr, "%s\n", xsToString(xsException));
+			error = 1;
+		}
+	}
+	fxCheckUnhandledRejections(machine, 1);
+	xsEndHost(machine);
+	}
+	xsEndMetering(machine);
+	fxBundleMapReset();
+	if (machine->exitStatus) {
+		fprintf(stderr, "Error: %s\n", fxAbortString(machine->exitStatus));
+		error = 1;
+	}
+	xsDeleteMachine(machine);
+	c_free(buffer);
 	return error;
 }
 
@@ -1011,6 +1115,8 @@ void fxLoadModule(txMachine* the, txSlot* module, txID moduleID)
 #else
 	txUnsigned flags = 0;
 #endif
+	if (fxBundleLoad(the, module, moduleID))
+		return;
 	c_strncpy(path, fxGetKeyName(the, moduleID), C_PATH_MAX - 1);
 	path[C_PATH_MAX - 1] = 0;
 	if (c_realpath(path, real)) {

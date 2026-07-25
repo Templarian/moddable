@@ -434,14 +434,12 @@ void xs_ethernet_configure(xsMachine *the)
 
 	xsmcVars(2);
 
-	if (xsmcHas(xsArg(0), xsID_hostname)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_hostname);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_hostname)) {
 		if (ESP_OK != esp_netif_set_hostname(gNetif, xsmcToString(xsVar(0))))
 			xsUnknownError("set hostname failed");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_static)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_static);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_static)) {
 		if (xsmcTest(xsVar(0))) {
 			esp_netif_ip_info_t ip_info = {0};
 

@@ -354,7 +354,6 @@ html_content.tzNames = [
 ];
 
 Object.freeze(html_content, 1);
-Object.freeze(html_content.prototype, 1);
 
 export default (html_content);
 

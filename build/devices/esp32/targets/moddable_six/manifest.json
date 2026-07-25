@@ -9,7 +9,7 @@
 		"$(MODULES)/drivers/button/manifest.json",
 		"$(MODULES)/drivers/neopixel/manifest.json",
 		"$(MODDABLE)/modules/drivers/ili9341_p8/manifest.json",
-		"$(MODULES)/drivers/sensors/gt911/manifest.json",
+		"$(MODULES)/drivers/sensors/gt911/manifest_async_worker.json",
 		"$(MODULES)/pins/pwm/manifest.json"
 	],
 	"modules": {

@@ -27,7 +27,7 @@ declare module "embedded:update" {
         byteLength?: number;
     }
 
-    export interface Updater {
+    export interface Updater extends Disposable {
         close(): void;
         complete(): void;
         write(bytes: ByteBuffer): void;

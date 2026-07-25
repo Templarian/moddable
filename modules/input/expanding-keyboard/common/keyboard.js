@@ -185,7 +185,6 @@ class KeyRowBehavior extends Behavior {
 		debugger;
 	}
 }
-Object.freeze(KeyRowBehavior.prototype);
 
 class ExpandingKeyRowBehavior extends KeyRowBehavior {
 	onDraw(port) {
@@ -285,7 +284,6 @@ class ExpandingKeyRowBehavior extends KeyRowBehavior {
 		}
 	}
 }
-Object.freeze(ExpandingKeyRowBehavior.prototype);
 
 class BottomKeyRowBehavior extends KeyRowBehavior {
 	onKeysChanged(port, keys) {
@@ -330,7 +328,6 @@ class BottomKeyRowBehavior extends KeyRowBehavior {
 		}
 	}
 }
-Object.freeze(BottomKeyRowBehavior.prototype);
 
 class KeyboardBehavior extends Behavior {
 	onCreate(container, $, data) {
@@ -470,7 +467,6 @@ class KeyboardBehavior extends Behavior {
 		container.start();
  	}
 }
-Object.freeze(KeyboardBehavior.prototype);
 
 class KeyboardFieldBehavior extends Behavior {
 	onCreate(container, $, data) {
@@ -529,7 +525,6 @@ class KeyboardFieldBehavior extends Behavior {
 		field.string = this.string;
 	}
 }
-Object.freeze(KeyboardFieldBehavior.prototype);
 
 const KeyboardField = Container.template($ => ({
 	Behavior:KeyboardFieldBehavior,

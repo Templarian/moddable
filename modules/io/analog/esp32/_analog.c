@@ -207,18 +207,13 @@ void xs_analog_constructor_(xsMachine *the)
     if (!builtinIsPinFree(pin))
 		xsRangeError("in use");
 
-	if (xsmcHas(xsArg(0), xsID_esp32)) {
-		xsmcGet(xsVar(1), xsArg(0), xsID_esp32);
-
-		if (xsmcHas(xsVar(1), xsID_calibrated)) {
-			xsmcGet(xsVar(2), xsVar(1), xsID_calibrated);
+	if (xsmcGet(xsVar(1), xsArg(0), xsID_esp32)) {
+		if (xsmcGet(xsVar(2), xsVar(1), xsID_calibrated))
 			calib = xsmcTest(xsVar(2));
-		}
 
-		if (xsmcHas(xsVar(1), xsID_attenuation)) {
+		if (xsmcGet(xsVar(2), xsVar(1), xsID_attenuation)) {
 			double atten;
 			uint8_t attenIdx;
-			xsmcGet(xsVar(2), xsVar(1), xsID_attenuation);
 			atten = xsmcToNumber(xsVar(2));
 			if (atten == 0)
 				attenIdx = 0;

@@ -100,6 +100,5 @@ class URM09 {
 		return ret;
 	}
 }
-Object.freeze(URM09.prototype);
 
 export {URM09 as default, URM09, Config};

@@ -223,6 +223,10 @@ void fxInitializeLinker(txLinker* linker)
 	linker->creation.incrementalKeyCount = 0;
 	linker->creation.nameModulo = 127;
 	linker->creation.symbolModulo = 127;
+	
+	linker->version.major = XS_MAJOR_VERSION;
+	linker->version.minor = XS_MINOR_VERSION;
+	linker->version.patch = XS_PATCH_VERSION;
 	c_strcpy(linker->main, "main");
 }
 
@@ -296,7 +300,7 @@ void fxMapCode(txLinker* linker, txLinkerScript* script, txID* theIDs)
 			p -= sizeof(txID);
 			mxEncodeID(p, id);
 			linker->mapIndex++;
-			if ((XS_CODE_GET_PROPERTY == code) || (XS_CODE_GET_SUPER == code) || (XS_CODE_GET_THIS_VARIABLE == code) || (XS_CODE_GET_VARIABLE == code))
+			if ((XS_CODE_GET_PROPERTY == code) || (XS_CODE_GET_SUPER == code) || (XS_CODE_GET_THIS_VARIABLE == code) || (XS_CODE_GET_VARIABLE == code) || (XS_CODE_PROGRAM_REFERENCE == code))
 				fxReferenceLinkerSymbol(linker, id);
 		}
 		else if (-1 == offset) {
@@ -833,11 +837,11 @@ void fxWriteArchive(txLinker* linker, txString path, FILE** fileAddress)
 	size = htonl(size);
 	mxThrowElse(fwrite(&size, 4, 1, file) == 1);
 	mxThrowElse(fwrite("VERS", 4, 1, file) == 1);
-	byte = XS_MAJOR_VERSION;
+	byte = linker->version.major;
 	mxThrowElse(fwrite(&byte, 1, 1, file) == 1);
-	byte = XS_MINOR_VERSION;
+	byte = linker->version.minor;
 	mxThrowElse(fwrite(&byte, 1, 1, file) == 1);
-	byte = XS_PATCH_VERSION;
+	byte = linker->version.patch;
 	mxThrowElse(fwrite(&byte, 1, 1, file) == 1);
 	byte = 0;
 	mxThrowElse(fwrite(&byte, 1, 1, file) == 1);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2025  Moddable Tech, Inc.
+ * Copyright (c) 2019-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -27,6 +27,10 @@ class Serial extends Native("xs_serial_destructor") {
 
 	get format() { return native("xs_serial_get_format").call(this); }
 	set format(value) { native("xs_serial_set_format").call(this, value); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default Serial;

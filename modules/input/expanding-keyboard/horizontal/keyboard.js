@@ -84,7 +84,6 @@ class HorizontalBottomKeyRowBehavior extends BottomKeyRowBehavior {
 		}
 	}
 }
-Object.freeze(HorizontalBottomKeyRowBehavior.prototype);
 
 class HorizontalKeyboardBehavior extends KeyboardBehavior {
 	onCreate(container, $, data) {
@@ -97,7 +96,6 @@ class HorizontalKeyboardBehavior extends KeyboardBehavior {
 		this.innerKeyGap = 3;
 	}
 }
-Object.freeze(HorizontalKeyboardBehavior.prototype);
 
 const KeyRow = Port.template($ => ({
 	left:0, right:0, top:TOPMARGIN, height:KEYHEIGHT, active:true

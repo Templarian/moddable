@@ -81,6 +81,5 @@ class DS1307 extends RTC {
 		return undefined !== result;
 	}
 }
-Object.freeze(DS1307.prototype);
 
 export default DS1307;

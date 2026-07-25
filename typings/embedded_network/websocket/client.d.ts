@@ -69,6 +69,7 @@ declare module "embedded:network/websocket/client" {
     static readonly ping: 9;
     static readonly pong: 10;
   }
+  interface WebSocketClient extends Disposable {}
 
   export default WebSocketClient;
 }

@@ -11,6 +11,10 @@ class StorageDomain extends Native("xs_storage_domain_destructor") {
 	
 	get format() { return native("xs_storage_domain_get_format").call(this); }
 	set format(value) { native("xs_storage_domain_set_format").call(this, value); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 function open(options, prototype) { return native("xs_storage_domain_open").call(this, options, prototype); }

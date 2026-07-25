@@ -76,6 +76,5 @@ export class Connection {
 		}
 	}
 };
-Object.freeze(Connection.prototype);
 
 export default Connection;

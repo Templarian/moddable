@@ -101,6 +101,10 @@ class Location  {
 		this.#sample = undefined;
 		return sample;
 	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default Location;

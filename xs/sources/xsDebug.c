@@ -2833,15 +2833,19 @@ void fxReport(txMachine* the, txString theFormat, ...)
 	c_va_end(arguments);
 #ifndef mxNoConsole
 	c_va_start(arguments, theFormat);
-#ifdef pebble
-char foo[128];
-c_vsnprintf(foo, 128, theFormat, arguments);
-modLog_transmit(foo);
-#else
 	c_vprintf(theFormat, arguments);
 	c_va_end(arguments);
+#elif pebble
+#ifdef mxDebug
+	if (!fxIsConnected(the)) {
 #endif
+		char buffer[128];
+		c_vsnprintf(buffer, sizeof(buffer), theFormat, arguments);
+		modLog_transmit(buffer);
+#ifdef mxDebug
+	}
 #endif
+#endif /* pebble */
 }
 
 void fxReportException(txMachine* the, txString thePath, txInteger theLine, txString theFormat, ...)

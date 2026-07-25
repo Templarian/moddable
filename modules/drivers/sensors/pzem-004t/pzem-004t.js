@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Moddable Tech, Inc.
+ * Copyright (c) 2023-2026 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -244,5 +244,9 @@ export default class PZEM0004T {
 
         this.#io.format = "buffer";
         this.#io.write(this.#outBuffer);
+    }
+
+    static {
+        this.prototype[Symbol.dispose] = this.prototype.close;
     }
 }

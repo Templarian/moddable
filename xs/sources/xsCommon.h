@@ -84,7 +84,7 @@
 	#define mxErrorIsError 1
 #endif
 #ifndef mxExplicitResourceManagement
-	#define mxExplicitResourceManagement 0
+	#define mxExplicitResourceManagement 1
 #endif
 #ifndef mxFloat16
 	#define mxFloat16 1
@@ -156,6 +156,7 @@ typedef struct {
 #if mxECMAScript2026
 	#define XS_MAJOR_VERSION 17
 	#define XS_MINOR_VERSION (3 + mxErrorIsError + mxExplicitResourceManagement + mxFloat16 + mxImmutableArrayBuffers + mxModuleStuff + mxUint8ArrayBase64 + mxNative)
+	#define XS_MOD_COMPATIBLE_MINOR_VERSION (3 + mxErrorIsError + mxFloat16 + mxImmutableArrayBuffers + mxModuleStuff + mxUint8ArrayBase64 + mxNative)
 #elif mxECMAScript2025
 	#define XS_MAJOR_VERSION 16
 	#define XS_MINOR_VERSION (3 + mxErrorIsError + mxExplicitResourceManagement + mxFloat16 + mxImmutableArrayBuffers + mxModuleStuff + mxUint8ArrayBase64 + mxNative)
@@ -173,6 +174,12 @@ typedef struct {
 	#define XS_PATCH_VERSION 1
 #else
 	#define XS_PATCH_VERSION 0
+#endif
+#ifndef XS_MOD_COMPATIBLE_MAJOR_VERSION
+	#define XS_MOD_COMPATIBLE_MAJOR_VERSION XS_MAJOR_VERSION
+#endif
+#ifndef XS_MOD_COMPATIBLE_MINOR_VERSION
+	#define XS_MOD_COMPATIBLE_MINOR_VERSION XS_MINOR_VERSION
 #endif
 
 #define XS_DIGEST_SIZE 16
@@ -501,6 +508,7 @@ enum {
 	XS_TOO_MUCH_COMPUTATION_EXIT,
 	XS_UNHANDLED_REJECTION_EXIT,
 	XS_NATIVE_STACK_OVERFLOW_EXIT,
+	XS_INCOMPATIBLE_MOD_EXIT,
 };
 
 extern void fxDeleteScript(txScript* script);
@@ -1322,6 +1330,9 @@ enum {
 	_isRawJSON,
 	_rawJSON,
 	_sumPrecise,
+#endif
+#if mxImmutableArrayBuffers
+	_sliceToImmutable,
 #endif
 	XS_ID_COUNT
 };

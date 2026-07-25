@@ -107,28 +107,19 @@ void xs_audioout_constructor_(xsMachine *the)
 	format = builtinInitializeFormat(the, format);
 	if (kIOFormatBuffer != format)
 		xsRangeError("invalid format");
-	if (xsmcHas(xsArg(0), xsID_audioType)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_audioType);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_audioType)) {
 		xsStringValue type = xsmcToString(xsVar(0));
 		if (c_strcmp(type, "LPCM"))
 			xsRangeError("invalid type");
 	}
-	if (xsmcHas(xsArg(0), xsID_bitsPerSample)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_bitsPerSample);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_bitsPerSample))
 		bitsPerSample = xsmcToInteger(xsVar(0));
-	}
-	if (xsmcHas(xsArg(0), xsID_channels)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_channels);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_channels))
 		numChannels = xsmcToInteger(xsVar(0));
-	}
-	if (xsmcHas(xsArg(0), xsID_sampleRate)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_sampleRate);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_sampleRate))
 		sampleRate = xsmcToInteger(xsVar(0));
-	}
-	if (xsmcHas(xsArg(0), xsID_queueLength)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_queueLength);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_queueLength))
 		queueLength = xsmcToInteger(xsVar(0));
-	}
 	if ((8 != bitsPerSample) && (16 != bitsPerSample))
 		xsRangeError("invalid bits per sample");
 	if ((1 != numChannels) && (2 != numChannels))

@@ -118,7 +118,6 @@ class BMP180 extends I2C {
 	}
 }
 
-Object.freeze(BMP180.prototype);
 
 export default BMP180;
 

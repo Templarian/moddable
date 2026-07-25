@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Moddable Tech, Inc.
+ * Copyright (c) 2021-2026 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -93,6 +93,10 @@ class DS3231 {
 
 		let c = io.readUint8(Register.CONTROL) & ~Register.ENABLE_BIT;	// enabled LOW
 		io.writeUint8(Register.CONTROL, c);
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

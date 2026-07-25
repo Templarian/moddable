@@ -121,4 +121,3 @@ export default class WipeTransition extends Transition {
 		this.die.cut();
 	}
 }
-Object.freeze(WipeTransition.prototype);

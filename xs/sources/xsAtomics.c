@@ -22,7 +22,7 @@
 
 static txInteger fxCheckAtomicsIndex(txMachine* the, txInteger index, txInteger length);
 static txSlot* fxCheckAtomicsTypedArray(txMachine* the, txBoolean onlyInt32);
-static txSlot* fxCheckAtomicsArrayBuffer(txMachine* the, txSlot* slot, txBoolean onlyShared);
+static txSlot* fxCheckAtomicsArrayBuffer(txMachine* the, txSlot* slot, txBoolean onlyShared, txBoolean mutable);
 static void* fxCheckAtomicsArrayBufferDetached(txMachine* the, txSlot* slot, txBoolean mutable);
 static txSlot* fxCheckSharedArrayBuffer(txMachine* the, txSlot* slot, txString which);
 static void fxPushAtomicsValue(txMachine* the, int i, txID id);
@@ -92,11 +92,11 @@ static void fxPushAtomicsValue(txMachine* the, int i, txID id);
 #define mxAtomicsTailWait() \
 	return (result != value) ? -1 : (timeout == 0) ? 0 : 1;
 
-#define mxAtomicsDeclarations(onlyInt32, onlyShared) \
+#define mxAtomicsDeclarations(onlyInt32, onlyShared, mutable) \
 	txSlot* dispatch = fxCheckAtomicsTypedArray(the, onlyInt32); \
 	txSlot* view = dispatch->next; \
 	txSlot* buffer = view->next; \
-	txSlot* host = fxCheckAtomicsArrayBuffer(the, buffer, onlyShared); \
+	txSlot* host = fxCheckAtomicsArrayBuffer(the, buffer, onlyShared, mutable); \
 	txU2 shift = dispatch->value.typedArray.dispatch->shift; \
 	txInteger length = fxGetDataViewSize(the, view, buffer) >> shift; \
 	txInteger index = fxCheckAtomicsIndex(the, 1, length); \
@@ -227,7 +227,7 @@ void fxBuildAtomics(txMachine* the)
 	mxPull(mxAtomicsObject);
 }
 
-txSlot* fxCheckAtomicsArrayBuffer(txMachine* the, txSlot* slot, txBoolean onlyShared)
+txSlot* fxCheckAtomicsArrayBuffer(txMachine* the, txSlot* slot, txBoolean onlyShared, txBoolean mutable)
 {
 	if ((!slot) || (!mxIsReference(slot)))
 		mxTypeError("typedArray.buffer: not an object");
@@ -239,6 +239,8 @@ txSlot* fxCheckAtomicsArrayBuffer(txMachine* the, txSlot* slot, txBoolean onlySh
 	if (slot && (slot->flag & XS_INTERNAL_FLAG) && (slot->kind == XS_ARRAY_BUFFER_KIND)) {
 		if (slot->value.arrayBuffer.address == C_NULL)
 			mxTypeError("typedArray.buffer: detached");
+		if (mutable && (slot->flag & XS_DONT_SET_FLAG))
+			mxTypeError("typedArray.buffer: read-only");
 		return slot;
 	}
 	mxTypeError("typedArray.buffer: not a SharedArrayBuffer instance, not an ArrayBuffer instance");
@@ -454,7 +456,7 @@ void fx_SharedArrayBuffer_prototype_slice(txMachine* the)
 
 void fx_Atomics_add(txMachine* the)
 {
-	mxAtomicsDeclarations(0, 0);
+	mxAtomicsDeclarations(0, 0, 1);
 	fxPushAtomicsValue(the, 2, dispatch->value.typedArray.dispatch->constructorID);
 	(*dispatch->value.typedArray.atomics->add)(the, host, offset, the->stack, 0);
 	mxPullSlot(mxResult);
@@ -462,7 +464,7 @@ void fx_Atomics_add(txMachine* the)
 
 void fx_Atomics_and(txMachine* the)
 {
-	mxAtomicsDeclarations(0, 0);
+	mxAtomicsDeclarations(0, 0, 1);
 	fxPushAtomicsValue(the, 2, dispatch->value.typedArray.dispatch->constructorID);
 	(*dispatch->value.typedArray.atomics->and)(the, host, offset, the->stack, 0);
 	mxPullSlot(mxResult);
@@ -470,7 +472,7 @@ void fx_Atomics_and(txMachine* the)
 
 void fx_Atomics_compareExchange(txMachine* the)
 {
-	mxAtomicsDeclarations(0, 0);
+	mxAtomicsDeclarations(0, 0, 1);
 	fxPushAtomicsValue(the, 2, dispatch->value.typedArray.dispatch->constructorID);
 	fxPushAtomicsValue(the, 3, dispatch->value.typedArray.dispatch->constructorID);
 	(*dispatch->value.typedArray.atomics->compareExchange)(the, host, offset, the->stack, 0);
@@ -480,7 +482,7 @@ void fx_Atomics_compareExchange(txMachine* the)
 
 void fx_Atomics_exchange(txMachine* the)
 {
-	mxAtomicsDeclarations(0, 0);
+	mxAtomicsDeclarations(0, 0, 1);
 	fxPushAtomicsValue(the, 2, dispatch->value.typedArray.dispatch->constructorID);
 	(*dispatch->value.typedArray.atomics->exchange)(the, host, offset, the->stack, 0);
 	mxPullSlot(mxResult);
@@ -495,13 +497,13 @@ void fx_Atomics_isLockFree(txMachine* the)
 
 void fx_Atomics_load(txMachine* the)
 {
-	mxAtomicsDeclarations(0, 0);
+	mxAtomicsDeclarations(0, 0, 0);
 	(*dispatch->value.typedArray.atomics->load)(the, host, offset, mxResult, 0);
 }
 
 void fx_Atomics_or(txMachine* the)
 {
-	mxAtomicsDeclarations(0, 0);
+	mxAtomicsDeclarations(0, 0, 1);
 	fxPushAtomicsValue(the, 2, dispatch->value.typedArray.dispatch->constructorID);
 	(*dispatch->value.typedArray.atomics->or)(the, host, offset, the->stack, 0);
 	mxPullSlot(mxResult);
@@ -509,7 +511,7 @@ void fx_Atomics_or(txMachine* the)
 
 void fx_Atomics_notify(txMachine* the)
 {
-	mxAtomicsDeclarations(1, 0);
+	mxAtomicsDeclarations(1, 0, 0);
 	txInteger count = ((mxArgc > 2) && !mxIsUndefined(mxArgv(2))) ? fxToInteger(the, mxArgv(2)) : 20;
 	if (count < 0)
 		count = 0;
@@ -524,7 +526,7 @@ void fx_Atomics_notify(txMachine* the)
 
 void fx_Atomics_store(txMachine* the)
 {
-	mxAtomicsDeclarations(0, 0);
+	mxAtomicsDeclarations(0, 0, 1);
 	fxPushAtomicsValue(the, 2, dispatch->value.typedArray.dispatch->constructorID);
 	*mxResult = *the->stack;
 	(*dispatch->value.typedArray.atomics->store)(the, host, offset, the->stack, 0);
@@ -533,7 +535,7 @@ void fx_Atomics_store(txMachine* the)
 
 void fx_Atomics_sub(txMachine* the)
 {
-	mxAtomicsDeclarations(0, 0);
+	mxAtomicsDeclarations(0, 0, 1);
 	fxPushAtomicsValue(the, 2, dispatch->value.typedArray.dispatch->constructorID);
 	(*dispatch->value.typedArray.atomics->sub)(the, host, offset, the->stack, 0);
 	mxPullSlot(mxResult);
@@ -541,7 +543,7 @@ void fx_Atomics_sub(txMachine* the)
 
 void fx_Atomics_wait(txMachine* the)
 {
-	mxAtomicsDeclarations(1, 1);
+	mxAtomicsDeclarations(1, 1, 0);
 	txNumber timeout;
 	txInteger result;
 	fxPushAtomicsValue(the, 2, dispatch->value.typedArray.dispatch->constructorID);
@@ -566,7 +568,7 @@ void fx_Atomics_wait(txMachine* the)
 #if mxECMAScript2024
 void fx_Atomics_waitAsync(txMachine* the)
 {
-	mxAtomicsDeclarations(1, 1);
+	mxAtomicsDeclarations(1, 1, 0);
 	txNumber timeout;
 	txInteger result;
 	txSlot* slot;
@@ -604,7 +606,7 @@ void fx_Atomics_waitAsync(txMachine* the)
 
 void fx_Atomics_xor(txMachine* the)
 {
-	mxAtomicsDeclarations(0, 0);
+	mxAtomicsDeclarations(0, 0, 1);
 	fxPushAtomicsValue(the, 2, dispatch->value.typedArray.dispatch->constructorID);
 	(*dispatch->value.typedArray.atomics->xor)(the, host, offset, the->stack, 0);
 	mxPullSlot(mxResult);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021  Moddable Tech, Inc.
+ * Copyright (c) 2019-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -41,6 +41,10 @@ class ExpanderI2C {
 	}
 	read(count) {
 		return new Uint8Array(this.#io.read(count));
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 
@@ -115,6 +119,10 @@ class Expander {
 		delete this.Digital;
 		delete this.DigitalBank;
 	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 class Digital {
@@ -160,6 +168,10 @@ class IO {
 	set format(value) {
 		if ("number" !== value)
 			throw new Error;
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 
@@ -217,6 +229,10 @@ class InputBank extends IO {
 		value = (value[0] | (value[1] << 8)) & ~this.#pins;
 		value |= enable & this.#pins;
 		i2c.write(0x04, value & 255, value >> 8);		// write GPINTEN
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

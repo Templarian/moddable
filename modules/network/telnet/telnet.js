@@ -108,7 +108,6 @@ class Connection extends Socket {
 		CLI.execute.call(this, "prompt");
 	}
 }
-Object.freeze(Connection.prototype);
 
 class Telnet extends Listener {
 	constructor(dictionary = {}) {
@@ -127,6 +126,5 @@ class Telnet extends Listener {
 		CLI.execute.call(socket, "prompt");
 	}
 }
-Object.freeze(Telnet.prototype);
 
 export default Telnet;

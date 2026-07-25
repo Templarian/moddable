@@ -290,18 +290,12 @@ void xs_camera_constructor(xsMachine *the)
 		format = builtinInitializeFormat(the, format);
 		if ((kIOFormatBuffer != format) && (kIOFormatBufferDisposable != format))
 			xsRangeError("invalid format");
-		if (xsmcHas(xsArg(0), xsID_width)) {
-			xsmcGet(xsVar(0), xsArg(0), xsID_width);
+		if (xsmcGet(xsVar(0), xsArg(0), xsID_width))
 			width = xsmcToInteger(xsVar(0));
-		}
-		if (xsmcHas(xsArg(0), xsID_height)) {
-			xsmcGet(xsVar(0), xsArg(0), xsID_height);
+		if (xsmcGet(xsVar(0), xsArg(0), xsID_height))
 			height = xsmcToInteger(xsVar(0));
-		}
-		if (xsmcHas(xsArg(0), xsID_imageType)) {
-			xsmcGet(xsVar(0), xsArg(0), xsID_imageType);
+		if (xsmcGet(xsVar(0), xsArg(0), xsID_imageType))
 			imageType = xsmcToInteger(xsVar(0));
-		}
 		if (imageType == kCommodettoBitmapRGB565LE)
 			yuvToRGB = CommodettoPixelsConverterGet(kCommodettoBitmapYUV422, kCommodettoBitmapRGB565LE);
 		else if (imageType == kCommodettoBitmapRGB565BE)

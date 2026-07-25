@@ -32,7 +32,6 @@ class REPL extends REPLCore {
 	}
 	static isDebug() @ "xs_repl_isDebug"
 }
-Object.freeze(REPL.prototype);
 
 export default REPL;
 

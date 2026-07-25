@@ -644,10 +644,10 @@ extern txBoolean fxHasAll(txMachine* the, txSlot* stack, txID id, txIndex index)
 mxExport txBoolean fxHasAt(txMachine* the);
 mxExport txBoolean fxHasID(txMachine*, txID);
 mxExport txBoolean fxHasIndex(txMachine* the, txIndex index);
-extern void fxGetAll(txMachine* the, txSlot* stack, txID id, txIndex index);
-mxExport void fxGetAt(txMachine*);
-mxExport void fxGetID(txMachine*, txID);
-mxExport void fxGetIndex(txMachine*, txIndex);
+extern txBoolean fxGetAll(txMachine* the, txSlot* stack, txID id, txIndex index);
+mxExport txBoolean fxGetAt(txMachine*);
+mxExport txBoolean fxGetID(txMachine*, txID);
+mxExport txBoolean fxGetIndex(txMachine*, txIndex);
 extern void fxSetAll(txMachine* the, txSlot* stack, txID id, txIndex index);
 mxExport void fxSetAt(txMachine*);
 mxExport void fxSetID(txMachine*, txID);
@@ -732,9 +732,9 @@ mxExport void _xsNewHostInstance(txMachine*, txSlot*, txSlot*);
 mxExport txBoolean _xsIsInstanceOf(txMachine*, txSlot*, txSlot*);
 mxExport txBoolean _xsHas(txMachine*, txSlot*, txID);
 mxExport txBoolean _xsHasIndex(txMachine*, txSlot*, txIndex);
-mxExport void _xsGet(txMachine*, txSlot*, txSlot*, txID);
-mxExport void _xsGetAt(txMachine*, txSlot*, txSlot*, txSlot*);
-mxExport void _xsGetIndex(txMachine*, txSlot*, txSlot*, txIndex);
+mxExport txBoolean _xsGet(txMachine*, txSlot*, txSlot*, txID);
+mxExport txBoolean _xsGetAt(txMachine*, txSlot*, txSlot*, txSlot*);
+mxExport txBoolean _xsGetIndex(txMachine*, txSlot*, txSlot*, txIndex);
 mxExport void _xsSet(txMachine*, txSlot*, txID, txSlot*);
 mxExport void _xsSetAt(txMachine*, txSlot*, txSlot*, txSlot*);
 mxExport void _xsSetIndex(txMachine*, txSlot*, txIndex, txSlot*);
@@ -1585,6 +1585,7 @@ mxExport void fx_ArrayBuffer_prototype_get_resizable(txMachine* the);
 mxExport void fx_ArrayBuffer_prototype_concat(txMachine* the);
 mxExport void fx_ArrayBuffer_prototype_resize(txMachine* the);
 mxExport void fx_ArrayBuffer_prototype_slice(txMachine* the);
+mxExport void fx_ArrayBuffer_prototype_sliceToImmutable(txMachine* the);
 mxExport void fx_ArrayBuffer_prototype_transfer(txMachine* the);
 mxExport void fx_ArrayBuffer_prototype_transferToFixedLength(txMachine* the);
 mxExport void fx_ArrayBuffer_prototype_transferToImmutable(txMachine* the);
@@ -2313,6 +2314,8 @@ enum {
 	((THE_SLOT) && ((THE_SLOT)->next) && ((THE_SLOT)->next->flag & XS_INTERNAL_FLAG) && ((THE_SLOT)->next->kind == XS_PROMISE_KIND) && (THE_SLOT != mxPromisePrototype.value.reference))
 #define mxIsProxy(THE_SLOT) \
 	(/* (THE_SLOT) && */ ((THE_SLOT)->next) && ((THE_SLOT)->next->flag & XS_INTERNAL_FLAG) && ((THE_SLOT)->next->kind == XS_PROXY_KIND))
+#define mxIsModule(THE_SLOT) \
+	(((THE_SLOT)->next) && ((THE_SLOT)->next->flag & XS_INTERNAL_FLAG) && ((THE_SLOT)->next->kind == XS_MODULE_KIND))
 #define mxIsCallable(THE_SLOT) \
 	( (THE_SLOT) &&  ((THE_SLOT)->next) && (((THE_SLOT)->next->kind == XS_CALLBACK_KIND) || ((THE_SLOT)->next->kind == XS_CALLBACK_X_KIND) || ((THE_SLOT)->next->kind == XS_CODE_KIND) || ((THE_SLOT)->next->kind == XS_CODE_X_KIND) || ((THE_SLOT)->next->kind == XS_PROXY_KIND)))
 #define mxIsConstructor(THE_SLOT) \

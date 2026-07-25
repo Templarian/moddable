@@ -160,4 +160,3 @@ export default class PKCS1_5 {
 	};
 };
 
-Object.freeze(PKCS1_5.prototype);

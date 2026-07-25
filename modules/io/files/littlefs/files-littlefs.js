@@ -38,6 +38,10 @@ class File extends Native("xs_filelittlefs_destructor"){
 	setSize(length) { return native("xs_filelittlefs_setSize").call(this, length); }
 
 	flush() { return native("xs_filelittlefs_flush").call(this); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 class DirectoryIterator extends Native("xs_directory_iterator_littlefs_destructor") {
@@ -72,6 +76,10 @@ class Directory extends Native("xs_directorylittlefs_destructor") {
 
 	scan(...path) {
 		return new DirectoryIterator(this, ...path);
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 Directory.prototype[Symbol.iterator] = Directory.prototype.scan;

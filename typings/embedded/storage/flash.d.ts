@@ -46,6 +46,7 @@ declare module "embedded:storage/flash" {
 
 		format: "buffer";
 	}
+	export interface Flash extends Disposable {}
 
 	const FlashStorage: {
 		open(options: FlashOpenOptions): Flash;

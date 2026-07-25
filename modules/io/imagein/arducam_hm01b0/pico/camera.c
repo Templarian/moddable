@@ -219,16 +219,11 @@ void xs_camera_constructor(xsMachine *the)
 	if ((kIOFormatBuffer != format) && (kIOFormatBufferDisposable != format))
 		xsRangeError("invalid format");
 
-	if (xsmcHas(xsArg(0), xsID_width)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_width);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_width))
 		width = xsmcToInteger(xsVar(0));
-	}
-	if (xsmcHas(xsArg(0), xsID_height)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_height);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_height))
 		height = xsmcToInteger(xsVar(0));
-	}
-	if (xsmcHas(xsArg(0), xsID_imageType)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_imageType);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_imageType)) {
 		if (xsStringType == xsmcTypeOf(xsVar(0))) {
 			if (c_strcmp("jpeg", xsmcToString(xsVar(0))))
 				xsRangeError("unknown imageType");
@@ -238,10 +233,8 @@ void xs_camera_constructor(xsMachine *the)
 		else
 			imageType = xsmcToInteger(xsVar(0));
 	}
-	if (xsmcHas(xsArg(0), xsID_FPS)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_FPS);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_FPS))
 		fps = xsmcToInteger(xsVar(0));
-	}
 
 	camera = c_calloc(1, sizeof(CameraRecord));
 	if (!camera)

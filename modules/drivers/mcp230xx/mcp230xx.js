@@ -193,7 +193,6 @@ MCP23008.prototype.GPPU = 0x06;
 MCP23008.prototype.GPIO = 0x09;
 MCP23008.prototype.writeSize = SMBus.prototype.writeByte;
 MCP23008.prototype.readSize = SMBus.prototype.readByte;
-Object.freeze(MCP23008.prototype);
 
 class MCP23017 extends Expander {}
 MCP23017.prototype.length = 16;
@@ -204,7 +203,6 @@ MCP23017.prototype.GPPU = 0x0C;
 MCP23017.prototype.GPIO = 0x12;
 MCP23017.prototype.writeSize = SMBus.prototype.writeWord;
 MCP23017.prototype.readSize = SMBus.prototype.readWord;
-Object.freeze(MCP23017.prototype);
 
 
 export { MCP23008, MCP23017 };

@@ -465,14 +465,11 @@ void xs_wifi419_connect(xsMachine *the)
 	uint32_t auth = CYW43_AUTH_OPEN;
 
 	xsmcVars(1);
-	if (!xsmcHas(xsArg(0), xsID_SSID))
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_SSID))
 		xsUnknownError("SSID required");
-
-	xsmcGet(xsVar(0), xsArg(0), xsID_SSID);
 	xsmcToStringBuffer(xsVar(0), (char *)ssid, sizeof(ssid));
 
-	if (xsmcHas(xsArg(0), xsID_password)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_password);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_password)) {
 		xsmcToStringBuffer(xsVar(0), (char *)password, sizeof(password));
 		auth = CYW43_AUTH_WPA2_AES_PSK;
 	}
@@ -506,14 +503,12 @@ void xs_wifi419_configure(xsMachine *the)
 
 	xsmcVars(2);
 
-	if (xsmcHas(xsArg(0), xsID_hostname)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_hostname);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_hostname)) {
 		xsmcToStringBuffer(xsVar(0), gHostname, sizeof(gHostname));
 		netif_set_hostname(netif_list, gHostname);
 	}
 
-	if (xsmcHas(xsArg(0), xsID_static)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_static);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_static)) {
 		if (xsmcTest(xsVar(0))) {
 			ip4_addr_t ip, netmask, gw;
 

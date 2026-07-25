@@ -112,6 +112,5 @@ class GP2AP01VT00F extends SMBus {
 		return {distance: 0.00653 * (range - c1)};
 	}
 }
-Object.freeze(GP2AP01VT00F.prototype);
 
 export {GP2AP01VT00F as default, GP2AP01VT00F, Emitter, Interval};

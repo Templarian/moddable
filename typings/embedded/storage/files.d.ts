@@ -39,6 +39,7 @@ declare module "embedded:storage/files" {
 		setSize(length: number): void;
 		flush(): void;
 	}
+	export interface File extends Disposable {}
 
 	export interface DirectoryOpenFileOptions {
 		path: string;
@@ -72,4 +73,5 @@ declare module "embedded:storage/files" {
 		scan(path?: string): IterableIterator<string>;
 		[Symbol.iterator](): IterableIterator<string>;
 	}
+	export interface Directory extends Disposable {}
 }

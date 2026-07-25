@@ -81,22 +81,16 @@ void xs_pulsewidth_constructor(xsMachine *the)
 
     xsmcVars(1);
 
-    if (!xsmcHas(xsArg(0), xsID_pin))
-		xsRangeError("pin required");
-
-    if (!xsmcHas(xsArg(0), xsID_edges))
+    if (!xsmcGet(xsVar(0), xsArg(0), xsID_edges))
         xsRangeError("edges required");
-
-    xsmcGet(xsVar(0), xsArg(0), xsID_edges);
 	edges = xsmcToInteger(xsVar(0));
 
-    xsmcGet(xsVar(0), xsArg(0), xsID_pin);
+    if (!xsmcGet(xsVar(0), xsArg(0), xsID_pin))
+		xsRangeError("pin required");
 	pin = builtinGetPin(the, &xsVar(0));
 
-    if (xsmcHas(xsArg(0), xsID_mode)) {
-        xsmcGet(xsVar(0), xsArg(0), xsID_mode);
+    if (xsmcGet(xsVar(0), xsArg(0), xsID_mode))
 	    mode = xsmcToInteger(xsVar(0));
-    }
 
 	if (!builtinIsPinFree(pin))
         xsRangeError("in use");

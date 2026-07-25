@@ -10,6 +10,10 @@ class FlashPartition extends Native("xs_flash_partition_destructor") {
 
 	get format() { return native("xs_flash_partition_get_format").call(this); }
 	set format(value) { native("xs_flash_partition_set_format").call(this, value); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 class FlashPartitionIterator {

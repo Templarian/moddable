@@ -60,19 +60,14 @@ void _xs_i2c_constructor(xsMachine *the)
 
 	xsmcVars(1);
 
-	if (!xsmcHas(xsArg(0), xsID_data))
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_data))
 		xsRangeError("data required");
-	if (!xsmcHas(xsArg(0), xsID_clock))
-		xsRangeError("address required");
-	if (!xsmcHas(xsArg(0), xsID_address))
-		xsRangeError("address required");
-
-	xsmcGet(xsVar(0), xsArg(0), xsID_data);
 	data = builtinGetPin(the, &xsVar(0));
 	if ((data < 0) || (data > 16))
 		xsRangeError("invalid data");
 
-	xsmcGet(xsVar(0), xsArg(0), xsID_clock);
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_clock))
+		xsRangeError("clock required");
 	clock = builtinGetPin(the, &xsVar(0));
 	if ((clock < 0) || (clock > 16))
 		xsRangeError("invalid clock");
@@ -82,7 +77,8 @@ void _xs_i2c_constructor(xsMachine *the)
 	else if (!builtinIsPinFree(data) || !builtinIsPinFree(clock))
 		xsRangeError("inUse");
 
-	xsmcGet(xsVar(0), xsArg(0), xsID_address);
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_address))
+		xsRangeError("address required");
 	address = builtinGetPin(the, &xsVar(0));
 	if ((address < 0) || (address > 127))
 		xsRangeError("invalid address");

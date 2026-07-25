@@ -38,7 +38,7 @@ declare module "embedded:network/dnssd" {
         onError?(): void;
     }
 
-    export interface ClaimHandle {
+    export interface ClaimHandle extends Disposable {
         close(): void;
     }
 
@@ -57,7 +57,7 @@ declare module "embedded:network/dnssd" {
         onLost?(service: ServiceObject): void;
     }
 
-    export interface DiscoverHandle {
+    export interface DiscoverHandle extends Disposable {
         close(): void;
     }
 
@@ -69,16 +69,18 @@ declare module "embedded:network/dnssd" {
         txt?: Map<string, string | ByteBuffer>;
     }
 
-    export interface AdvertiseHandle {
+    export interface AdvertiseHandle extends Disposable {
         close(): void;
         updateTXT(txt: Map<string, string | ByteBuffer>): void;
     }
 
-    export default class DNSSD {
+    class DNSSD {
         constructor(options: DNSSDOptions);
         close(): void;
         claim(options: ClaimOptions): ClaimHandle;
         discover(options: DiscoverOptions): DiscoverHandle;
         advertise(options: AdvertiseOptions): AdvertiseHandle;
     }
+    interface DNSSD extends Disposable {}
+    export default DNSSD;
 }

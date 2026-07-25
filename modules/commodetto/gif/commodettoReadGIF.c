@@ -104,13 +104,10 @@ void xs_readgif(xsMachine *the)
 	if (xsmcArgc > 1) {
 		xsmcVars(1);
 
-		if (xsmcHas(xsArg(1), xsID_available)) {
-			xsmcGet(xsVar(0), xsArg(1), xsID_available);
+		if (xsmcGet(xsVar(0), xsArg(1), xsID_available))
 			availableIn = xsmcToInteger(xsVar(0));
-		}
 
-		if (xsmcHas(xsArg(1), xsID_pixelFormat)) {
-			xsmcGet(xsVar(0), xsArg(1), xsID_pixelFormat);
+		if (xsmcGet(xsVar(0), xsArg(1), xsID_pixelFormat)) {
 			format = xsmcToInteger(xsVar(0));
 			if ((kCommodettoBitmapFormat != format) && (kCommodettoBitmapCLUT256 != format)
 				&& (kCommodettoBitmapGray16 != format) && (kCommodettoBitmapMONOCHROME != format)

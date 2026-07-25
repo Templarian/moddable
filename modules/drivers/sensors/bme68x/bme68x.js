@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Moddable Tech, Inc.
+ * Copyright (c) 2023-2026 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -98,6 +98,10 @@ export class BME68x @ "xs_bne68x_destructor" {
 	static SEQUENTIAL_MODE = 3;
 
 	static VALID_DATA = 0x80;
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 // ECMA-419 sensor driver - compound sensor with temperature, humidity, pressure
@@ -154,5 +158,9 @@ export default class {
 				pressure: sample.pressure
 			}
 		}
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }

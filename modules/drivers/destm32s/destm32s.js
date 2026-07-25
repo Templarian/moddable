@@ -51,4 +51,3 @@ export default class DESTM32S @ "xs_destm32s_destructor" {
 	configure(options) @ "xs_destm32s_configure";
 }
 
-Object.freeze(DESTM32S.prototype);

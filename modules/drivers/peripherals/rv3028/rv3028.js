@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023  Moddable Tech, Inc.
+ * Copyright (c) 2021-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -84,6 +84,10 @@ class RV3028 {
 		io.writeBuffer(Register.UNIXTIME, b);
 
 		io.writeUint8(Register.STATUS, 0);		// enable
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

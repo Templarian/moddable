@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025  Moddable Tech, Inc.
+ * Copyright (c) 2025-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -34,6 +34,10 @@ class WiFi extends Native("xs_wifi_destructor"){
 	get BSSID() { return native("xs_wifi_BSSID_get").call(this); }
 	get RSSI() { return native("xs_wifi_RSSI_get").call(this); }
 	get channel() { return native("xs_wifi_channel_get").call(this); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 };
 
 export default WiFi;

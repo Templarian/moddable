@@ -335,6 +335,5 @@ class Controller extends Behavior {
 		Retention.writePreference(model.authenticationKey, authentication);
 	}
 }
-Object.freeze(Controller.prototype);
 
 export default Controller;

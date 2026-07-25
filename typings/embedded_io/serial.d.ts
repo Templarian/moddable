@@ -56,6 +56,7 @@ declare module "embedded:io/serial" {
     get format(): "number" | "buffer"
     set format(value: "number" | "buffer")
   }
+  interface Serial extends Disposable {}
 
   export default Serial;
 }

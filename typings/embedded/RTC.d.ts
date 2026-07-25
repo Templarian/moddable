@@ -37,6 +37,7 @@ declare module "embedded:RTC" {
 		time: number;
 		configure(options: RTCConfigureOptions): void;
 	}
+	export interface RTC extends Disposable {}
 
 	export default RTC;
 }

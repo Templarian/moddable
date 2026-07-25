@@ -87,6 +87,24 @@ class MakeFile extends MAKEFILE {
 	constructor(path) {
 		super(path)
 	}
+	generateManifestDefinitions(tool) {
+		this.write("MANIFEST =");
+		for (var result in tool.manifests.already) {
+			this.write(" \\\n\t");
+			this.write(result);
+		}
+		this.line("");
+		this.write("STRIPS =");
+		if (tool.strip) {
+			for (var result of tool.strip) {
+				this.write("\\\n\t-s \"");
+				this.write(result);
+				this.write("\"");
+			}
+		}
+		this.line("");
+		this.line("");
+	}
 	generateObjectsDefinitions(tool) {
 		if (tool.cFolders) {
 			this.write("DIRECTORIES =");
@@ -493,7 +511,7 @@ export default class extends Tool {
 		this.defines = null;
 		this.preloads = null;
 		this.recipes = null;
-		this.strip = null;
+		this.strip = this.manifest.strip;
 		this.typescript = this.manifest.typescript;
 		
 		let check = true;

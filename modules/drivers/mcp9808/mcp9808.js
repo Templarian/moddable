@@ -70,6 +70,5 @@ class MCP9808 extends SMBus {
 		return {temperature};
 	}
 }
-Object.freeze(MCP9808.prototype);
 
 export default MCP9808;

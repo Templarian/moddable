@@ -145,17 +145,15 @@ void xs_directorystorage_open(xsMachine *the)
 	char domain[64];
 
 	xsmcVars(1);
-	if (!xsmcHas(xsArg(0), xsID_path))
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_path))
 		xsUnknownError("no path");
-	xsmcGet(xsVar(0), xsArg(0), xsID_path);
 	xsmcToStringBuffer(xsVar(0), domain, sizeof(domain));
 	size_t length = c_strlen(domain);
 	if (0 == length) xsUnknownError("invalid");
 	if ('/' == domain[length - 1])
 		domain[length - 1] = 0;
 
-	if (xsmcHas(xsArg(0), xsID_mode)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_mode);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_mode)) {
 		char *modeStr = xsmcToString(xsVar(0));
 		if (0 == c_strcmp(modeStr, "r"))
 			mode = NVS_READONLY;

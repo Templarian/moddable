@@ -83,29 +83,35 @@ txBoolean _xsHasIndex(txMachine *the, txSlot *self, txIndex index)
 	return fxHasIndex(the, index);
 }
 
-void _xsGet(txMachine *the, txSlot *res, txSlot *self, txID id)
+txBoolean _xsGet(txMachine *the, txSlot *res, txSlot *self, txID id)
 {
+	txBoolean result;
 	mxOverflow(-1);
 	fxPush(*self);
-	mxGetID(id);
+	result = mxGetID(id);
 	*res = fxPop();
+	return result;
 }
 
-void _xsGetAt(txMachine *the, txSlot *res, txSlot *self, txSlot *at)
+txBoolean _xsGetAt(txMachine *the, txSlot *res, txSlot *self, txSlot *at)
 {
+	txBoolean result;
 	mxOverflow(-2);
 	fxPush(*self);
 	fxPush(*at);
-	fxGetAt(the);
+	result = fxGetAt(the);
 	*res = fxPop();
+	return result;
 }
 
-void _xsGetIndex(txMachine *the, txSlot *res, txSlot *self, txIndex index)
+txBoolean _xsGetIndex(txMachine *the, txSlot *res, txSlot *self, txIndex index)
 {
+	txBoolean result;
 	mxOverflow(-1);
 	fxPush(*self);
-	mxGetIndex(index);
+	result = mxGetIndex(index);
 	*res = fxPop();
+	return result;
 }
 
 void _xsSet(txMachine *the, txSlot *self, txID id, txSlot *v)

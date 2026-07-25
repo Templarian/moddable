@@ -147,6 +147,10 @@ class FT3168 {
 
     return result
   }
+
+  static {
+    this.prototype[Symbol.dispose] = this.prototype.close
+  }
 }
 
 export default FT3168

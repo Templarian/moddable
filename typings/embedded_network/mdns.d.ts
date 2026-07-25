@@ -57,24 +57,26 @@ declare module "embedded:network/mdns" {
 		txt?: Map<string, string | undefined>;
 	}
 
-	export interface ClaimInstance {
+	export interface ClaimInstance extends Disposable {
 		close(): void;
 	}
 
-	export interface AdvertiseInstance {
+	export interface AdvertiseInstance extends Disposable {
 		close(): void;
 		updateTXT(txt?: Map<string, string | undefined>): void;
 	}
 
-	export interface DiscoverInstance {
+	export interface DiscoverInstance extends Disposable {
 		close(): void;
 	}
 
-	export default class DNSSD {
+	class DNSSD {
 		constructor(options: DNSSDOptions);
 		close(): void;
 		claim(options: ClaimOptions): ClaimInstance;
 		advertise(options: AdvertiseOptions): AdvertiseInstance;
 		discover(options: DiscoverOptions): DiscoverInstance;
 	}
+	interface DNSSD extends Disposable {}
+	export default DNSSD;
 }

@@ -106,7 +106,7 @@ static void fxWriteStack(txMachine* the, txSnapshot* snapshot);
 	#define mxFloat16Additions 0
 #endif
 #if mxImmutableArrayBuffers
-	#define mxImmutableArrayBuffersAdditions 2
+	#define mxImmutableArrayBuffersAdditions 3
 #else
 	#define mxImmutableArrayBuffersAdditions 0
 #endif
@@ -738,6 +738,9 @@ static txCallback gxCallbacks[mxCallbacksLength] = {
 	fx_Math_sumPrecise,
 	fx_WeakMap_prototype_getOrInsert,
 	fx_WeakMap_prototype_getOrInsertComputed,
+#endif
+#if mxImmutableArrayBuffers
+	fx_ArrayBuffer_prototype_sliceToImmutabls,
 #endif
 };
 extern const txTypeDispatch gxTypeDispatches[];

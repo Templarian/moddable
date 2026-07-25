@@ -383,22 +383,26 @@ class Connection {
 	}
 	set route(route) {
 		this.#route = route;
-		this.#options.onRequest = route.onRequest; 
-		this.#options.onReadable = route.onReadable; 
-		this.#options.onResponse = route.onResponse; 
-		this.#options.onWritable = route.onWritable; 
-		this.#options.onDone = route.onDone 
-		this.#options.onError = route.onError; 
+		this.#options.onRequest = route.onRequest;
+		this.#options.onReadable = route.onReadable;
+		this.#options.onResponse = route.onResponse;
+		this.#options.onWritable = route.onWritable;
+		this.#options.onDone = route.onDone
+		this.#options.onError = route.onError;
 		if (this.#state === "receiveHeader") {
 			this.#options.onRequest?.call(this, {
 				method: this.#options.method,
 				path: this.#options.path,
-				headers: this.#options.headers							
+				headers: this.#options.headers
 			});
 		}
 		else {
 			// error?
 		}
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 
@@ -434,6 +438,10 @@ class HTTPServer {
 	}
 	get port() {
 		return this.#listener.port;
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

@@ -23,6 +23,5 @@ export class PWM @ "xs_pwm_destructor" {
 	close() @ "xs_pwm_close";
 	write(value) @ "xs_pwm_write";
 };
-Object.freeze(PWM.prototype);
 
 export default PWM;

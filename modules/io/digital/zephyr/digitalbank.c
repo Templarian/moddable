@@ -102,17 +102,14 @@ void xs_digitalbank_constructor(xsMachine *the)
 
 	builtinInitIO();
 
-	if (!xsmcHas(xsArg(0), xsID_port))
+	if (!xsmcGet(tmp, xsArg(0), xsID_port))
 		xsUnknownError("port required");
-	xsmcGet(tmp, xsArg(0), xsID_port);
 	const struct modZephyrGPIOBank *bank = modZephyrGetGPIOBank(xsmcToString(tmp));
 	if (NULL == bank)
 		xsRangeError("bad port");
 
-	if (!xsmcHas(xsArg(0), xsID_pins))
+	if (!xsmcGet(tmp, xsArg(0), xsID_pins))
 		xsUnknownError("invalid");
-
-	xsmcGet(tmp, xsArg(0), xsID_pins);
 	pins = xsmcToUnsigned(tmp);
 	if (!builtinArePinsFree(bank->bankIndex, pins))
 		xsUnknownError("in use");
@@ -129,17 +126,13 @@ void xs_digitalbank_constructor(xsMachine *the)
 		xsTrace("digital: ActiveLow deprecated, use activeLow: true\n");
 		activeLow = 1;
 	}
-	if (xsmcHas(xsArg(0), xsID_activeLow)) {
-		xsmcGet(tmp, xsArg(0), xsID_activeLow);
+	if (xsmcGet(tmp, xsArg(0), xsID_activeLow))
 		activeLow = xsmcTest(tmp);
-	}
 
 	uint32_t initialValue = 0;
 	if ((kDigitalOutput == tmode) || (kDigitalOutputOpenDrain == tmode)) {
-		if (xsmcHas(xsArg(0), xsID_initialValue)) {
-			xsmcGet(tmp, xsArg(0), xsID_initialValue);
+		if (xsmcGet(tmp, xsArg(0), xsID_initialValue))
 			initialValue = xsmcToUnsigned(tmp) & pins;
-		}
 	}
 
 	onReadable = builtinGetCallback(the, xsID_onReadable);
@@ -147,14 +140,10 @@ void xs_digitalbank_constructor(xsMachine *the)
 		if (!((kDigitalInput <= tmode) && (tmode <= kDigitalInputPullUpDown)))
 			xsRangeError("invalid mode");
 
-		if (xsmcHas(xsArg(0), xsID_rises)) {
-			xsmcGet(tmp, xsArg(0), xsID_rises);
+		if (xsmcGet(tmp, xsArg(0), xsID_rises))
 			rises = xsmcToUnsigned(tmp) & pins;
-		}
-		if (xsmcHas(xsArg(0), xsID_falls)) {
-			xsmcGet(tmp, xsArg(0), xsID_falls);
+		if (xsmcGet(tmp, xsArg(0), xsID_falls))
 			falls = xsmcToUnsigned(tmp) & pins;
-		}
 
 		if (!rises & !falls)
 			xsRangeError("invalid edges");

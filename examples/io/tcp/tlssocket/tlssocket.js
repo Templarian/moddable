@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025  Moddable Tech, Inc.
+ * Copyright (c) 2021-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK.
  * 
@@ -170,6 +170,10 @@ class TLSSocket {
 		this.#data = data;
 
 		this.#callbacks.onReadable?.(readable);
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

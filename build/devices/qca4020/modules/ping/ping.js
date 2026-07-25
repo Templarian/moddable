@@ -79,7 +79,6 @@ class Ping @ "xs_ping_destructor" {
 	_close() @ "xs_ping_close"
 	_ping() @ "xs_ping"
 };
-Object.freeze(Ping.prototype);
 
 export default Ping;
 

@@ -104,17 +104,12 @@ void _xs_i2c_constructor(xsMachine *the)
 
 	xsmcVars(1);
 
-	if (!xsmcHas(xsArg(0), xsID_data))
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_data))
 		xsRangeError("data required");
-	if (!xsmcHas(xsArg(0), xsID_clock))
-		xsRangeError("clock required");
-	if (!xsmcHas(xsArg(0), xsID_address))
-		xsRangeError("address required");
-
-	xsmcGet(xsVar(0), xsArg(0), xsID_data);
 	data = builtinGetPin(the, &xsVar(0));
 
-	xsmcGet(xsVar(0), xsArg(0), xsID_clock);
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_clock))
+		xsRangeError("clock required");
 	clock = builtinGetPin(the, &xsVar(0));
 
 	if (usingPins(data, clock))
@@ -122,7 +117,8 @@ void _xs_i2c_constructor(xsMachine *the)
 	else if (!builtinIsPinFree(data) || !builtinIsPinFree(clock))
 		xsRangeError("inUse");
 
-	xsmcGet(xsVar(0), xsArg(0), xsID_address);
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_address))
+		xsRangeError("address required");
 	address = builtinGetPin(the, &xsVar(0));
 	if ((address < 0) || (address > 127))
 		xsRangeError("invalid address");
@@ -140,20 +136,16 @@ void _xs_i2c_constructor(xsMachine *the)
 	if ((hz <= 0) || (hz > 20000000))
 		xsRangeError("invalid hz");
 
-	if (xsmcHas(xsArg(0), xsID_timeout)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_timeout);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_timeout)) {
 		timeout = xsmcToInteger(xsVar(0));
 		if (timeout < -1)
 			xsRangeError("invalid timeout");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_pullup)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_pullup);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_pullup))
 		pullup = xsmcToBoolean(xsVar(0));
-	}
 
-	if (xsmcHas(xsArg(0), xsID_port)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_port);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_port)) {
 		port = xsmcToInteger(xsVar(0));
 		if ((port < 0) || (port >= I2C_NUM_MAX))
 			xsRangeError("invalid port");
@@ -518,6 +510,7 @@ struct TransactionRecord {
 	uint8_t				hasReadBuffer;
 	uint8_t				operation;
 	uint8_t				bufferLength;
+	uint8_t				otherBufferLength;	// for writeRead: buffer & bufferLength are read, (buffer + bufferLength) & otherBufferLength are write
 	uint8_t				processing;		// 0 unstarted, 1 i2c transaction in progress, 2 i2c transaction done
 	uint8_t				reg;			// smbus register
 	int					err;
@@ -530,6 +523,7 @@ enum {
 	kOperationClose,
 	kOperationWrite,
 	kOperationRead,
+	kOperationWriteRead,
 	kOperationReadUint8,
 	kOperationReadUint16,
 	kOperationWriteUint8,
@@ -568,8 +562,10 @@ void i2cDeliver(void *theIn, void *refcon, uint8_t *message, uint16_t messageLen
 	} 
 	xSemaphoreGive(gI2CTaskMutex);
 
-	if (kOperationClose == operation)
+	if (kOperationClose == operation) {
+		xsForget(transaction->i2c->obj);
 		_xs_i2casync_destructor(transaction->i2c);	// all resources must be released before invoking callback ... so callback could call new again
+	}
 
 	if (transaction->hasCallback) {
 		xsBeginHost(the);
@@ -686,6 +682,11 @@ static void i2cTask(void *pvParameter)
 							transaction->err = i2c_master_transmit(i2c->device, transaction->buffer, transaction->bufferLength, i2c->timeout);
 						else //@@ write quick unsupported thorugh transmit, but probe seems similar-ish
 							transaction->err = i2c_master_probe(i2c->bus, i2c->address, 1000);
+						break;
+
+					case kOperationWriteRead:
+						transaction->err = i2c_master_transmit_receive(i2c->device, transaction->buffer + transaction->bufferLength, transaction->otherBufferLength, transaction->buffer, transaction->bufferLength, i2c->timeout);
+						transaction->operation = kOperationRead;
 						break;
 
 					case kOperationWriteUint8:
@@ -910,6 +911,49 @@ void _xs_i2casync_write(xsMachine *the)
 	queueTransaction(transaction);
 }
 
+void _xs_i2casync_writeRead(xsMachine *the)
+{
+	I2C i2c = xsmcGetHostDataValidate(xsThis, (xsHostHooks *)&xsI2CHooks);
+	xsUnsignedValue lengthWrite, lengthRead;
+	void *bufferWrite, *bufferRead;
+	uint8_t stop = true, hasReadBuffer = false;
+	int callbackIndex = -1;
+
+	if (xsmcArgc > 2) {
+		if (xsmcIsCallable(xsArg(2)))
+			callbackIndex = 2;
+		else {
+			stop = xsmcToBoolean(xsArg(2));
+			if (xsmcArgc > 2)
+				callbackIndex = 3;
+		}
+	}
+
+	if (xsReferenceType == xsmcTypeOf(xsArg(1))) {
+		xsmcGetBufferWritable(xsArg(1), &bufferRead, &lengthRead);
+		hasReadBuffer = true;
+	}
+	else
+ 		lengthRead = xsmcToInteger(xsArg(1));
+
+	xsmcGetBufferReadable(xsArg(0), &bufferWrite, &lengthWrite);
+
+	// set-up transaction record
+	Transaction transaction = newI2CTransaction(the, i2c, kOperationWriteRead, lengthRead + lengthWrite, callbackIndex);
+
+	c_memmove(transaction->buffer + lengthRead, bufferWrite, lengthWrite);
+	transaction->bufferLength = lengthRead;
+	transaction->otherBufferLength = lengthWrite;
+
+	transaction->hasReadBuffer = hasReadBuffer;
+	if (hasReadBuffer) {
+		transaction->readBuffer = xsArg(1);
+		xsRemember(transaction->readBuffer);
+	}
+	
+	queueTransaction(transaction);
+}
+
 void _xs_smbusasync_destructor(void *data)
 {
 	_xs_i2casync_destructor(data);
@@ -922,10 +966,8 @@ void _xs_smbusasync_constructor(xsMachine *the)
 	I2C i2c = xsmcGetHostDataValidate(xsThis, (xsHostHooks *)&xsI2CHooks);
 	xsSetHostHooks(xsThis, (xsHostHooks *)&xsSMBusHooks);
 	i2c->stop = 0;
-	if (xsmcHas(xsArg(0), xsID_stop)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_stop);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_stop))
 		i2c->stop = xsmcToBoolean(xsVar(0));
-	}
 }
 
 void _xs_smbusasync_close(xsMachine *the)

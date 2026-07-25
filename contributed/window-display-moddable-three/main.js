@@ -35,7 +35,6 @@ class AppBehavior extends Behavior {
 		application.add(new SCREENS[this.index]({}));
 	}
 }
-Object.freeze(AppBehavior.prototype);
 
 export default function() {
 	return new Application(null, {

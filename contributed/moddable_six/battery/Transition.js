@@ -34,7 +34,6 @@ export class HorizontalTransition extends WipeTransition {
 		delete this.container;
 	}
 }
-Object.freeze(HorizontalTransition.prototype);
 
 export class VerticalTransition extends WipeTransition {
 	constructor(backwards) {
@@ -56,6 +55,5 @@ export class VerticalTransition extends WipeTransition {
 		delete this.container;
 	}
 }
-Object.freeze(VerticalTransition.prototype);
 
 export default HorizontalTransition;

@@ -21,6 +21,5 @@
 class Vdac {
 	static write(channel, value) @ "xs_vdac_write";
 };
-Object.freeze(Vdac.prototype);
 
 export default Vdac;

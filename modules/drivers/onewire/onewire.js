@@ -53,6 +53,5 @@ class OneWire @ "xs_onewire_destructor" {
 
 }
 
-Object.freeze(OneWire.prototype);
 
 export default OneWire;

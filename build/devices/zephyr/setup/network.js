@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025  Moddable Tech, Inc.
+ * Copyright (c) 2025-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -38,8 +38,14 @@ export default function (done) {
 			...i,
 			onChanged() {
 				trace(`device.network.interface.${name} state: ${this.connection}\n`);
-				if (this.connection < 500)
+				if (this.connection < 500) {
+					if (connection <= 200) {
+						trace(`Wi-Fi disconnected\n`);		//@@ password rejected?
+						if (0 == --count)
+							done();
+					}
 					return;
+				}
 
 				trace(`  IP address: ${this.address}\n`);
 				this.close();

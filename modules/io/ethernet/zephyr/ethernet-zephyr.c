@@ -218,16 +218,14 @@ void xs_ethernet_configure(xsMachine *the)
 
 	xsmcVars(2);
 
-	if (xsmcHas(xsArg(0), xsID_hostname)) {
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_hostname)) {
 		char hostname[64];
-		xsmcGet(xsVar(0), xsArg(0), xsID_hostname);
 		const char *src = xsmcToStringBuffer(xsVar(0), hostname, sizeof(hostname));
 		if (net_hostname_set((char *)src, c_strlen(src)) < 0)
 			xsUnknownError("set hostname failed");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_static)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_static);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_static)) {
 		if (xsmcTest(xsVar(0))) {
 			struct in_addr ip, netmask, gw;
 

@@ -72,8 +72,7 @@ void xs_udp_constructor(xsMachine *the)
 	xsmcVars(1);
 
 	int port = 0;
-	if (xsmcHas(xsArg(0), xsID_port)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_port);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_port)) {
 		port = xsmcToInteger(xsVar(0));
 		if ((port < 0) || (port > 65535))
 			xsRangeError("invalid port");

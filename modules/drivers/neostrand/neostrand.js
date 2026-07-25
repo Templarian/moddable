@@ -584,8 +584,6 @@ NeoStrand.Pattern = Pattern;
 NeoStrand.Dim = Dim;
 //NeoStrand.Ease = Ease;
 
-Object.freeze(NeoStrand.prototype);
-Object.freeze(NeoStrandEffect.prototype);
 
 export default { NeoStrand, NeoStrandEffect };
 

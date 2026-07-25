@@ -80,7 +80,6 @@ class Serial @ "xs_serial_destructor" {
 };
 
 
-Object.freeze(Serial.prototype);
 
 export default Serial;
 

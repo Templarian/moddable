@@ -32,6 +32,7 @@ declare module "embedded:network/dns/resolver/udp" {
     resolve(options: Options): void
 
   }
+  interface Resolver extends Disposable {}
 
   export default Resolver
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025  Moddable Tech, Inc.
+ * Copyright (c) 2024-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -31,6 +31,10 @@ class Storage extends Native("xs_directorystorage_destructor") {
 
 	get format() { return native("xs_directorystorage_format_get").call(this); }
 	set format(value) { native("xs_directorystorage_format_set").call(this, value); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 function open(options, prototype) { return native("xs_directorystorage_open").call(this, options, prototype); }

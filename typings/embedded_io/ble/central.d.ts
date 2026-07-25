@@ -23,6 +23,7 @@ declare module "embedded:io/bluetoothle/central" {
         close(): void;
         read(): Advertisement;
     }
+    interface GAPClient extends Disposable {}
 
     interface GATTClientNotifiedValue extends ArrayBuffer {
         handle: number
@@ -100,6 +101,7 @@ declare module "embedded:io/bluetoothle/central" {
             writeWithOutResponse: 4;
         };
     }
- 
+    interface GATTClient extends Disposable {}
+
     export { GATTClient, GAPClient };
 }

@@ -129,11 +129,11 @@ mxImport xsBooleanValue _xsHas(xsMachine *, xsSlot *, xsIdentifier);
 mxImport xsBooleanValue _xsHasIndex(xsMachine *, xsSlot *, xsIndex);
 #define xsmcHasIndex(_THIS, _INDEX)	_xsHasIndex(the, &_THIS, _INDEX)
 
-mxImport void _xsGet(xsMachine *, xsSlot *, xsSlot *, xsIdentifier);
+mxImport xsBooleanValue _xsGet(xsMachine *, xsSlot *, xsSlot *, xsIdentifier);
 #define xsmcGet(_SLOT, _THIS, _ID)	_xsGet(the, &_SLOT, &_THIS, _ID)
-mxImport void _xsGetAt(xsMachine *, xsSlot *, xsSlot *, xsSlot *);
+mxImport xsBooleanValue _xsGetAt(xsMachine *, xsSlot *, xsSlot *, xsSlot *);
 #define xsmcGetAt(_SLOT, _THIS, _AT)	_xsGetAt(the, &_SLOT, &_THIS, &_AT)
-mxImport void _xsGetIndex(xsMachine *, xsSlot *, xsSlot *, xsIndex);
+mxImport xsBooleanValue _xsGetIndex(xsMachine *, xsSlot *, xsSlot *, xsIndex);
 #define xsmcGetIndex(_SLOT, _THIS, _INDEX)	_xsGetIndex(the, &_SLOT, &_THIS, _INDEX)
 
 mxImport void _xsSet(xsMachine *, xsSlot *, xsIdentifier, xsSlot *);

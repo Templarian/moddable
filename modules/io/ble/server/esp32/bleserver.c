@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025  Moddable Tech, Inc.
+ * Copyright (c) 2025-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -159,7 +159,7 @@ struct BLEServerRecord {
 	uint8_t		addressType;
 	uint8_t		secure;
 	uint8_t		immediate;
-	uint16_t	mtu;
+	uint16_t		mtu;
 };
 typedef struct BLEServerRecord BLEServerRecord;
 typedef struct BLEServerRecord *BLEServer;
@@ -268,9 +268,7 @@ void xs_gattserver_build(xsMachine *the)
 	xsSlot *onSecured = builtinGetCallback(the, xsID_onSecured);
 
 	uint8_t secure = 0, authenticate = 0, immediate = 0, bond = 0, display = 0, keyboard = 0;
-	if (xsmcHas(xsArg(0), xsID_security)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_security);
-
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_security)) {
 		xsmcGet(xsVar(1), xsVar(0), xsID_authenticate);
 		authenticate = xsmcTest(xsVar(1));
 
@@ -304,10 +302,10 @@ void xs_gattserver_build(xsMachine *the)
 	builtinInitializeTarget(the);
 
 	int mtu = 0;
-	if (xsmcHas(xsArg(0), xsID_mtu)) {
-		xsSlot tmp;
-		xsmcGet(tmp, xsArg(0), xsID_mtu);
+	xsSlot tmp;
+	if (xsmcGet(tmp, xsArg(0), xsID_mtu)) {
 		mtu = xsmcToInteger(tmp);
+
 		if (mtu > BLE_ATT_MTU_MAX)
 			mtu = BLE_ATT_MTU_MAX;
 		else if (mtu < BLE_ATT_MTU_DFLT)
@@ -439,8 +437,7 @@ void xs_gattserver_addService(xsMachine *the)
 			if (!xsmcTest(xsVar(2)))
 				xsUnknownError("properies missing");
 			gsc->properties = xsmcToInteger(xsVar(2));
-			if (xsmcHas(xsVar(1), xsID_value)) {
-				xsmcGet(xsVar(2), xsVar(1), xsID_value);
+			if (xsmcGet(xsVar(2), xsVar(1), xsID_value)) {
 				void *data;
 				xsUnsignedValue dataLength;
 				xsmcGetBufferReadable(xsVar(2), &data, &dataLength);
@@ -498,10 +495,9 @@ void xs_gattserver_addService(xsMachine *the)
 				if (ble_uuid_from_str(&gsd->uuid, xsmcToString(xsVar(4))))
 					xsRangeError("bad uuid");
 
-				if (xsmcHas(xsVar(3), xsID_value)) {
+				if (xsmcGet(xsVar(4), xsVar(3), xsID_value)) {
 					if (xsmcHas(xsVar(3), xsID_onRead) || xsmcHas(xsVar(3), xsID_onWrite))
 						xsUnknownError("invalid - no callbacks with value");
-					xsmcGet(xsVar(4), xsVar(3), xsID_value);
 					void *data;
 					xsUnsignedValue dataLength;
 					xsmcGetBufferReadable(xsVar(4), &data, &dataLength);
@@ -705,6 +701,8 @@ static void writeCharacteristic(void *the, void *refcon, uint8_t *message, uint1
 int accessCharacteristic(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg)
 {
 	BLEGATTServerConnection connection = findConnection(gServer, conn_handle);		//@@ gServer
+	if (C_NULL == connection)
+		return BLE_ATT_ERR_UNLIKELY;
 
 	switch (ctxt->op) {
 		case BLE_GATT_ACCESS_OP_READ_CHR: {
@@ -899,6 +897,8 @@ static void deliverOnSecured(void *theIn, void *refcon, uint8_t *message, uint16
 	BLEServer server = refcon;
 	uint16_t conn_handle = *(uint16_t *)message;
 	BLEGATTServerConnection connection = findConnection(server, conn_handle);
+	if (C_NULL == connection)
+		return;
 
 	struct ble_gap_conn_desc desc;
 	if (0 != ble_gap_conn_find(conn_handle, &desc))
@@ -925,6 +925,8 @@ static void deliverOnPasskey(void *theIn, void *refcon, uint8_t *message, uint16
 	BLEServer server = refcon;
 	struct ble_gap_event *event = (struct ble_gap_event *)message;
 	BLEGATTServerConnection connection = findConnection(server, event->passkey.conn_handle);
+	if (C_NULL == connection)
+		return;
 	struct ble_gap_passkey_params *params = &event->passkey.params;
 
 	xsBeginHost(the);
@@ -971,7 +973,11 @@ static void deliverSubscribe(void *the, void *refcon, uint8_t *message, uint16_t
 	BLEServer server = refcon;
 	BLESubscribe sub = (BLESubscribe)message;
 	BLEGATTServerCharacteristic gsc = findCharacteristic(server, sub->attr_handle);
+	if (C_NULL == gsc)
+		return;
 	BLEGATTServerConnection connection = findConnection(server, sub->conn_handle);
+	if (C_NULL == connection)
+		return;
 	uint8_t enable = sub->notify || sub->indicate;
 	gsc->notify = sub->notify;
 	gsc->indicate = sub->indicate;
@@ -1026,9 +1032,11 @@ int handleGAPEvent(struct ble_gap_event *event, void *arg)
 			modMessagePostToMachine(server->the, (void *)&event->disconnect.conn, sizeof(event->disconnect.conn), deliverDisconnect, server);
 			break;
 
-		case BLE_GAP_EVENT_MTU:
-			(findConnection(server, event->mtu.conn_handle))->maximumWrite = event->mtu.value - 3; 
-			break;
+		case BLE_GAP_EVENT_MTU: {
+			BLEGATTServerConnection connection = findConnection(server, event->mtu.conn_handle);
+			if (connection)
+				connection->maximumWrite = event->mtu.value - 3; 
+			} break;
 
 		case BLE_GAP_EVENT_PARING_COMPLETE:
 			if ((0 == event->enc_change.status) && server->onSecured)
@@ -1128,6 +1136,9 @@ void xs_gattserverconnection_notify(xsMachine *the)
 
 void xs_gattserverconnection_close(xsMachine *the)
 {
+	if (C_NULL == xsmcGetHostData(xsThis))
+		return;
+
 	BLEGATTServerConnection connection = xsmcGetHostDataValidate(xsThis, xs_gattserverconnection_destructor);
 	BLEServer server = connection->server;
 	ble_gap_terminate(connection->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
@@ -1151,6 +1162,22 @@ void xs_gattserverconnection_get_maximumWrite(xsMachine *the)
 	BLEGATTServerConnection connection = xsmcGetHostDataValidate(xsThis, xs_gattserverconnection_destructor);
 
 	xsmcSetInteger(xsResult, connection->maximumWrite);
+}
+
+void xs_gattserverconnection_get_remoteAddress(xsMachine *the)
+{
+	BLEGATTServerConnection connection = xsmcGetHostDataValidate(xsThis, xs_gattserverconnection_destructor);
+
+	struct ble_gap_conn_desc desc;
+	if (0 != ble_gap_conn_find(connection->conn_handle, &desc))
+		return;
+
+	char address[24];
+	snprintf(address, sizeof(address), "%02X:%02X:%02X:%02X:%02X:%02X/%02X",
+         desc.peer_id_addr.val[5], desc.peer_id_addr.val[4], desc.peer_id_addr.val[3],
+         desc.peer_id_addr.val[2], desc.peer_id_addr.val[1], desc.peer_id_addr.val[0],
+         desc.peer_id_addr.type);
+	xsmcSetString(xsResult, address);
 }
 
 void xs_gattserverconnection_replyToPasskey(xsMachine *the)
@@ -1190,6 +1217,12 @@ void xs_gattserverconnection_replyToPasskey(xsMachine *the)
 	int err = ble_sm_inject_io(connection->conn_handle, &pkey);
 	if (err)
 		xsUnknownError("failed");
+}
+
+void xs_gattserverconnection_disconnect(xsMachine *the)
+{
+	BLEGATTServerConnection connection = xsmcGetHostDataValidate(xsThis, xs_gattserverconnection_destructor);
+	ble_gap_terminate(connection->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
 }
 
 void xs_gattservercharacteristic_destructor(void *data)

@@ -66,7 +66,11 @@ class Message extends Native("xs_appmessage_destructor") {
  		return native("xs_appmessage_get_input").call(this);
 	}
 	get output() {
- 		return native("xs_appmessage_get_output").call(this);		
+ 		return native("xs_appmessage_get_output").call(this);
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

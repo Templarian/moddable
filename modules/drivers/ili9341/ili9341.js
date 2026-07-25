@@ -53,4 +53,3 @@ export default class ILI9341 @ "xs_ILI9341_destructor" {
 	close() @ "xs_ILI9341_close";
 }
 
-Object.freeze(ILI9341.prototype);

@@ -100,6 +100,5 @@ class Scanner {
 		this.#items = undefined;
 	}
 }
-Object.freeze(Scanner.prototype);
 
 export default Scanner;

@@ -85,7 +85,6 @@ trace(`after complete: ${Time.ticks} - total ${Time.ticks - this.startms}\n`);
 	}
 }
 
-Object.freeze(OTARequest.prototype);
 export default (OTARequest);
 
 

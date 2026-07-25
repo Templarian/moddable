@@ -31,9 +31,11 @@ declare module "embedded:io/analog" {
     readonly resolution: number;
     onReadable?: () => void;
     read(): number;
+    close(): void;
     get format(): "number"
     set format(value: "number")
     target?: any;
   }
+  interface Analog extends Disposable {}
   export default Analog;
 }

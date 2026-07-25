@@ -92,9 +92,8 @@ void xs_digitalbank_constructor(xsMachine *the)
 	builtinInitIO();
 
 #if kPinBanks > 1
-	if (xsmcHas(xsArg(0), xsID_bank)) {
+	if (xsmcGet(tmp, xsArg(0), xsID_bank)) {
 		uint32_t b;
-		xsmcGet(tmp, xsArg(0), xsID_bank);
 		b = xsmcToUnsigned(tmp);
 		if (b >= kPinBanks)
 			xsUnknownError("invalid bank");
@@ -118,18 +117,15 @@ void xs_digitalbank_constructor(xsMachine *the)
 		xsRangeError("invalid mode");
 
 	uint32_t activeLow = 0;
-	if (xsmcHas(xsArg(0), xsID_activeLow)) {
-		xsmcGet(tmp, xsArg(0), xsID_activeLow);
+	if (xsmcGet(tmp, xsArg(0), xsID_activeLow)) {
 		if (xsmcTest(tmp))
 			activeLow = pins;
 	}
 
 	uint32_t initialValue = 0;
 	if ((kDigitalOutput == mode) || (kDigitalOutputOpenDrain == mode)) {
-		if (xsmcHas(xsArg(0), xsID_initialValue)) {
-			xsmcGet(tmp, xsArg(0), xsID_initialValue);
+		if (xsmcGet(tmp, xsArg(0), xsID_initialValue))
 			initialValue = xsmcToUnsigned(tmp) & pins;
-		}
 	}
 
 	onReadable = builtinGetCallback(the, xsID_onReadable);
@@ -138,14 +134,10 @@ void xs_digitalbank_constructor(xsMachine *the)
 			if (!((kDigitalInput <= mode) && (mode <= kDigitalInputPullUpDown)))
 				xsRangeError("invalid mode");
 
-			if (xsmcHas(xsArg(0), xsID_rises)) {
-				xsmcGet(tmp, xsArg(0), xsID_rises);
+			if (xsmcGet(tmp, xsArg(0), xsID_rises))
 				rises = xsmcToUnsigned(tmp) & pins;
-			}
-			if (xsmcHas(xsArg(0), xsID_falls)) {
-				xsmcGet(tmp, xsArg(0), xsID_falls);
+			if (xsmcGet(tmp, xsArg(0), xsID_falls))
 				falls = xsmcToUnsigned(tmp) & pins;
-			}
 			if (!rises & !falls)
 				xsRangeError("invalid edges");
 

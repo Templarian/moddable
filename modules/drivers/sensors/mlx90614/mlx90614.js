@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021  Moddable Tech, Inc.
+ * Copyright (c) 2016-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -80,6 +80,10 @@ class MLX90614 {
 
 		let value = (vBuf[1] << 8) | vBuf[0];
 		return (value * 0.02) - 273.15;
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 export default MLX90614;

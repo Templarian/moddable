@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025  Moddable Tech, Inc.
+ * Copyright (c) 2025-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -24,4 +24,8 @@ export default class ArchivePebbleResource extends Native("ArchivePebbleResource
 	constructor(id) { super(); native("ArchivePebbleResourceCreate").call(this, id); }
 	close() { return native("ArchivePebbleResource_close").call(this); }
 	get archive() { return native("ArchivePebbleResource_get_archive").call(this); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }

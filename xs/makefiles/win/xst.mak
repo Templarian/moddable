@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2016-2023 Moddable Tech, Inc.
+# Copyright (c) 2016-2026 Moddable Tech, Inc.
 #
 #   This file is part of the Moddable SDK Tools.
 # 
@@ -139,6 +139,7 @@ OBJECTS = \
 	$(TMP_DIR)\modBase64.obj \
 	$(TMP_DIR)\xst.obj \
 	$(TMP_DIR)\xst262.obj \
+	$(TMP_DIR)\xstBundle.obj \
 	$(TMP_DIR)\xstFuzz.obj \
 	$(TMP_DIR)\e_acos.obj \
 	$(TMP_DIR)\e_acosh.obj \

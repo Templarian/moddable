@@ -376,10 +376,9 @@ void BLEServer_addService(xsMachine *the)
 				properties = CBCharacteristicPropertyIndicateEncryptionRequired;
 			}
 		}
-		if (xsmcHas(xsVar(1), xsID_value)) {
+		if (xsmcGet(xsVar(2), xsVar(1), xsID_value)) {
 			void* buffer;
 			xsUnsignedValue length;
-			xsmcGet(xsVar(2), xsVar(1), xsID_value);
 			xsmcGetBufferReadable(xsVar(2), &buffer, &length);
 			value = [NSData dataWithBytes:buffer length:length];
 		}
@@ -426,8 +425,7 @@ void BLEServer_addService(xsMachine *the)
 			NSString* string = [NSString stringWithUTF8String:xsmcToString(xsVar(4))];
 			CBUUID* uuid = [CBUUID UUIDWithString:string];
 			id value = nil;
-			if (xsmcHas(xsVar(3), xsID_value)) {
-				xsmcGet(xsVar(4), xsVar(3), xsID_value);
+			if (xsmcGet(xsVar(4), xsVar(3), xsID_value)) {
 				void* buffer;
 				xsUnsignedValue length;
 				xsmcGetBufferReadable(xsVar(4), &buffer, &length);

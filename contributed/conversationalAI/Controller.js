@@ -200,6 +200,5 @@ class Controller extends Behavior {
 			container.distribute("onUpdate");
 	}
 }
-Object.freeze(Controller.prototype);
 
 export default Controller;

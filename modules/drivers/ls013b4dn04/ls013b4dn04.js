@@ -54,4 +54,3 @@ export default class LS013B4DN04 @ "xs_ls013b4dn04_destructor" {
 	set rotation() @ "xs_ls013b4dn04_set_rotation";
 }
 
-Object.freeze(LS013B4DN04.prototype);

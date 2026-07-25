@@ -68,8 +68,7 @@ void xs_pwm_constructor_(xsMachine *the)
 
 	xsmcVars(2);
 
-    if (xsmcHas(xsArg(0), xsID_from)) {
-		xsmcGet(xsVar(1), xsArg(0), xsID_from);
+    if (xsmcGet(xsVar(1), xsArg(0), xsID_from)) {
 		pwm = xsmcGetHostDataValidate(xsVar(1), xs_pwm_destructor_);
 		pin = pwm->pin;
 		duty = pwm->duty;
@@ -86,15 +85,13 @@ void xs_pwm_constructor_(xsMachine *the)
 			xsUnknownError("in use");
 	}
 
-    if (xsmcHas(xsArg(0), xsID_hz)) {
-        xsmcGet(xsVar(0), xsArg(0), xsID_hz);
+    if (xsmcGet(xsVar(0), xsArg(0), xsID_hz)) {
         hz = xsmcToInteger(xsVar(0));
         if (hz <= 0)
 			xsRangeError("invalid hz");
     }
 
-    if (xsmcHas(xsArg(0), xsID_resolution)) {
-        xsmcGet(xsVar(0), xsArg(0), xsID_resolution);
+    if (xsmcGet(xsVar(0), xsArg(0), xsID_resolution)) {
         resolution = xsmcToInteger(xsVar(0));
         if ((resolution <= 0) || (resolution >= RES_BITS_MAX))
 			xsRangeError("invalid resolution");

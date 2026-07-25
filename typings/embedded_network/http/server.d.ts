@@ -42,7 +42,7 @@ declare module "embedded:network/http/server" {
         onError?(this: HTTPConnection): void;
     }
 
-    export interface HTTPConnection {
+    export interface HTTPConnection extends Disposable {
         close(): void;
         detach(): TCP;
         accept(options: HTTPConnectionHandlers): void;
@@ -59,9 +59,11 @@ declare module "embedded:network/http/server" {
         onConnect(this: HTTPServer, connection: HTTPConnection): void;
     }
 
-    export default class HTTPServer {
+    class HTTPServer {
         constructor(options: HTTPServerOptions);
         close(): void;
         readonly port: number;
     }
+    interface HTTPServer extends Disposable {}
+    export default HTTPServer;
 }

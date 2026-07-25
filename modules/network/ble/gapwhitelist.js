@@ -48,6 +48,5 @@ class GAPWhitelist {
 	static #whitelistRemove(entry) @ "xs_gap_whitelist_remove"
 	static #whitelistClear() @ "xs_gap_whitelist_clear"
 }
-Object.freeze(GAPWhitelist.prototype);
 
 export default GAPWhitelist;

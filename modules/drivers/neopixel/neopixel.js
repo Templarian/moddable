@@ -37,6 +37,5 @@ class NeoPixel @ "xs_neopixel_destructor" {
 	get length() @ "xs_neopixel_length_get";
 	get byteLength() @ "xs_neopixel_byteLength_get";
 }
-Object.freeze(NeoPixel.prototype);
 
 export default NeoPixel;

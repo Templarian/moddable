@@ -1093,9 +1093,9 @@ xsVar(0) = xsGet(xsThis, xsID("foo"));
 
 #### xsmcGet
 
-The `xsmcGet` macro is functionally equivalent to the `xsGet` macro. The property is returned in the slot provided.
+The `xsmcGet` macro is functionally equivalent to the `xsGet` macro. The property is returned in the slot provided. The return value is a boolean which indicates if the property exists.
 
-**`void xsmcGet(xsSlot theSlot, xsSlot theThis, xsIdentifier theID)`**
+**`xsBooleanValue xsmcGet(xsSlot theSlot, xsSlot theThis, xsIdentifier theID)`**
 
 | Arguments | Description |
 | --- | :-- |
@@ -1108,6 +1108,8 @@ The `xsmcGet` macro is functionally equivalent to the `xsGet` macro. The propert
 ```javascript
 foo
 this.foo
+if ("foo" in this)
+	return this.foo;
 ```
 
 ##### In C:
@@ -1116,6 +1118,8 @@ this.foo
 xsmcVars(1);
 xsmcGet(xsVar(0), xsGlobal, xsID_foo);
 xsmcGet(xsVar(0), xsThis, xsID("foo"));
+if (xsmcGet(xsResult, xsThis, xsID("foo")))
+	return;
 ```
 
 ***
@@ -1151,9 +1155,9 @@ xsGetAt(xsVar(0), xsInteger(5));
 
 #### xsmcGetAt
 
-The `xsmcGetAt` macro is functionally equivalent to the `xsGetAt` macro. The property is returned in the slot provided.
+The `xsmcGetAt` macro is functionally equivalent to the `xsGetAt` macro. The property is returned in the slot provided. The return value is a boolean which indicates if the property exists.
 
-**`void xsmcGetAt(xsSlot theSlot, xsSlot theThis, xsSlot theKey)`**
+**`xsBooleanValue xsmcGetAt(xsSlot theSlot, xsSlot theThis, xsSlot theKey)`**
 
 | Arguments | Description |
 | --- | :-- |
@@ -1206,9 +1210,9 @@ xsGetIndex(xsThis, 0);
 
 #### xsmcGetIndex
 
-The `xsmcGetIndex` macro is functionally equivalent to the `xsGetIndex` macro. The property is returned in the slot provided.
+The `xsmcGetIndex` macro is functionally equivalent to the `xsGetIndex` macro. The property is returned in the slot provided. The return value is a boolean which indicates if the property exists.
 
-**`void xsmcGetIndex(xsSlot theSlot, xsSlot theThis, xsIndex theIndex)`**
+**`xsBooleanValue xsmcGetIndex(xsSlot theSlot, xsSlot theThis, xsIndex theIndex)`**
 
 | Arguments | Description |
 | --- | :-- |

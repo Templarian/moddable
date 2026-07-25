@@ -1185,6 +1185,7 @@ xs_ghash_init(xsMachine *the)
 		len = xsmcGetArrayBufferLength(xsArg(1));
 		c_memset(&ghash->y, 0, sizeof(ghash->y));
 		_ghash_update(ghash, aad, len);
+		_ghash_flush_partial(ghash);
 		c_memcpy(&ghash->y0, &ghash->y, sizeof(ghash->y));
 		ghash->aad_len = len;
 	}

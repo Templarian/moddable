@@ -36,7 +36,7 @@ declare module "embedded:io/socket/tcp" {
     target?: any;
   };
   
-  export default class TCP {
+  class TCP {
     constructor(options: Options)
     readonly remoteAddress: string | undefined;
     readonly remotePort: number | undefined;
@@ -47,4 +47,6 @@ declare module "embedded:io/socket/tcp" {
     get format(): "number" | "buffer"
     set format(value: "number" | "buffer")
   }
+  interface TCP extends Disposable {}
+  export default TCP;
 }

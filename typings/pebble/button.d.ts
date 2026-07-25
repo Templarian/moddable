@@ -18,16 +18,42 @@
 *
 */
 
-type ButtonType = "back" | "up" | "down" | "select";
+export type ButtonType = "back" | "up" | "down" | "select";
 
-interface PebbleButtonSingleOptions {
-  type: ButtonType;
-  onPush: (pushed: 0 | 1, type: ButtonType) => void;
+export type RecognizerType = "single" | "long" | "multi" | "raw";
+
+export interface SingleRecognizerOptions {
+  repeat?: number;
 }
 
-interface PebbleButtonMultipleOptions {
+export interface LongRecognizerOptions {
+  delay?: number;
+}
+
+export interface MultiRecognizerOptions {
+  min?: number;
+  max?: number;
+  lastOnly?: boolean;
+  timeout?: number;
+}
+
+type OnPush = (pushed: 0 | 1, type: ButtonType, recognizer: RecognizerType, count: number, repeat: boolean) => void;
+
+interface PebbleButtonRecognizers {
+  single?: boolean | SingleRecognizerOptions;
+  long?: boolean | LongRecognizerOptions;
+  multi?: boolean | MultiRecognizerOptions;
+  raw?: boolean;
+}
+
+interface PebbleButtonSingleOptions extends PebbleButtonRecognizers {
+  type: ButtonType;
+  onPush: OnPush;
+}
+
+interface PebbleButtonMultipleOptions extends PebbleButtonRecognizers {
   types: ButtonType[];
-  onPush: (pushed: 0 | 1, type: ButtonType) => void;
+  onPush: OnPush;
 }
 
 type PebbleButtonOptions = PebbleButtonSingleOptions | PebbleButtonMultipleOptions;
@@ -36,5 +62,6 @@ declare class PebbleButton {
   constructor(options: PebbleButtonOptions);
   close(): void;
 }
+interface PebbleButton extends Disposable {}
 
 export default PebbleButton;

@@ -144,6 +144,10 @@ class CST816  {
 
 		return result;
 	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default CST816;

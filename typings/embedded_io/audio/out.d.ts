@@ -36,6 +36,7 @@ declare module "embedded:io/audio/out" {
     write(buffer: ByteBuffer): void;
     start(): void;
     stop(options?: { flush?: boolean }): void;
+    close(): void;
 
     readonly audioType: AudioType;
     readonly bitsPerSample: 8 | 16;
@@ -45,6 +46,7 @@ declare module "embedded:io/audio/out" {
     set format(value: "buffer")
     volume: number;
   }
+  interface AudioOut extends Disposable {}
 
   export { AudioOut as default };
 }

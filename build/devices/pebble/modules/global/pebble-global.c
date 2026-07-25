@@ -174,6 +174,34 @@ void xs_global_wakeup(xsMachine *the)
 		app_wakeup_service_subscribe(C_NULL);
 }
 
+static void health(HealthEventType event, void *context)
+{
+	xsMachine *the = context;
+
+	xsBeginHost(the);
+		xsmcVars(2);
+		xsmcGet(xsResult, xsGlobal, xsID_watch);
+		xsmcSetStringX(xsVar(0), "health");
+
+		switch (event) {
+			case HealthEventSignificantUpdate:	xsmcSetStringX(xsVar(1), "significant"); break;
+			case HealthEventMovementUpdate:	xsmcSetStringX(xsVar(1), "movement"); break;
+			case HealthEventSleepUpdate:	xsmcSetStringX(xsVar(1), "sleep"); break;
+			case HealthEventMetricAlert:	xsmcSetStringX(xsVar(1), "metric"); break;
+			case HealthEventHeartRateUpdate:	xsmcSetStringX(xsVar(1), "heart rate"); break;
+		}
+		xsCall2(xsResult, xsID_do, xsVar(0), xsVar(1));
+	xsEndHost(the);
+}
+
+void xs_global_health(xsMachine *the)
+{
+	if (xsmcTest(xsArg(0)))
+		health_service_events_subscribe(health, the);
+	else
+		health_service_events_unsubscribe();
+}
+
 void xs_global_firmwareVersion_get(xsMachine *the)
 {
 	WatchInfoVersion version = watch_info_get_firmware_version();

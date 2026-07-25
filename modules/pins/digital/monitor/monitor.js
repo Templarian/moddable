@@ -32,6 +32,5 @@ Monitor.Rising = 1;
 Monitor.Falling = 2;
 Monitor.PWM = 4;
 
-Object.freeze(Monitor.prototype);
 
 export default Monitor;

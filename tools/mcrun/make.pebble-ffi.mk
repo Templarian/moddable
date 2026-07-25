@@ -36,7 +36,7 @@ xsbug:
 
 $(BIN_DIR)/mc.xsa: $(DATA) $(MODULES) $(RESOURCES)
 	@echo "# xsl mc.xsa"
-	xsl -a -b $(MODULES_DIR) -n $(DOT_SIGNATURE) -o $(BIN_DIR) $(DATA) $(MODULES) $(RESOURCES)
+	xsl -a -b $(MODULES_DIR) -n $(DOT_SIGNATURE) -o $(BIN_DIR) $(DATA) $(MODULES) $(RESOURCES) $(STRIPS)
 
 ifneq ($(VERBOSE),1)
 MAKEFLAGS += --silent

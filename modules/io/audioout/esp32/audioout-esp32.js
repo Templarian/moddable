@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025  Moddable Tech, Inc.
+ * Copyright (c) 2024-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -35,6 +35,10 @@ class AudioOut extends Native("xs_audioout_destructor_") {
 
 	get volume() { return native("xs_audioout_get_volume_").call(this); };
 	set volume(it) { native("xs_audioout_set_volume_").call(this, it); };
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 AudioOut.Async = class extends AudioOut {

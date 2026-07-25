@@ -484,6 +484,9 @@ txBoolean fxDefinePrivateProperty(txMachine* the, txSlot* instance, txSlot* chec
 	if (instance->flag & XS_DONT_MARSHALL_FLAG)
 		return 0;
 #endif
+	if (mxIsModule(instance)) {
+		instance = mxModuleInstanceExports(instance)->value.reference;
+	}
 	address = &(instance->next);
 	while ((property = *address)) {
 		if (!(property->flag & XS_INTERNAL_FLAG)) {
@@ -587,6 +590,9 @@ txSlot* fxGetPrivateProperty(txMachine* the, txSlot* instance, txSlot* check, tx
 			instance = alias;
 	}
 #endif
+	if (mxIsModule(instance)) {
+		instance = mxModuleInstanceExports(instance)->value.reference;
+	}
 	result = instance->next;
 	while (result) {
 		if (result->kind == XS_PRIVATE_KIND) {
@@ -623,6 +629,9 @@ txSlot* fxSetPrivateProperty(txMachine* the, txSlot* instance, txSlot* check, tx
 			instance = fxAliasInstance(the, instance);
 	}
 #endif
+	if (mxIsModule(instance)) {
+		instance = mxModuleInstanceExports(instance)->value.reference;
+	}
 	result = instance->next;
 	while (result) {
 		if (result->kind == XS_PRIVATE_KIND) {

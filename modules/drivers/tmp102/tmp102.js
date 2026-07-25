@@ -72,6 +72,5 @@ class TMP102 extends SMBus {
 		return {temperature: value * 0.0625};
 	}
 }
-Object.freeze(TMP102.prototype);
 
 export default TMP102;

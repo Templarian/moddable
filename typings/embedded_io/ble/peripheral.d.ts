@@ -13,11 +13,13 @@ declare module "embedded:io/bluetoothle/peripheral" {
         onWarning?(this: GATTServer, message: string): void;
     }
 
-    interface GATTServerConnection {
+    interface GATTServerConnection extends Disposable {
         close(): void;
         notify(characteristic: GATTServerCharacteristic, value: ArrayBuffer, callback?: (error?: Error) => void): void;
         replyToPasskey(action: "input" | "compareNumber" | "outOfBand", value: number | boolean | ArrayBuffer): void;
-        get maxinumWrite(): number;
+        disconnect(): void;
+        readonly maxinumWrite: number;
+        readonly remoteAddress: string | undefined;
     }
 
     interface GATTServerService {
@@ -56,7 +58,7 @@ declare module "embedded:io/bluetoothle/peripheral" {
     class GATTServer {
         constructor(options: GATTServerOptions);
 
-        close?(): void;
+        close(): void;
         addService(service: GATTServerService): void;
         deleteService(service: GATTServerService): void;
         startAdvertising(scan: GATTServerAdvertisingRecords, response?: GATTServerAdvertisingRecords): void;
@@ -86,6 +88,7 @@ declare module "embedded:io/bluetoothle/peripheral" {
             dualModeHost: 16;
         }
     }
+    interface GATTServer extends Disposable {}
 
     export { GATTServer };
 }

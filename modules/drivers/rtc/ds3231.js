@@ -100,6 +100,5 @@ class DS3231 extends RTC {
 		return undefined !== result;
 	}
 }
-Object.freeze(DS3231.prototype);
 
 export default DS3231;

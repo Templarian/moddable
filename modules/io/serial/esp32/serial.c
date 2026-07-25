@@ -102,15 +102,13 @@ void xs_serial_constructor(xsMachine *the)
 
 	xsmcVars(1);
 
-	if (xsmcHas(xsArg(0), xsID_transmit)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_transmit);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_transmit)) {
 		transmit = builtinGetPin(the, &xsVar(0));
 		if (!builtinIsPinFree(transmit))
 			xsUnknownError("in use");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_receive)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_receive);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_receive)) {
 		receive = builtinGetPin(the, &xsVar(0));
 		if (!builtinIsPinFree(receive))
 			xsUnknownError("in use");
@@ -118,8 +116,7 @@ void xs_serial_constructor(xsMachine *the)
 	else if (UART_PIN_NO_CHANGE == transmit)
 		xsUnknownError("invalid");
 
-	if (xsmcHas(xsArg(0), xsID_port)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_port);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_port)) {
 		uart = builtinGetSignedInteger(the, &xsVar(0));
 		if ((uart < 0) || (uart >= UART_NUM_MAX))
 			xsRangeError("invalid port");

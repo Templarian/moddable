@@ -57,6 +57,7 @@ declare module "embedded:io/digitalbank" {
     get format(): "number"
     set format(value: "number")
   }
+  interface DigitalBank extends Disposable {}
 
   export default DigitalBank;
 }

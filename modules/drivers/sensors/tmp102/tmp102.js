@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2023  Moddable Tech, Inc.
+ * Copyright (c) 2016-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -180,6 +180,10 @@ class TMP102  {
 
 		let value = (this.#twoC16(io.readUint16(Register.TEMP_READ, true)) >> this.#shift) * 0.0625;
 		return { temperature: value, alert: (conf & ALERT_BIT) == (conf & POLARITY_BIT) };
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

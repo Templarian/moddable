@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2025  Moddable Tech, Inc.
+ * Copyright (c) 2019-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -30,6 +30,10 @@ class DigitalBank extends Native("xs_digitalbank_destructor") {
 	set format(value) {
 		if ("number" !== value)
 			throw new RangeError;
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 DigitalBank.Input = 0;

@@ -27,7 +27,6 @@ class AudioIn @ "xs_audioin_destructor" {
 	get bitsPerSample() @ "xs_audioin_get_bitsPerSample";
 	get numChannels() @ "xs_audioin_get_numChannels";
 }
-Object.freeze(AudioIn.prototype);
 
 export default AudioIn;
 

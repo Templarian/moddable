@@ -55,9 +55,8 @@ void xs_pwm_constructor_(xsMachine *the)
 
 	xsmcVars(2);
 
-	if (!xsmcHas(xsArg(0), xsID_port))
+	if (!xsmcGet(tmp, xsArg(0), xsID_port))
 		xsRangeError("port required");
-	xsmcGet(tmp, xsArg(0), xsID_port);
 	const struct modZephyrPWM *port = modZephyrGetPWM(xsmcToString(tmp));
 	if (NULL == port)
 		xsRangeError("bad pwm port");
@@ -65,22 +64,19 @@ void xs_pwm_constructor_(xsMachine *the)
 	if (!device_is_ready(port->device))
 		xsRangeError("pwm port not ready");
 
-    if (xsmcHas(xsArg(0), xsID_hz)) {
-        xsmcGet(xsVar(0), xsArg(0), xsID_hz);
+    if (xsmcGet(xsVar(0), xsArg(0), xsID_hz)) {
         hz = xsmcToInteger(xsVar(0));
         if (hz <= 0)
 			xsRangeError("invalid hz");
     }
 
-    if (xsmcHas(xsArg(0), xsID_channel)) {
-        xsmcGet(xsVar(0), xsArg(0), xsID_channel);
+    if (xsmcGet(xsVar(0), xsArg(0), xsID_channel)) {
         channel = xsmcToInteger(xsVar(0));
         if (channel < 0)
 			xsRangeError("invalid channel");
     }
 
-    if (xsmcHas(xsArg(0), xsID_resolution)) {
-        xsmcGet(xsVar(0), xsArg(0), xsID_resolution);
+    if (xsmcGet(xsVar(0), xsArg(0), xsID_resolution)) {
         resolution = xsmcToInteger(xsVar(0));
         if ((resolution <= 0) || (resolution >= RES_BITS_MAX))
 			xsRangeError("invalid resolution");

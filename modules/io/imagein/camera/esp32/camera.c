@@ -361,16 +361,11 @@ void xs_camera_constructor(xsMachine *the)
 	if ((kIOFormatBuffer != format) && (kIOFormatBufferDisposable != format))
 		xsRangeError("invalid format");
 
-	if (xsmcHas(xsArg(0), xsID_width)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_width);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_width))
 		width = xsmcToInteger(xsVar(0));
-	}
-	if (xsmcHas(xsArg(0), xsID_height)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_height);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_height))
 		height = xsmcToInteger(xsVar(0));
-	}
-	if (xsmcHas(xsArg(0), xsID_imageType)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_imageType);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_imageType)) {
 		if (xsStringType == xsmcTypeOf(xsVar(0))) {
 			if (c_strcmp("jpeg", xsmcToString(xsVar(0))))
 				xsRangeError("unknown imageType");
@@ -682,30 +677,18 @@ void xs_camera_configure(xsMachine *the)
 	sensor_t *sensor = esp_camera_sensor_get();
 	xsSlot tmp;
 
-	if (camera->sensorHas.brightness && xsmcHas(xsArg(0), xsID_brightness)) {
-		xsmcGet(tmp, xsArg(0), xsID_brightness);
+	if (camera->sensorHas.brightness && xsmcGet(tmp, xsArg(0), xsID_brightness))
 		sensor->set_brightness(sensor, xsmcToInteger(tmp));
-	}
-	if (camera->sensorHas.contrast && xsmcHas(xsArg(0), xsID_contrast)) {
-		xsmcGet(tmp, xsArg(0), xsID_contrast);
+	if (camera->sensorHas.contrast && xsmcGet(tmp, xsArg(0), xsID_contrast))
 		sensor->set_contrast(sensor, xsmcToInteger(tmp));
-	}
-	if (camera->sensorHas.saturation && xsmcHas(xsArg(0), xsID_saturation)) {
-		xsmcGet(tmp, xsArg(0), xsID_saturation);
+	if (camera->sensorHas.saturation && xsmcGet(tmp, xsArg(0), xsID_saturation))
 		sensor->set_saturation(sensor, xsmcToInteger(tmp));
-	}
-	if (camera->sensorHas.sharpness && xsmcHas(xsArg(0), xsID_sharpness)) {
-		xsmcGet(tmp, xsArg(0), xsID_sharpness);
+	if (camera->sensorHas.sharpness && xsmcGet(tmp, xsArg(0), xsID_sharpness))
 		sensor->set_sharpness(sensor, xsmcToInteger(tmp));
-	}
-	if (camera->sensorHas.denoise && xsmcHas(xsArg(0), xsID_denoise)) {
-		xsmcGet(tmp, xsArg(0), xsID_denoise);
+	if (camera->sensorHas.denoise && xsmcGet(tmp, xsArg(0), xsID_denoise))
 		sensor->set_denoise(sensor, xsmcToInteger(tmp));
-	}
-	if (camera->sensorHas.wb_mode && xsmcHas(xsArg(0), xsID_whiteBalance)) {
-		xsmcGet(tmp, xsArg(0), xsID_whiteBalance);
+	if (camera->sensorHas.wb_mode && xsmcGet(tmp, xsArg(0), xsID_whiteBalance))
 		sensor->set_wb_mode(sensor, xsmcToInteger(tmp));
-	}
 }
 
 /*

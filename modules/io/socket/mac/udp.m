@@ -93,15 +93,13 @@ void xs_udp_constructor(xsMachine *the)
 
 	onReadable = builtinGetCallback(the, xsID_onReadable);
 
-	if (xsmcHas(xsArg(0), xsID_port)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_port);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_port)) {
 		port = xsmcToInteger(xsVar(0));
 		if ((port < 0) || (port > 65535))
 			xsRangeError("invalid port");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_timeToLive)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_timeToLive);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_timeToLive)) {
 		ttl = xsmcToInteger(xsVar(0));
 		if ((ttl <= 0) || (ttl > 255))
 			xsRangeError("invalid timeToLive");
@@ -124,14 +122,14 @@ void xs_udp_constructor(xsMachine *the)
 		if (port) {
 			int flag = 1;
 			if (setsockopt(udp->skt, SOL_SOCKET, SO_REUSEPORT, (const void *)&flag, sizeof(flag)) < 0)
-				xsUnknownError("SO_REUSEPORT failed");
+				xsUnknownError("SO_REUSEPORT failed: %s", strerror(errno));
 
 			struct sockaddr_in address;
 			address.sin_family      = AF_INET;
 			address.sin_port        = htons(port);
 			address.sin_addr.s_addr = htonl(INADDR_ANY);
 			if (0 != bind(udp->skt, (struct sockaddr *) &address, sizeof(address)))
-				xsUnknownError("bind failed");
+				xsUnknownError("bind failed: %s", strerror(errno));
 		}
 
 		int set = 1;
@@ -141,7 +139,7 @@ void xs_udp_constructor(xsMachine *the)
 
 		if (ttl > 0) {
 			if (setsockopt(udp->skt, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl)) < 0)
-				xsUnknownError("set TTL failed");
+				xsUnknownError("set TTL failed: %s", strerror(errno));
 		}
 
 		udp->cfRunLoopSource = CFSocketCreateRunLoopSource(NULL, udp->cfSkt, 0);
@@ -250,7 +248,7 @@ void xs_udp_write(xsMachine *the)
 	xsmcGetBufferReadable(xsArg(0), &buffer, &byteLength);
 	int result = sendto(udp->skt, buffer, byteLength, 0, (const struct sockaddr *)&dest_addr, sizeof(dest_addr));
 	if (result < 0)
-		xsUnknownError("sendto failed");
+		xsUnknownError("sendto failed: %s", strerror(errno));
 }
 
 void xs_udp_add(xsMachine *the)
@@ -260,7 +258,7 @@ void xs_udp_add(xsMachine *the)
 		int flag = 1;
 
 		if (setsockopt(udp->skt, SOL_SOCKET, SO_BROADCAST, (const void *)&flag, sizeof(flag)) < 0)
-			xsUnknownError("SO_BROADCAST failed");
+			xsUnknownError("SO_BROADCAST failed: %s", strerror(errno));
 
 		u_char loop = 0;
 		setsockopt(udp->skt, IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop));
@@ -275,7 +273,7 @@ void xs_udp_add(xsMachine *the)
 
 	imr.imr_interface.s_addr = htonl(INADDR_ANY);
 	if (setsockopt(udp->skt, IPPROTO_IP, IP_ADD_MEMBERSHIP, &imr, sizeof(imr)) < 0)
-		xsUnknownError("IP_ADD_MEMBERSHIP failed");
+		xsUnknownError("IP_ADD_MEMBERSHIP failed: %s", strerror(errno));
 }
 
 void xs_udp_remove(xsMachine *the)
@@ -284,11 +282,11 @@ void xs_udp_remove(xsMachine *the)
 	struct ip_mreq imr;
 	imr.imr_multiaddr.s_addr = inet_addr(xsmcToString(xsArg(0)));
 	if (~0 == *(int *)&imr.imr_multiaddr.s_addr)
-		xsUnknownError("invalid address");
+		xsUnknownError("invalid address: %s", strerror(errno));
 
 	imr.imr_interface.s_addr = htonl(INADDR_ANY);
 	if (setsockopt(udp->skt, IPPROTO_IP, IP_DROP_MEMBERSHIP, &imr, sizeof(imr)) < 0)
-		xsUnknownError("IP_DROP_MEMBERSHIP failed");
+		xsUnknownError("IP_DROP_MEMBERSHIP failed: %s", strerror(errno));
 }
 
 void udpHold(UDP udp)

@@ -87,4 +87,3 @@ export default class CombTransition extends Transition {
 		die.cut();
 	}
 }
-Object.freeze(CombTransition.prototype);

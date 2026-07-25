@@ -59,6 +59,7 @@ typedef struct {
 	uint8_t				hasOnReadable;
 	uint8_t				hasOnWritable;
 	uint8_t				hasOnError;
+	uint8_t				initialWritablePending;
 
 	uint8_t				writeBuffer[kWriteBufferSize];
 	uint8_t				*toWrite;
@@ -108,17 +109,13 @@ void xs_serial_constructor(xsMachine *the)
 	xsmcGet(onWritable, xsArg(0), xsID_onWritable);
 	xsmcGet(onError, xsArg(0), xsID_onError);
 
-	if (xsmcHas(xsArg(0), xsID_format)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_format);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_format))
 		xsmcToStringBuffer(xsVar(0), format, sizeof(format));
-	}
 	else
 		format[0] = 0;
 
-	if (xsmcHas(xsArg(0), xsID_target)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_target);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_target))
 		xsmcSet(xsThis, xsID_target, xsVar(0));
-	}
 
 	s = calloc(1, sizeof(xsSerialRecord));
 	if (!s)
@@ -170,6 +167,7 @@ void xs_serial_constructor(xsMachine *the)
 		s->onWritable = onWritable;
 		xsRemember(s->onWritable);
 
+		s->initialWritablePending = 1;
 		s->writable = modTimerAdd(0, 0, fxSerialWritable, &s, sizeof(s));
 	}
 }
@@ -196,28 +194,43 @@ void xs_serial_read(xsMachine *the)
 {
 	xsSerial s = xsmcGetHostData(xsThis);
 	int available = 0;
-	int count;
 
 	ioctl(s->fd, FIONREAD, &available);
 	if (0 == available)
 		return;
-
-	if (xsmcArgc) {
-		count = xsmcToInteger(xsArg(0));
-		if (count > available)
-			count = available;
-	}
-	else
-		count = available;
-
-	if (1 == s->bufferFormat) {
-		xsmcSetArrayBuffer(xsResult, NULL, count);
-		read(s->fd, xsmcToArrayBuffer(xsResult), count);
-	}
-	else if (2 == s->bufferFormat) {
+		
+	if (2 == s->bufferFormat) {
 		uint8_t byte;
 		read(s->fd, &byte, 1);
 		xsResult = xsInteger(byte);
+	}
+	else {
+		uint8_t *buffer;
+		int requested;
+		xsUnsignedValue byteLength;
+		uint8_t allocate = 1;
+
+		if (0 == xsmcArgc)
+			requested = available;
+		else if (xsReferenceType == xsmcTypeOf(xsArg(0))) {
+			xsResult = xsArg(0);
+			xsmcGetBufferWritable(xsResult, (void **)&buffer, &byteLength);
+			requested = (int)byteLength;
+			if (requested > available)
+				requested = available;
+			allocate = 0;
+			xsmcSetInteger(xsResult, requested);
+		}
+		else {
+			requested = xsmcToInteger(xsArg(0));
+			if (requested > available)
+				requested = available;
+		}
+		if (requested <= 0) 
+			xsUnknownError("invalid");
+		if (allocate)
+			buffer = xsmcSetArrayBuffer(xsResult, NULL, requested);
+		read(s->fd, buffer, requested);
 	}
 }
 
@@ -272,16 +285,14 @@ void xs_serial_set(xsMachine *the)
 
 	ioctl(s->fd, TIOCMGET, &flags);
 
-	if (xsmcHas(xsArg(0), xsID_RTS)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_RTS);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_RTS)) {
 		if (xsmcTest(xsVar(0)))
 			flags |= TIOCM_RTS;
 		else
 			flags &= ~TIOCM_RTS;
 	}
 
-	if (xsmcHas(xsArg(0), xsID_DTR)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_DTR);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_DTR)) {
 		if (xsmcTest(xsVar(0)))
 			flags |= TIOCM_DTR;
 		else
@@ -316,6 +327,9 @@ void fxSerialReadable(CFSocketRef socketRef, CFSocketCallBackType cbType, CFData
 {
 	xsSerial s = context;
 
+	if (s->initialWritablePending)
+		fxSerialWritable(s->writable, &s, sizeof(s));
+
 	if (cbType & kCFSocketReadCallBack) {
 		int count, err;
 
@@ -348,6 +362,7 @@ void fxSerialWritable(modTimer timer, void *refcon, int refconSize)
 	xsSerial s = *(xsSerial *)refcon;
 
 	s->writable = NULL;
+	s->initialWritablePending = 0;
 
 	xsBeginHost(s->the);
 		xsCallFunction1(s->onWritable, s->obj, xsInteger(kWriteBufferSize));		// 1024 is the default on macOS?

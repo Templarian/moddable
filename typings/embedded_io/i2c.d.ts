@@ -36,9 +36,13 @@ declare module "embedded:io/i2c" {
     write(value: ByteBuffer, stop?: boolean): void;
     read(byteLength: number, stop?: boolean): ArrayBuffer;
     read(buffer: ByteBuffer, stop?: boolean): number;
+    writeRead(writeBuffer: ByteBuffer, readByteLength: number, stop?: boolean): ArrayBuffer;
+    writeRead(writeBuffer: ByteBuffer, readBuffer: ByteBuffer, stop?: boolean): number;
+    close(): void;
     get format(): "buffer"
     set format(value: "buffer")
   }
+  interface I2C extends Disposable {}
 
   export default I2C;
 }

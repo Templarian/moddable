@@ -82,7 +82,6 @@ export class Tween {
 		}
 	}
 }
-Object.freeze(Tween.prototype);
 
 export default class Timeline {
 	constructor() {
@@ -139,4 +138,3 @@ export default class Timeline {
 		this.seekTo(it * this.duration);
 	}
 }
-Object.freeze(Timeline.prototype);

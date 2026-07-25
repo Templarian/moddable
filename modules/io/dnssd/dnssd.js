@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Moddable Tech, Inc.
+ * Copyright (c) 2018-2026 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -580,6 +580,10 @@ class DNSSD {
 			claim.probing += 1;
 		}, 250, 10);		//@@ random initial delay
 	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 DNSSD.IP = "224.0.0.251";
 DNSSD.PORT = 5353;
@@ -682,6 +686,10 @@ class Advertise {
 			delete this.#service.txt;
 		dnssd.update(this.#service);
 	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 class Discover {
@@ -733,6 +741,10 @@ class Discover {
 		this.#list.splice(this.#list.indexOf(this), 1);
 		this.#serviceType = undefined;
 	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 //@@ ttl
@@ -758,6 +770,10 @@ class Claim  {
 		dnssd.unclaim(this.#claim);
 		this.#list.splice(this.#list.indexOf(this), 1);
 		this.#claim = undefined;
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 
@@ -790,5 +806,9 @@ export default class {
 	}
 	advertise(options) {
 		return new Advertise(options, this.#list);
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }

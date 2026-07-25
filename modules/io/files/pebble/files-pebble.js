@@ -36,6 +36,10 @@ class File extends Native("xs_filepfs_destructor"){
 	}
 
 	flush() {};
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 File.prototype.setSize = unimplemented;
 
@@ -62,6 +66,10 @@ class Directory extends Native("xs_directorypfs_destructor") {
 
 	scan(...path) {
 		return (native("xs_directorypfs_scan").call(this, ...path))[Symbol.iterator]();
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 Directory.prototype[Symbol.iterator] = Directory.prototype.scan;

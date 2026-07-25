@@ -151,12 +151,9 @@ void xs_worker_destructor(void *data)
 
 static void getIntegerProperty(xsMachine *the, xsSlot *slot, xsIdentifier id, xsIntegerValue *value)
 {
-	if (!xsmcHas(*slot, id))
-		return;
-	
 	xsSlot tmp;
-	xsmcGet(tmp, *slot, id);
-	*value = xsmcToInteger(tmp);
+	if (xsmcGet(tmp, *slot, id))
+		*value = xsmcToInteger(tmp);
 }
 
 static void workerConstructor(xsMachine *the, xsBooleanValue shared)

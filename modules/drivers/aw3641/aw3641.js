@@ -52,6 +52,5 @@ AW3641.Time1_3s_Brightness50=14;
 AW3641.Time1_3s_Brightness40=15;
 AW3641.Time1_3s_Brightness30=16;	
 
-Object.freeze(AW3641.prototype);
 
 export default AW3641;

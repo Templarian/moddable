@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 Daisuke Sato, Wilberforce, Moddable Tech, Inc.
+ * Copyright (c) 2020-2026 Daisuke Sato, Wilberforce, Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -159,6 +159,10 @@ class MPU6886  {
 				z: view.getInt16(12) * this.#gyroScale
 			}
 		}
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

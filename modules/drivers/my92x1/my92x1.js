@@ -22,6 +22,5 @@ class MY92x1 @ "xs_LightMy92x1_destructor" {
 	constructor() @ "xs_LightMy92x1";
 	write()  @ "xs_LightMy92x1_write";
 }
-Object.freeze(MY92x1.prototype);
 
 export default MY92x1;

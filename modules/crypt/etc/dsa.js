@@ -105,4 +105,3 @@ export default class DSA {
 	};
 };
 
-Object.freeze(DSA.prototype);

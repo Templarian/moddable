@@ -34,6 +34,10 @@ class WiFi extends Native("xs_wifi419_destructor"){
 	get BSSID() { return native("xs_wifi419_BSSID_get").call(this); }
 	get RSSI() { return native("xs_wifi419_RSSI_get").call(this); }
 	get channel() { return native("xs_wifi419_channel_get").call(this); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 };
 
 export default WiFi;

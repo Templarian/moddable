@@ -142,4 +142,3 @@ export default class PKCS8 {
 	};
 };
 
-Object.freeze(PKCS8.prototype);

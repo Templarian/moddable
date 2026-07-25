@@ -204,8 +204,7 @@ void xs_gapclient(xsMachine *the)
 	scan->advertisementConstructor = xsmcToReference(xsArg(1));
 
 	xsmcVars(1);
-	if (xsmcHas(xsArg(0), xsID_services)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_services);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_services)) {
 		getUUIDList(the, &xsVar(0), &scan->serviceFiltersLength, &
 		scan->serviceFilters);
 	}
@@ -575,8 +574,7 @@ void xs_gattclient_constructor(xsMachine *the)
 
 	xsmcVars(2);
 
-	if (xsmcHas(xsArg(0), xsID_mtu)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_mtu);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_mtu)) {
 		mtu = xsmcToInteger(xsVar(0));
 		if (mtu > 247)		//@@ constant?
 			mtu = 247;
@@ -597,9 +595,7 @@ void xs_gattclient_constructor(xsMachine *the)
 	xsSlot *onSecured = builtinGetCallback(the, xsID_onSecured);
 	xsSlot *onPasskey = builtinGetCallback(the, xsID_onPasskey);
 
-	if (xsmcHas(xsArg(0), xsID_security)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_security);
-
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_security)) {
 		xsmcGet(xsVar(1), xsVar(0), xsID_authenticate);
 		authenticate = xsmcTest(xsVar(1));
 
@@ -1244,11 +1240,9 @@ void xs_gattclient_write(xsMachine *the)
 	if (destructor == xs_gattclientcharacteristic_destructor) {
 		GATTClientCharacteristic gcc = (GATTClientCharacteristic)xsmcGetHostChunk(xsArg(1)); 
 		handle = gcc->chr.val_handle;
-		if ((gcc->chr.properties & BT_GATT_CHRC_WRITE_WITHOUT_RESP) && xsmcHas(xsArg(3), xsID_response)) {
-			xsSlot tmp;
-			xsmcGet(tmp, xsArg(3), xsID_response);
+		xsSlot tmp;
+		if ((gcc->chr.properties & BT_GATT_CHRC_WRITE_WITHOUT_RESP) && xsmcGet(tmp, xsArg(3), xsID_response))
 			withResponse = xsmcTest(tmp);		// options.response false for no-response request (default is true)
-		}
 	}
 	else if (destructor == xs_gattclientdescriptor_destructor)
 		handle = ((struct ble_gatt_dsc *)xsmcGetHostChunk(xsArg(1)))->handle;

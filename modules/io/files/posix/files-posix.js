@@ -38,6 +38,10 @@ class File extends Native("xs_fileposix_destructor"){
 	setSize(length) { return native("xs_fileposix_setSize").call(this, length); }
 
 	flush() { return native("xs_fileposix_flush").call(this); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 class DirectoryIterator extends Native("xs_directory_iterator_posix_destructor") {
@@ -75,6 +79,10 @@ class Directory extends Native("xs_directoryposix_destructor") {
 
 	scan(...path) {
 		return new DirectoryIterator(this, ...path);
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 Directory.prototype[Symbol.iterator] = Directory.prototype.scan;

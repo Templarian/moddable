@@ -62,6 +62,5 @@ class REPL extends REPLCore {
 		this.prompt();
 	}
 }
-Object.freeze(REPL.prototype);
 
 export default REPL;

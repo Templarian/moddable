@@ -7,6 +7,10 @@ class Update extends Native("xs_update_destructor") {
 
 	get format() { return native("xs_update_get_format").call(this); }
 	set format(value) { native("xs_update_set_format").call(this, value); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 function open(options, prototype) { return native("xs_update_open").call(this, options, prototype); }

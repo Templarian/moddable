@@ -30,7 +30,6 @@ class BaseScreenBehavior extends Behavior {
 		application.delegate("switchScreen");
 	}
 }
-Object.freeze(BaseScreenBehavior.prototype);
 
 /* -=====================================================================- */
 /* -============================ Logo screen ============================- */
@@ -59,7 +58,6 @@ class ModdableLogoScreenBehavior extends BaseScreenBehavior {
 		container.start();
 	}
 }
-Object.freeze(ModdableLogoScreenBehavior.prototype);
 
 const ModdableLogoScreen = Container.template($ => ({
 	top: 0, bottom: 0, left: 0, right: 0,
@@ -128,7 +126,6 @@ class DotsScreenBehavior extends BaseScreenBehavior {
 		container.start();
 	}
 }
-Object.freeze(DotsScreenBehavior.prototype);
 
 const DotsScreen = Container.template($ => ({
 	top: 0, bottom: 0, left: 0, right: 0,
@@ -173,7 +170,6 @@ class OneScreenBehavior extends BaseScreenBehavior {
 		container.start();
 	}
 }
-Object.freeze(OneScreenBehavior.prototype);
 
 const OneScreen = Container.template($ => ({
 	top: 0, bottom: 0, left: 0, right: 0,
@@ -237,7 +233,6 @@ class GraphScreenBehavior extends BaseScreenBehavior {
 		container.start();
 	}
 }
-Object.freeze(GraphScreenBehavior.prototype);
 
 const GraphScreen = Container.template($ => ({
 	top: 0, bottom: 0, left: 0, right: 0,
@@ -309,7 +304,6 @@ class DatesScreenBehavior extends BaseScreenBehavior {
 		container.add(new TransitionBackground);
 	}
 }
-Object.freeze(DatesScreenBehavior.prototype);	
 
 class TransitionBackgroundBehavior extends Behavior {
 	onDisplaying(die) {
@@ -326,7 +320,6 @@ class TransitionBackgroundBehavior extends Behavior {
 		application.delegate("switchScreen");
 	}
 }
-Object.freeze(TransitionBackgroundBehavior.prototype);
 
 const TransitionBackground = Die.template($ => ({
 	top: 0, bottom: 0, left: 0, right: 0,
@@ -382,7 +375,6 @@ class ColorPickerScreenBehavior extends BaseScreenBehavior {
 		super.onFinished(container);
 	}
 }
-Object.freeze(ColorPickerScreenBehavior.prototype);
 
 class CrosshairBehavior extends Behavior {
 	onCreate(content, data) {
@@ -434,7 +426,6 @@ class CrosshairBehavior extends Behavior {
     	return val.toString(16).padStart(2, 0).toUpperCase();
     }
 }
-Object.freeze(CrosshairBehavior.prototype);
 
 const ColorPickerScreen = Container.template($ => ({
 	top: 0, bottom: 0, left: 0, right: 0,
@@ -486,7 +477,6 @@ class SquaresScreenBehavior extends Behavior {
 		}
 	}
 }
-Object.freeze(SquaresScreenBehavior.prototype);
 
 const SquaresScreen = Container.template($ => ({
 	top: 0, bottom: 0, left: 0, right: 0,

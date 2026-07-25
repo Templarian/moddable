@@ -138,8 +138,6 @@ enum {
 };
 
 
-#define mxIsModule(THE_SLOT) \
-	(((THE_SLOT)->next) && ((THE_SLOT)->next->flag & XS_INTERNAL_FLAG) && ((THE_SLOT)->next->kind == XS_MODULE_KIND))
 #define mxIsModuleSource(THE_SLOT) \
 	(((THE_SLOT)->next) && ((THE_SLOT)->next->flag & XS_INTERNAL_FLAG) && ((THE_SLOT)->next->kind == XS_MODULE_SOURCE_KIND))
 

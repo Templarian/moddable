@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021  Moddable Tech, Inc.
+ * Copyright (c) 2021-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -59,6 +59,10 @@ class NTC_THERMISTOR {
 			R = this.#Rseries * (resolution / adc - 1);
 		const S = (Math.log(R / this.#Rnominal) / this.#Beta) + (1 / 298.15);
 		return { temperature: (1/S) - 273.15 };
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

@@ -130,7 +130,14 @@ struct sxLinker {
 	txString name;
 	txSize nameSize;
 	
-
+	struct {
+		txByte major;
+		txByte minor;
+		txByte patch;
+	} version;
+	int errorCount;
+	int warningCount;
+	
 	char main[1024];
 };
 
@@ -280,6 +287,7 @@ extern void fxPrintTable(txMachine* the, FILE* file, txSize modulo, txSlot** tab
 extern void fxSetHostFunctionProperty(txMachine* the, txSlot* property, txCallback call, txInteger length, txID id);
 
 /* xslStrip.c */
+extern void fxCheckMod(txLinker* linker);
 extern void fxStripCallbacks(txLinker* linker, txMachine* the);
 extern void fxStripDefaults(txLinker* linker, FILE* file);
 extern void fxStripName(txLinker* linker, txString name);

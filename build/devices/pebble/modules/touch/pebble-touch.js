@@ -23,6 +23,10 @@ class Touch extends Native("xs_touch_destructor") {
 	close() { return native("xs_touch_close").call(this); }
 	configure() {}
 	sample() { return native("xs_touch_sample").call(this); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default Touch;

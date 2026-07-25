@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025  Moddable Tech, Inc.
+ * Copyright (c) 2025-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -33,6 +33,10 @@ class Display extends Native("xs_display_destructor") {
 
 	get width() { return native("xs_display_get_width").call(this); }
 	get height() { return native("xs_display_get_height").call(this); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default Display;

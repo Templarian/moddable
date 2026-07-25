@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025  Moddable Tech, Inc.
+ * Copyright (c) 2025-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -41,6 +41,10 @@ class PebbleDisplay extends Native("xs_pebbledisplay_destructor") {
 
 	get color() {return native("xs_pebbledisplay_color_get").call(this);}
 	get round() {return native("xs_pebbledisplay_round_get").call(this);}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 PebbleDisplay.prototype.frameBuffer = true
 PebbleDisplay.prototype.unobstructed = Object.freeze({

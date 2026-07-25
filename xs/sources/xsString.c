@@ -1805,32 +1805,40 @@ void fx_String_prototype_trim(txMachine* the)
 void fx_String_prototype_trimAux(txMachine* the, txBoolean trimStart, txBoolean trimEnd)
 {
 	txString string = fxCoerceToString(the, mxThis), start;
-	txInteger offset, length;
+	txInteger offset, length, trimmed = 0;
 	if (trimStart) {
 		start = fxSkipSpaces(string);
 		offset = mxPtrDiff(start - string);
 		mxMeterSome(offset);
+		trimmed = offset > 0;
 	}
 	else {
 		start = string;
 		offset = 0;
 	}
 	if (trimEnd) {
-		txString current = start;
-		txString end = current;
+		txString end = start;
+		txString current = fxSkipSpaces(end);
 		while (c_read8(current)) {
 			end = current + 1;
 			current = fxSkipSpaces(end);
 		}
 		length = mxPtrDiff(end - start);
 		mxMeterSome(length);
+		trimmed = trimmed || (end < current);
 	}
 	else
 		length = mxStringLength(start);
-	mxResult->value.string = (txString)fxNewChunk(the, length + 1);
-	c_memcpy(mxResult->value.string, mxThis->value.string + offset, length);
-	mxResult->value.string[length] = 0;
-	mxResult->kind = XS_STRING_KIND;
+	if (trimmed) {
+		mxResult->value.string = (txString)fxNewChunk(the, length + 1);
+		c_memcpy(mxResult->value.string, mxThis->value.string + offset, length);
+		mxResult->value.string[length] = 0;
+		mxResult->kind = XS_STRING_KIND;
+	}
+	else {
+		mxResult->value.string = mxThis->value.string;
+		mxResult->kind = mxThis->kind;
+	}
 }
 
 void fx_String_prototype_trimEnd(txMachine* the)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Moddable Tech, Inc.
+ * Copyright (c) 2023-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -96,6 +96,9 @@ class SEN0322
 		const oxygenPercent = this.#key * (rxbuf[0] + (rxbuf[1] / 10.0) + (rxbuf[2] / 100.0));
 		return { O: oxygenPercent * 10_000 }; // O2 concentration in PPM
 	}
-	
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 export default SEN0322;

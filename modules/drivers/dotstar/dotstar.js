@@ -46,4 +46,3 @@ export default class DotStar @ "xs_DotStar_destructor" {
 	get c_dispatch() @ "xs_DotStar_get_c_dispatch";
 }
 
-Object.freeze(DotStar.prototype);

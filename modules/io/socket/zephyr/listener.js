@@ -36,6 +36,10 @@ class Listener extends Native("xs_listener_destructor_") {
 		if ("socket/tcp" !== value)
 			throw new RangeError;
 	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default Listener;

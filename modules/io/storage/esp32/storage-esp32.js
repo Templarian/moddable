@@ -11,6 +11,10 @@ class Storage extends Native("xs_directorystorage_destructor") {
 
 	get format() { return native("xs_directorystorage_format_get").call(this); }
 	set format(value) { native("xs_directorystorage_format_set").call(this, value); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 function open(options, prototype) { return native("xs_directorystorage_open").call(this, options, prototype); }

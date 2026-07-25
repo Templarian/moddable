@@ -377,11 +377,9 @@ void xs_wifi419_scan(xsMachine *the)
 	wf->onComplete = builtinGetCallback(the, xsID_onComplete);
 
 	struct scan_config config = {0};
-	if (xsmcHas(xsArg(0), xsID_channel)) {
-		xsSlot tmp;
-		xsmcGet(tmp, xsArg(0), xsID_channel);
+	xsSlot tmp;
+	if (xsmcGet(tmp, xsArg(0), xsID_channel))
 		config.channel = xsmcToInteger(tmp);
-	}
 
 	wf->scanning = 1;
 	gScan = wf;
@@ -403,16 +401,13 @@ void xs_wifi419_connect(xsMachine *the)
 
 	xsmcVars(1);
 
-	if (!xsmcHas(xsArg(0), xsID_SSID))
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_SSID))
 		xsUnknownError("SSID required");
-
-	xsmcGet(xsVar(0), xsArg(0), xsID_SSID);
 	char ssid[sizeof(config.ssid) + 1];
 	xsmcToStringBuffer(xsVar(0), ssid, sizeof(ssid));
 	c_memcpy(config.ssid, ssid, c_strlen(ssid));
 
-	if (xsmcHas(xsArg(0), xsID_password)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_password);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_password)) {
 		char password[sizeof(config.password) + 1];
 		xsmcToStringBuffer(xsVar(0), password, sizeof(password));
 		c_memcpy(config.password, password, c_strlen(password));
@@ -422,8 +417,7 @@ void xs_wifi419_connect(xsMachine *the)
 
 	wifi_set_sleep_type(NONE_SLEEP_T);
 
-	if (xsmcHas(xsArg(0), xsID_channel)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_channel);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_channel)) {
 		int channel = xsmcToInteger(xsVar(0));
 		if ((channel >= 1) && (channel <= 13))
 			wifi_set_channel(channel);
@@ -453,15 +447,13 @@ void xs_wifi419_configure(xsMachine *the)
 
 	xsmcVars(2);
 
-	if (xsmcHas(xsArg(0), xsID_hostname)) {
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_hostname)) {
 		char hostname[64];
-		xsmcGet(xsVar(0), xsArg(0), xsID_hostname);
 		if (!wifi_station_set_hostname(xsmcToStringBuffer(xsVar(0), hostname, sizeof(hostname))))
 			xsUnknownError("set hostname failed");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_static)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_static);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_static)) {
 		if (xsmcTest(xsVar(0))) {
 			struct ip_info ip_info = {0};
 			char addr[16];

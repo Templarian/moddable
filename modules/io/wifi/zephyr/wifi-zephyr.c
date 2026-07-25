@@ -343,16 +343,13 @@ void xs_wifi_connect(xsMachine *the)
 	params.bandwidth = WIFI_FREQ_BANDWIDTH_20MHZ;
 	params.verify_peer_cert = false;
 
-	if (!xsmcHas(xsArg(0), xsID_SSID))
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_SSID))
 		xsUnknownError("SSID required");
-
-	xsmcGet(xsVar(0), xsArg(0), xsID_SSID);
 	xsmcToStringBuffer(xsVar(0), ssidLocal, sizeof(ssidLocal));
 	params.ssid = ssidLocal;
 	params.ssid_length = c_strlen(ssidLocal);
 
-	if (xsmcHas(xsArg(0), xsID_password)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_password);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_password)) {
 		params.psk = xsmcToString(xsVar(0));
 		params.psk_length = c_strlen(params.psk);
 		params.security = WIFI_SECURITY_TYPE_PSK;
@@ -386,16 +383,14 @@ void xs_wifi_configure(xsMachine *the)
 
 	xsmcVars(2);
 
-	if (xsmcHas(xsArg(0), xsID_hostname)) {
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_hostname)) {
 		char hostname[64];
-		xsmcGet(xsVar(0), xsArg(0), xsID_hostname);
 		const char *src = xsmcToStringBuffer(xsVar(0), hostname, sizeof(hostname));
 		if (net_hostname_set((char *)src, c_strlen(src)) < 0)
 			xsUnknownError("set hostname failed");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_static)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_static);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_static)) {
 		if (xsmcTest(xsVar(0))) {
 			struct in_addr ip, netmask, gw;
 

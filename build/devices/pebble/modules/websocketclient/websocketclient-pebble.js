@@ -303,6 +303,10 @@ class WebSocketClient {
 	}
 
 	static close = 8;
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default WebSocketClient;

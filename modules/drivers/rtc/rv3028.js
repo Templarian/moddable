@@ -91,6 +91,5 @@ class RV3028 extends RTC {
 		return undefined !== result;
 	}
 }
-Object.freeze(RV3028.prototype);
 
 export default RV3028;

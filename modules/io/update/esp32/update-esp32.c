@@ -39,10 +39,8 @@ void xs_update_close(xsMachine *the)
 
 void xs_update_open(xsMachine *the)
 {
-	if (!xsmcHas(xsArg(0), xsID_partition))
+	if (!xsmcGet(xsResult, xsArg(0), xsID_partition))
 		xsUnknownError("no partition");
-
-	xsmcGet(xsResult, xsArg(0), xsID_partition);
 	uint8_t writable;
 	xsUpdateRecord update;
 	update.partition = getESP32FlashPartition(the, &xsResult, &writable);
@@ -52,8 +50,7 @@ void xs_update_open(xsMachine *the)
 		xsUnknownError("read-only partition");
 
 	update.append = 1;
-	if (xsmcHas(xsArg(0), xsID_mode)) {
-		xsmcGet(xsResult, xsArg(0), xsID_mode);
+	if (xsmcGet(xsResult, xsArg(0), xsID_mode)) {
 		char *modeStr = xsmcToString(xsResult);
 		if (0 == c_strcmp(modeStr, "a"))
 			;
@@ -67,8 +64,7 @@ void xs_update_open(xsMachine *the)
 		xsRangeError("unsupported");
 
 	uint32_t byteLength = OTA_SIZE_UNKNOWN;
-	if (xsmcHas(xsArg(0), xsID_byteLength)) {
-		xsmcGet(xsResult, xsArg(0), xsID_byteLength);
+	if (xsmcGet(xsResult, xsArg(0), xsID_byteLength)) {
 		xsNumberValue tmp = xsmcToNumber(xsResult);
 		if (c_isnan(tmp) || (tmp < 0) || (tmp > 0xffffffff) || (tmp > update.partition->size))
 			xsRangeError("invalid byteLength");

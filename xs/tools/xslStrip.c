@@ -37,6 +37,9 @@
 
 #include "xsl.h"
 
+static void fxCheckModCode(txLinker* linker, txString name, txU1 code, txString what);
+static void fxCheckModGlobal(txLinker* linker, txString name, txString key);
+static txFlag fxIsLinkerSymbolStringUsed(txLinker* linker, txString theString);
 static txFlag fxIsLinkerSymbolUsed(txLinker* linker, txID id);
 static void fxStripCallback(txLinker* linker, txCallback which);
 static void fxStripClass(txLinker* linker, txMachine* the, txSlot* slot);
@@ -44,6 +47,157 @@ static void fxStripInstance(txLinker* linker, txMachine* the, txSlot* slot);
 static void fxStripObject(txLinker* linker, txMachine* the, txSlot* slot);
 static void fxUnstripCallback(txLinker* linker, txCallback which);
 static void fxUnuseSymbol(txLinker* linker, txID id);
+
+
+void fxCheckMod(txLinker* linker)
+{
+	#define mxGlobalKeys 35
+	static char* gxGlobalKeys[mxGlobalKeys] = {
+		"AsyncDisposableStack",
+		"Atomics",
+		"BigInt",
+		"BigInt64Array",
+		"BigUint64Array",
+		"Compartment",
+		"DataView",
+		"Date",
+		"DisposableStack",
+		"FinalizationRegistry",
+		"Float16Array",
+		"Float32Array",
+		"Float64Array",
+		"Generator",
+		"Int8Array",
+		"Int16Array",
+		"Int32Array",
+		"JSON",
+		"Map",
+		"Math",
+		"ModuleSource",
+		"Promise",
+		"Proxy",
+		"Reflect",
+		"RegExp",
+		"Set",
+		"SharedArrayBuffer",
+		"Uint8Array",
+		"Uint8ClampedArray",
+		"Uint16Array",
+		"Uint32Array",
+		"WeakMap",
+		"WeakRef",
+		"WeakSet",
+		"eval",
+	};
+	txLinkerStrip* linkerStrip = linker->firstStrip;
+	txString name;
+	int major = linker->version.major;
+	int minor = linker->version.minor;
+	int patch = linker->version.patch;
+	linker->errorCount = 0;
+	linker->warningCount = 0;
+	while (linkerStrip) {
+		name = linkerStrip->name;
+		if (name[0] == '>') {
+			if (sscanf(name, ">%d.%d.%d", &major, &minor, &patch) < 3)
+				fxReportLinkerError(linker, "invalid strip: %s", name);
+			break;
+		}
+		linkerStrip = linkerStrip->nextStrip;
+	}
+	if ((major == 17) && (minor == 7) && (patch == 0)) {
+		fxCheckModCode(linker, name, XS_CODE_USING, "using");
+		fxCheckModCode(linker, name, XS_CODE_USING_ASYNC, "await using");
+		fxCheckModGlobal(linker, name, "AsyncDisposableStack");
+		fxCheckModGlobal(linker, name, "DisposableStack");
+		fxCheckModGlobal(linker, name, "SuppressedError");
+		linker->version.major = 17;
+		linker->version.minor = 7;
+		linker->version.patch = 0;
+	}
+	while (linkerStrip) {
+		name = linkerStrip->name;
+		int i;
+		for (i = 0; i < mxGlobalKeys; i++) {
+			txString key = gxGlobalKeys[i];
+			if (!c_strcmp(name, key)) {
+				fxCheckModGlobal(linker, name, key);
+				break;
+			}
+		}
+		if (!c_strcmp(name, "BigInt")) {
+			fxCheckModCode(linker, name, XS_CODE_BIGINT_1, "BigInt literal");
+			fxCheckModCode(linker, name, XS_CODE_BIGINT_2, "BigInt literal");
+		}
+		else if (!c_strcmp(name, "Generator")) {
+			fxCheckModCode(linker, name, XS_CODE_ASYNC_GENERATOR_FUNCTION, "async function*");
+			fxCheckModCode(linker, name, XS_CODE_GENERATOR_FUNCTION, "function*");
+		}
+		else if (!c_strcmp(name, "Promise")) {
+			fxCheckModCode(linker, name, XS_CODE_ASYNC_FUNCTION, "async function");
+			fxCheckModCode(linker, name, XS_CODE_ASYNC_GENERATOR_FUNCTION, "async function*");
+			fxCheckModCode(linker, name, XS_CODE_IMPORT, "dynamic import");
+			fxCheckModCode(linker, name, XS_CODE_USING_ASYNC, "await using");
+		}
+		else if (!c_strcmp(name, "eval")) {
+			fxCheckModCode(linker, name, XS_CODE_EVAL, "eval");
+			fxCheckModCode(linker, name, XS_CODE_EVAL_TAIL, "eval");
+			fxCheckModGlobal(linker, name, "Function");
+			fxCheckModGlobal(linker, name, "ModuleSource");
+		}
+		linkerStrip = linkerStrip->nextStrip;
+	}
+	if (linker->errorCount) {
+		fxReportLinkerError(linker, "%d error(s): incompatible mod", linker->errorCount);
+	}
+	else if (linker->warningCount) {
+		fprintf(stderr, "### %d warning(s): test mod!", linker->warningCount);
+	}
+}
+
+void fxCheckModCode(txLinker* linker, txString name, txU1 code, txString what)
+{
+	if (fxIsCodeUsed(code)) {
+		fprintf(stderr, "### error: strip %s: incompatible code: %s\n", name, what);
+		linker->errorCount++;
+	}
+}
+
+void fxCheckModGlobal(txLinker* linker, txString name, txString key)
+{
+	if (fxIsLinkerSymbolStringUsed(linker, key)) {
+		fprintf(stderr, "### warning: strip %s: unavailable global: %s\n", name, key);
+		linker->warningCount++;
+	}
+}
+
+txFlag fxIsLinkerSymbolStringUsed(txLinker* linker, txString theString)
+{
+	txString aString;
+	txSize aLength;
+	txSize aSum;
+	txSize aModulo;
+	txLinkerSymbol* aSymbol;
+	txID anID;
+
+	aString = theString;
+	aLength = 0;
+	aSum = 0;
+	while(*aString != 0) {
+		aLength++;
+		aSum = (aSum << 1) + *aString++;
+	}
+	aSum &= 0x7FFFFFFF;
+	aModulo = aSum % linker->symbolModulo;
+	aSymbol = linker->symbolTable[aModulo];
+	while (aSymbol != C_NULL) {
+		if (aSymbol->sum == aSum)
+			if (c_strcmp(aSymbol->string, theString) == 0)
+				return aSymbol->flag;
+		aSymbol = aSymbol->next;
+	}
+	return 0;
+}
 
 txFlag fxIsCallbackStripped(txLinker* linker, txCallback which)
 {
@@ -359,12 +513,14 @@ void fxStripCallbacks(txLinker* linker, txMachine* the)
 #if mxExplicitResourceManagement
 	if (fxIsCallbackStripped(linker, fx_DisposableStack)) {
 		fxStripClass(linker, the, &mxDisposableStackConstructor);
+		fxUnstripCallback(linker, fx_Error_toString);
 	}
 	else {
 		fxUnstripCallback(linker, fx_SuppressedError);
 	}
 	if (fxIsCallbackStripped(linker, fx_AsyncDisposableStack)) {
 		fxStripClass(linker, the, &mxAsyncDisposableStackConstructor);
+		fxUnstripCallback(linker, fx_Error_toString);
 	}
 	else {
 		fxUnstripCallback(linker, fx_SuppressedError);

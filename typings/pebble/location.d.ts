@@ -46,5 +46,6 @@ declare class Location {
   configure(options: LocationConfiguration): void;
   sample(): LocationSample | undefined;
 }
+interface Location extends Disposable {}
 
 export default Location;

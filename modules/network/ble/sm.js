@@ -45,6 +45,5 @@ export default class SM {
 
 	static #deleteBonding() @ "xs_ble_sm_delete_bonding"
 };
-Object.freeze(SM.prototype);
 
 export {SM, IOCapability, Authorization};

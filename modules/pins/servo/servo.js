@@ -25,6 +25,5 @@ export class Servo @ "xs_servo_destructor" {
 	write() @ "xs_servo_write";
 	writeMicroseconds() @ "xs_servo_writeMicroseconds";
 };
-Object.freeze(Servo.prototype);
 
 export default Servo;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021  Moddable Tech, Inc.
+ * Copyright (c) 2021-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -50,6 +50,10 @@ class CapacitiveMoisture {
 		adc /= this.#averaging;
 		adc = (1024 - adc) / 1024; // value between 0-1 with 1 being the most wet
 		return { moisture: adc }
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

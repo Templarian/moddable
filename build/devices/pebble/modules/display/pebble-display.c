@@ -72,9 +72,8 @@ void xs_pebbledisplay(xsMachine *the)
 {
 	pblDisplay pd;
 
-	if (xsmcHas(xsArg(0), xsID_pixelFormat)) {
-		xsmcVars(1);
-		xsmcGet(xsVar(0), xsArg(0), xsID_pixelFormat);
+	xsmcVars(1);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_pixelFormat)) {
 		if (kCommodettoBitmapMonochrome != xsmcToInteger(xsVar(0)))
 			xsUnknownError("bad format");
 	}

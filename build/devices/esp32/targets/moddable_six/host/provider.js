@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024  Moddable Tech, Inc.
+ * Copyright (c) 2021-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -30,6 +30,7 @@ import SPI from "embedded:io/spi";
 import Touch from "embedded:sensor/Touch/GT911";
 import PulseWidth from "embedded:io/pulsewidth";
 
+//@@ I2C, Serial, and SPI should be i2c, serial, and spi.
 const device = {
 	I2C: {
 		default: {
@@ -64,18 +65,16 @@ const device = {
 		Touch: class {
 			constructor(options) {				
 				const address = [0x14, 0x5D].find(address => {
-					let result = 1, i;
+					let result = 1;
 					try {
-						i = new I2C({
+						using i = new device.I2C.default.io({
 							...device.I2C.default,
 							hz: 200_000,
 							address
 						});
 						result = i.write(new ArrayBuffer);		// SMBus write quick (see linux/drivers/i2c/i2c-core-base.c => i2c_default_probe)
 					}
-					catch {
-					}
-					i?.close();
+					catch { /* ignore */ }
 					return undefined === result;
 				});
 
@@ -83,8 +82,8 @@ const device = {
 					...options,
 					sensor: {
 						...device.I2C.default,
-						io: device.io.I2C,
-						address
+						address,
+						hz: 400_000,
 					},
 					interrupt: {
 						io: Digital,

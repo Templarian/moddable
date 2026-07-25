@@ -126,22 +126,17 @@ void xs_flash_partition_set_format(xsMachine *the)
 void xs_flash_partition_open(xsMachine *the)
 {
 	char path[PATH_MAX];
-	xsIndex id;
-	xsIntegerValue blocks;
-	xsIntegerValue blockLength;
 	xsBooleanValue	readOnly = 0;
-	xsFlash flash;
 	xsmcVars(2);
 	
 	if (kIOFormatBuffer != builtinInitializeFormat(the, kIOFormatBuffer))
 		xsRangeError("invalid format");
-	if (!xsmcHas(xsArg(0), xsID_path))
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_path))
 		xsUnknownError("no path");
-	xsmcGet(xsVar(0), xsArg(0), xsID_path);
-	id = xsToID(xsVar(0));
-	if (!xsmcHas(xsArg(2), id))
+	xsIndex id = xsToID(xsVar(0));
+	if (!xsmcGet(xsVar(1), xsArg(2), id))
 		xsUnknownError("partition not found");
-		
+
 	NSFileManager* manager = [NSFileManager defaultManager];
 	NSURL* url = [manager URLForDirectory:NSApplicationSupportDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
 	url = [url URLByAppendingPathComponent:@PIU_DOT_SIGNATURE isDirectory:YES];
@@ -151,17 +146,13 @@ void xs_flash_partition_open(xsMachine *the)
 	strcat(path, xsmcToString(xsVar(0)));
 	strcat(path, ".flash");
 	
-	xsmcGet(xsVar(1), xsArg(2), id);
-	if (!xsmcHas(xsVar(1), xsID_blocks))
+	if (!xsmcGet(xsVar(0), xsVar(1), xsID_blocks))
 		xsUnknownError("invalid partition");
-	xsmcGet(xsVar(0), xsVar(1), xsID_blocks);
-	blocks = xsmcToInteger(xsVar(0));
-	if (!xsmcHas(xsVar(1), xsID_blockLength))
+	xsIntegerValue blocks = xsmcToInteger(xsVar(0));
+	if (!xsmcGet(xsVar(0), xsVar(1), xsID_blockLength))
 		xsUnknownError("invalid partition");
-	xsmcGet(xsVar(0), xsVar(1), xsID_blockLength);
-	blockLength = xsmcToInteger(xsVar(0));
-	if (xsmcHas(xsArg(0), xsID_mode)) {
-		xsmcGet(xsResult, xsArg(0), xsID_mode);
+	xsIntegerValue blockLength = xsmcToInteger(xsVar(0));
+	if (xsmcGet(xsResult, xsArg(0), xsID_mode)) {
 		char *modeStr = xsmcToString(xsResult);
 		if (0 == c_strcmp(modeStr, "r"))
 			readOnly = 1;
@@ -170,7 +161,7 @@ void xs_flash_partition_open(xsMachine *the)
 		else
 			xsUnknownError("invalid mode");
 	}
-	flash = c_calloc(1, sizeof(xsFlashRecord));
+	xsFlash flash = c_calloc(1, sizeof(xsFlashRecord));
 	if (!flash)
 		xsRangeError("not enough memory");
 	flash->blocks = blocks;

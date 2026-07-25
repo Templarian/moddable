@@ -38,8 +38,10 @@ declare module "embedded:io/spi" {
     write(buffer: ByteBuffer): void;
     transfer(buffer: ByteBuffer): void;
     flush(deselect?: boolean): void;
+    close(): void;
     get format(): "buffer";
     set format(value: "buffer");
   }
+  interface SPI extends Disposable {}
   export default SPI;
 }

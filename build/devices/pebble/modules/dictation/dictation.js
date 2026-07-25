@@ -26,6 +26,10 @@ class Dictation extends Native("xs_dictation_destructor") {
 	stop() { return native("xs_dictation_stop").call(this) };
 	read() { return native("xs_dictation_read").call(this) };
 	get format() {return "string"};
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default Dictation;

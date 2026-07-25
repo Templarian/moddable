@@ -135,8 +135,7 @@ void xs_appmessage(xsMachine *the)
 
 	builtinInitializeTarget(the);
 
-	if (xsmcHas(xsArg(0), xsID_format)) {
-		xsmcGet(tmp, xsArg(0), xsID_format);
+	if (xsmcGet(tmp, xsArg(0), xsID_format)) {
 		if (0 != c_strcmp(xsmcToString(tmp), "map"))
 			xsRangeError("only map");
 	}
@@ -147,14 +146,12 @@ void xs_appmessage(xsMachine *the)
 	if (C_NULL == state) {
 		inbound = app_message_inbox_size_maximum();
 		outbound = app_message_outbox_size_maximum();
-		if (xsmcHas(xsArg(0), xsID_input)) {
-			xsmcGet(tmp, xsArg(0), xsID_input);
+		if (xsmcGet(tmp, xsArg(0), xsID_input)) {
 			uint32_t t = xsmcToUnsigned(tmp);
 			if (t < inbound)
 				inbound = t;
 		}
-		if (xsmcHas(xsArg(0), xsID_output)) {
-			xsmcGet(tmp, xsArg(0), xsID_output);
+		if (xsmcGet(tmp, xsArg(0), xsID_output)) {
 			uint32_t t = xsmcToUnsigned(tmp);
 			if (t < outbound)
 				outbound = t;
@@ -203,10 +200,8 @@ void xs_appmessage(xsMachine *the)
 	xsSetHostHooks(xsThis, (xsHostHooks *)&xsAppMessageHooks);
 	xsRemember(pm->obj);
 
-	if (xsmcHas(xsArg(0), xsID_keys)) {
-		xsmcGet(tmp, xsArg(0), xsID_keys);
+	if (xsmcGet(tmp, xsArg(0), xsID_keys))
 		pm->keys = xsmcToReference(tmp);
-	}
 
 	if (C_NULL == state->firstInstance)
 		state->writable = sys_app_pp_get_comm_session() ? 1 : 0;

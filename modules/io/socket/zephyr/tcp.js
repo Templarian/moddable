@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2025  Moddable Tech, Inc.
+ * Copyright (c) 2019-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -29,6 +29,10 @@ class TCP extends Native("xs_tcp_destructor") {
 
 	get format() { return native("xs_tcp_get_format").call(this); }
 	set format(it) { native("xs_tcp_set_format").call(this, it); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default TCP;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025  Moddable Tech, Inc.
+ * Copyright (c) 2022-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -31,6 +31,10 @@ class PulseWidth extends Native("xs_pulsewidth_destructor") {
         if ("number" !== value)
             throw new RangeError;
     }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 };
 
 PulseWidth.Rising = 1;

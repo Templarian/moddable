@@ -307,6 +307,8 @@ int main(int argc, char* argv[])
 				fxMapScript(linker, script);
 				script = script->nextScript;
 			}
+			fxCheckMod(linker);
+			
 			fxBufferSymbols(linker);
 			fxBufferMaps(linker);
 			

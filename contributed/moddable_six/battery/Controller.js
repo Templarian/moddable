@@ -308,6 +308,5 @@ class Controller extends Behavior {
 		this.setInternalParam("zeroCharge", parseFloat(it));
 	}
 }
-Object.freeze(Controller.prototype);
 
 export default Controller;

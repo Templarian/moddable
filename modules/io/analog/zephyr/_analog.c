@@ -78,18 +78,15 @@ void xs_analog_constructor_(xsMachine *the)
 
 	xsmcVars(2);
 
-	if (!xsmcHas(xsArg(0), xsID_port))
+	if (!xsmcGet(tmp, xsArg(0), xsID_port))
 		xsRangeError("port required");
-	if (!xsmcHas(xsArg(0), xsID_channel))
-		xsRangeError("channel required");
-
-	xsmcGet(tmp, xsArg(0), xsID_port);
 	const struct modZephyrAnalog *port = modZephyrGetAnalog(xsmcToString(tmp));
 	if (NULL == port)
 		xsRangeError("bad_port");
 
-	xsmcGet(xsVar(0), xsArg(0), xsID_channel);
-	channel = builtinGetPin(the, &xsVar(0));		// 
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_channel))
+		xsRangeError("channel required");
+	channel = builtinGetPin(the, &xsVar(0));
 
 	idx = adc_channel_idx(channel);
 	if (-1 == idx)

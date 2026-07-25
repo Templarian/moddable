@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Wilberforce
  
- * Copyright (c) 2019-2020 Moddable Tech, Inc.
+ * Copyright (c) 2019-2026 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -178,7 +178,10 @@ class SH200Q {
             thermometer
         };
     }
+
+    static {
+        this.prototype[Symbol.dispose] = this.prototype.close;
+    }
 }
-Object.freeze(SH200Q.prototype);
 
 export default SH200Q;

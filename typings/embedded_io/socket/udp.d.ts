@@ -36,9 +36,11 @@ declare module "embedded:io/socket/udp" {
       address: string;
       port: number;
     };
+    close(): void;
     get format(): "buffer"
     set format(value: "buffer")
   }
+  interface UDP extends Disposable {}
 
   export default UDP
 }

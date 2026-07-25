@@ -1,0 +1,14 @@
+{
+	"modules": {
+		"embedded:io/crypt/digest": "./digest",
+		"*": [
+			"$(MODULES)/crypt/digest/kcl/ghash"
+		]
+	},
+	"preload": [
+		"embedded:io/crypt/digest"
+	],
+	"dependency": [
+		{ "idf": "mbedtls" }
+	]
+}

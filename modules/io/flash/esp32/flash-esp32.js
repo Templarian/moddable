@@ -16,6 +16,10 @@ class Flash extends Native("xs_flashstorage_destructor") {
 		if (value != "buffer")
 			throw new RangeError("invalid");
 	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 function open(options, constructor) { return native("xs_flashstorage_open").call(this, options, constructor); }

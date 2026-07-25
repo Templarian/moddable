@@ -100,18 +100,15 @@ void xs_pulsecount_constructor_(xsMachine *the)
 	if (!builtinIsPinFree(signal))
 		xsRangeError("in use");
 
-	if (xsmcHas(xsArg(0), xsID_control)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_control);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_control)) {
 		control = builtinGetPin(the, &xsVar(0));
 
         if (!builtinIsPinFree(control))
 		    xsRangeError("in use");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_filter)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_filter);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_filter))
 		filter = xsmcToInteger(xsVar(0));
-	}
 
     pcnt_unit_config_t unit_config = {
 		.high_limit = +32767,

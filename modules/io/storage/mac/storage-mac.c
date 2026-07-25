@@ -237,9 +237,8 @@ void xs_storage_domain_open(xsMachine *the)
 	uint8_t format;
 	xsmcVars(1);
 	
-	if (!xsmcHas(xsArg(0), xsID_path))
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_path))
 		xsUnknownError("no path");
-	xsmcGet(xsVar(0), xsArg(0), xsID_path);
 	xsmcToStringBuffer(xsVar(0), path, sizeof(path));
 	size_t pathLength = c_strlen(path);
 	if (pathLength == 0)
@@ -247,8 +246,7 @@ void xs_storage_domain_open(xsMachine *the)
 	if ('/' == path[pathLength - 1])
 		pathLength--;
 		
-	if (xsmcHas(xsArg(0), xsID_mode)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_mode);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_mode)) {
 		char *modeStr = xsmcToString(xsVar(0));
 		if (0 == c_strcmp(modeStr, "r"))
 			readOnly = 1;

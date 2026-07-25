@@ -51,4 +51,3 @@ export default class SSD1351 @ "xs_ssd1351_destructor" {
 	get c_dispatch() @ "xs_ssd1351_get_c_dispatch";
 }
 
-Object.freeze(SSD1351.prototype);

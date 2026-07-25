@@ -123,17 +123,12 @@ void _xs_i2c_constructor(xsMachine *the)
 
 	xsmcVars(1);
 
-	if (!xsmcHas(xsArg(0), xsID_data))
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_data))
 		xsRangeError("data required");
-	if (!xsmcHas(xsArg(0), xsID_clock))
-		xsRangeError("clock required");
-	if (!xsmcHas(xsArg(0), xsID_address))
-		xsRangeError("address required");
-
-	xsmcGet(xsVar(0), xsArg(0), xsID_data);
 	data = builtinGetPin(the, &xsVar(0));
 
-	xsmcGet(xsVar(0), xsArg(0), xsID_clock);
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_clock))
+		xsRangeError("clock required");
 	clock = builtinGetPin(the, &xsVar(0));
 
 	if (usingPins(data, clock))
@@ -141,7 +136,8 @@ void _xs_i2c_constructor(xsMachine *the)
 	else if (!builtinIsPinFree(data) || !builtinIsPinFree(clock))
 		xsRangeError("inUse");
 
-	xsmcGet(xsVar(0), xsArg(0), xsID_address);
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_address))
+		xsRangeError("address required");
 	address = builtinGetPin(the, &xsVar(0));
 	if ((address < 0) || (address > 127))
 		xsRangeError("invalid address");
@@ -163,20 +159,15 @@ void _xs_i2c_constructor(xsMachine *the)
 	else
 		nrfHz = NRF_DRV_TWI_FREQ_100K;
 
-	if (xsmcHas(xsArg(0), xsID_timeout)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_timeout);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_timeout))
 		timeout = xsmcToInteger(xsVar(0)) * (80000000 / 1000);
-	}
 	if (0 == timeout)
 		timeout = portMAX_DELAY;
 
-	if (xsmcHas(xsArg(0), xsID_pullup)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_pullup);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_pullup))
 		pullup = xsmcTest(xsVar(0)) ? 1 : 0;
-	}
 
-	if (xsmcHas(xsArg(0), xsID_port)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_port);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_port)) {
 		port = xsmcToInteger(xsVar(0));
 		if (port != MODDEF_I2C_INTERFACE)
 			xsRangeError("invalid port");

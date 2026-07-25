@@ -25,6 +25,5 @@ class Preference {
 	static keys(domain) @ "xs_preference_keys";
 //	static reset() @ "xs_preference_reset";
 }
-Object.freeze(Preference.prototype);
 
 export default Preference;

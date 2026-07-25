@@ -1599,8 +1599,10 @@ void fxForStatement(txParser* parser)
 			fxAssignmentExpression(parser);
 		fxMatchToken(parser, XS_TOKEN_RIGHT_PARENTHESIS);
 		fxStatement(parser, 0);
-		if (awaitFlag)
+		if (awaitFlag) {
 			fxPushNodeStruct(parser, 3, XS_TOKEN_FOR_AWAIT_OF, aLine);
+			parser->flags |= mxAwaitingFlag;
+		}
 		else if (aToken == XS_TOKEN_IN)
 			fxPushNodeStruct(parser, 3, XS_TOKEN_FOR_IN, aLine);
 		else

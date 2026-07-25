@@ -148,6 +148,10 @@ class QMI8658 {
       }
     }
   }
+
+  static {
+    this.prototype[Symbol.dispose] = this.prototype.close
+  }
 }
 
 QMI8658.ACCEL_SCALE = ACCEL_SCALE

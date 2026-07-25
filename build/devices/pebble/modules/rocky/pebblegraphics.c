@@ -89,12 +89,9 @@ void pebble_graphics_context(xsMachine *the)
 
 	xsSetHostHooks(xsThis, &xsPebbleGraphicsContextHooks);
 
-	if (xsmcHas(xsArg(0), xsID_onUpdate)) {
-		pgr->onUpdate = builtinGetCallback(the, xsID_onUpdate);
-
-		Layer *layer = window_get_root_layer(pgr->w);
-		layer_set_update_proc(layer, doUpdate);
-	}
+	pgr->onUpdate = builtinGetCallback(the, xsID_onUpdate);
+	if (pgr->onUpdate)
+		layer_set_update_proc(window_get_root_layer(pgr->w), doUpdate);
 }
 
 Fixed_S16_3 prv_fixed_s3_from_double(double d)

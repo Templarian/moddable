@@ -1,0 +1,8 @@
+{
+	"modules": {
+		"embedded:sensor/Touch/GT911": "./gt911_async"
+	},
+	"preload": [
+		"embedded:sensor/Touch/GT911"
+	]
+}

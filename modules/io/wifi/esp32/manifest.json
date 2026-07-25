@@ -4,5 +4,8 @@
 	},
 	"preload": [
 		"embedded:network/interface/wifi"
+	],
+	"dependency": [
+		{ "idf": "esp_wifi" }
 	]
 }

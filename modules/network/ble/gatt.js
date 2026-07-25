@@ -154,7 +154,6 @@ class Client {
 		ClientCallback[event].call(this, params);
 	}
 };
-Object.freeze(Client.prototype);
 
 class Service {
 	constructor(dictionary) {
@@ -216,7 +215,6 @@ class Service {
 		}
 	}
 };
-Object.freeze(Service.prototype);
 
 class Characteristic {
 	constructor(dictionary) {
@@ -300,7 +298,6 @@ class Characteristic {
 		}
 	}
 };
-Object.freeze(Characteristic.prototype);
 
 class Descriptor {
 	constructor(dictionary) {
@@ -353,7 +350,6 @@ class Descriptor {
 	_readValue() @ "xs_gatt_descriptor_read_value"
 	_writeValue() @ "xs_gatt_descriptor_write_value"
 };
-Object.freeze(Descriptor.prototype);
 
 export {
 	Client,

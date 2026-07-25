@@ -1170,7 +1170,11 @@ void fxModuleNodeBind(void* it, void* param)
 	txBinder* binder = param;
 	fxScopeBinding(self->scope, param);
 	fxScopeBindDefineNodes(self->scope, param);
+	if (self->scope->disposableNodeCount)
+		fxBinderPushVariables(param, 2);
 	fxNodeDispatchBind(self->body, param);
+	if (self->scope->disposableNodeCount)
+		fxBinderPopVariables(param, 2);
 	fxScopeBound(self->scope, param);
 	self->scopeCount = binder->scopeMaximum;
 }

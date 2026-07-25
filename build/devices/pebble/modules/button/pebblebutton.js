@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025  Moddable Tech, Inc.
+ * Copyright (c) 2025-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -21,6 +21,10 @@
 class PebbleButton extends Native("xs_pebblebutton_destructor") {
 	constructor(options) { super(); native("xs_pebblebutton").call(this, options); }
 	close() { return native("xs_pebblebutton_close").call(this); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default PebbleButton;

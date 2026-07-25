@@ -55,10 +55,9 @@ void xs_pwm_constructor_(xsMachine *the)
     if (!builtinIsPinFree(pin))
 		xsRangeError("in use");
 
-    if (xsmcHas(xsArg(0), xsID_hz)) {
+    if (xsmcGet(xsVar(0), xsArg(0), xsID_hz)) {
         int hz;
 
-        xsmcGet(xsVar(0), xsArg(0), xsID_hz);
         hz = xsmcToInteger(xsVar(0));
 
         if (gHz != hz) {

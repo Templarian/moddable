@@ -383,8 +383,7 @@ void xs_directoryposix_status(xsMachine *the)
 	int flags = 0;
 	
 	if (xsmcTest(xsArg(1))) {
-		if (xsmcHas(xsArg(1), xsID_resolveTarget)) {
-			xsmcGet(xsResult, xsArg(1), xsID_resolveTarget);
+		if (xsmcGet(xsResult, xsArg(1), xsID_resolveTarget)) {
 			if (!xsmcTest(xsResult))
 				flags = AT_SYMLINK_NOFOLLOW;
 		}

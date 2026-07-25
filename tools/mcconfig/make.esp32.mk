@@ -182,6 +182,7 @@ INC_DIRS = \
 	$(IDF_PATH)/components \
 	$(IDF_PATH)/components/bootloader_support/include \
 	$(IDF_PATH)/components/bt/include \
+	$(IDF_PATH)/components/bt/porting/include \
 	$(IDF_PATH)/components/bt/include/$(ESP32_BT_SUBCLASS)/include \
 	$(IDF_PATH)/components/bt/host/bluedroid/api/include \
 	$(IDF_PATH)/components/bt/host/bluedroid/api/include/api \
@@ -236,6 +237,9 @@ INC_DIRS = \
 	$(IDF_PATH)/components/lwip/port/esp32xx/include/ \
 	$(IDF_PATH)/components/lwip/port/freertos/include/ \
 	$(IDF_PATH)/components/mbedtls/mbedtls/include/ \
+	$(IDF_PATH)/components/mbedtls/mbedtls/tf-psa-crypto/include/ \
+	$(IDF_PATH)/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/include/ \
+	$(IDF_PATH)/components/mbedtls/port/include/ \
 	$(IDF_PATH)/components/newlib/include \
 	$(IDF_PATH)/components/newlib/platform_include \
 	$(IDF_PATH)/components/bt/host/nimble/esp-hci/include \

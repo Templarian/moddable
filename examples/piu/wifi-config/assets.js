@@ -97,7 +97,6 @@ class CircleOfSquaresBehavior extends Behavior {
     }
   }
 }
-Object.freeze(CircleOfSquaresBehavior.prototype);
 
 class AnimatedCircleOfSquaresBehavior extends Behavior {
   onDisplaying(port) {
@@ -154,7 +153,6 @@ class AnimatedCircleOfSquaresBehavior extends Behavior {
     port.fillColor("#cce6ff", last6coords[11], last6coords[10], 8, 8);
   } 
 }
-Object.freeze(AnimatedCircleOfSquaresBehavior.prototype);
 
 export const WiFiStatusSpinner = Container.template($ => ({
   left: 0, right: 0, top: 0, bottom: 0, Skin: WhiteSkin,

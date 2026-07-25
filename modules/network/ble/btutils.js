@@ -162,7 +162,6 @@ export class Bytes extends ArrayBuffer {
 	equals(bytes) @ "xs_bytes_equals"
 	
 }
-Object.freeze(Bytes.prototype);
 
 function uuid(strings) {
 	return new Bytes(strings[0].replaceAll("-", ""), true);
@@ -462,6 +461,5 @@ export class Advertisement {
 		return uuidList;
 	}
 }
-Object.freeze(Advertisement.prototype);
 
 export { uuid, address };

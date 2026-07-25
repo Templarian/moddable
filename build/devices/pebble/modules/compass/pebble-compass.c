@@ -116,8 +116,7 @@ void xs_compass_configure(xsMachine *the)
 	/* PebbleCompass pc = */ xsmcGetHostDataValidate(xsThis, (void *)&xsCompassHooks);
 	xsSlot tmp;
 
-	if (xsmcHas(xsArg(0), xsID_filter)) {
-		xsmcGet(tmp, xsArg(0), xsID_filter);
+	if (xsmcGet(tmp, xsArg(0), xsID_filter)) {
 		int filter = xsmcToNumber(tmp);
 		compass_service_set_heading_filter(normalize_angle(DEG_TO_TRIGANGLE(filter)));
 	}

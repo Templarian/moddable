@@ -124,7 +124,6 @@ class AMSAuthenticator extends BLEServer {
 		});
 	}
 }
-Object.freeze(AMSAuthenticator.prototype);
 
 class AMSClient extends BLEClient {
 	constructor(device) {
@@ -216,6 +215,5 @@ class AMSClient extends BLEClient {
 	onTrackChanged(artist, album, title, duration) {
 	}
 }
-Object.freeze(AMSClient.prototype);
 
 export {AMSAuthenticator, AMSClient, RemoteCommandID, PlaybackState, QueueAttributeID, ShuffleMode, RepeatMode};

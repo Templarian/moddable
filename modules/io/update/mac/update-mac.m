@@ -93,17 +93,14 @@ void xs_update_open(xsMachine *the)
 
 	if (kIOFormatBuffer != builtinInitializeFormat(the, kIOFormatBuffer))
 		xsRangeError("unsupported");
-	if (!xsmcHas(xsArg(0), xsID_partition))
+	if (!xsmcGet(xsResult, xsArg(0), xsID_partition))
 		xsUnknownError("no partition");
-
-	xsmcGet(xsResult, xsArg(0), xsID_partition);
 	flash = xsmcGetHostDataValidate(xsResult, xs_flash_partition_destructor);
 	if (flash->readOnly)
 		xsUnknownError("read-only partition");
 
 	append = 1;
-	if (xsmcHas(xsArg(0), xsID_mode)) {
-		xsmcGet(xsResult, xsArg(0), xsID_mode);
+	if (xsmcGet(xsResult, xsArg(0), xsID_mode)) {
 		char *modeStr = xsmcToString(xsResult);
 		if (0 == c_strcmp(modeStr, "a"))
 			;
@@ -114,8 +111,7 @@ void xs_update_open(xsMachine *the)
 	}
 
 	size = flash->size;
-	if (xsmcHas(xsArg(0), xsID_byteLength)) {
-		xsmcGet(xsResult, xsArg(0), xsID_byteLength);
+	if (xsmcGet(xsResult, xsArg(0), xsID_byteLength)) {
 		xsNumberValue tmp = xsmcToNumber(xsResult);
 		if (c_isnan(tmp) || (tmp < 0) || (tmp > 0xffffffff) || (tmp > flash->size))
 			xsRangeError("invalid byteLength");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Moddable Tech, Inc.
+ * Copyright (c) 2023-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -58,6 +58,9 @@ class TTP223
 	{
 		return { position: this.#io.read() };
 	}
-	
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 export default TTP223;

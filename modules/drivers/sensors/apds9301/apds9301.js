@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Moddable Tech, Inc.
+ * Copyright (c) 2022-2026 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -301,6 +301,10 @@ class Sensor {
     if (setClearBit)
       command |= Command.CLEARINT;
     return this.#io.writeUint16(command, value);
+  }
+
+  static {
+    this.prototype[Symbol.dispose] = this.prototype.close;
   }
 }
 

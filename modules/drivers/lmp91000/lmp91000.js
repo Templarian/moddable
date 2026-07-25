@@ -192,4 +192,3 @@ export default class LMP91000 extends I2C {
 	}
 }
 
-Object.freeze(LMP91000.prototype);

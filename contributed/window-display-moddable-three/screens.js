@@ -26,7 +26,6 @@ class BaseScreenBehavior extends Behavior {
 		application.delegate("switchScreen");
 	}
 }
-Object.freeze(BaseScreenBehavior.prototype);
 
 /* -=====================================================================- */
 /* -============================ Logo screen ============================- */
@@ -46,7 +45,6 @@ class ModdableLogoScreenBehavior extends BaseScreenBehavior {
 		container.add(new TransitionBackground);
 	}
 }
-Object.freeze(ModdableLogoScreenBehavior.prototype);
 
 const ModdableLogoScreen = Container.template($ => ({
 	top: 0, bottom: 0, left: 0, right: 0, Skin: ASSETS.WhiteSkin,
@@ -93,7 +91,6 @@ class TransitionBackgroundBehavior extends Behavior {
 		this.index++;
 	}
 }
-Object.freeze(TransitionBackgroundBehavior.prototype);
 
 const TransitionBackground = Die.template($ => ({
 	top: 0, bottom: 0, left: 0, right: 0,
@@ -122,7 +119,6 @@ class EyeScreenBehavior extends BaseScreenBehavior {
 		container.start();
 	}
 }
-Object.freeze(EyeScreenBehavior.prototype);
 
 const EyeScreen = Container.template($ => ({
 	top: 0, bottom: 0, left: 0, right: 0, Skin: ASSETS.WhiteSkin,
@@ -151,7 +147,6 @@ class WeatherScreenBehavior extends BaseScreenBehavior {
 		container.start();
 	}
 }
-Object.freeze(WeatherScreenBehavior.prototype);
 
 const WeatherScreen = Container.template($ => ({
 	top: 0, bottom: 0, left: 0, right: 0, Skin: ASSETS.BlackSkin,
@@ -212,7 +207,6 @@ class WorldScreenBehavior extends BaseScreenBehavior {
 		}
 	}
 }
-Object.freeze(WorldScreenBehavior.prototype);
 
 const WorldScreen = Container.template($ => ({
 	top: 0, bottom: 0, left: 0, right: 0, Skin: ASSETS.BlackSkin,
@@ -240,7 +234,6 @@ class WiFiScreenBehavior extends BaseScreenBehavior {
 		container.start();
 	}
 }
-Object.freeze(WorldScreenBehavior.prototype);
 
 const WiFiScreen = Container.template($ => ({
 	top: 0, bottom: 0, left: 0, right: 0, Skin: ASSETS.BlackSkin,

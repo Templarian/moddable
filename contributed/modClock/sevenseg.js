@@ -530,4 +530,3 @@ export class SevenSegDisplay {
 }
 
 export default SevenSegDisplay;
-Object.freeze(SevenSegDisplay.prototype);

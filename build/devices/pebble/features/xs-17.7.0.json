@@ -1,0 +1,14 @@
+{
+	"strip": [
+		">17.7.0",
+		"Proxy",
+		"Reflect",
+		"Atomics",
+		"WeakMap",
+		"WeakSet",
+		"BigInt",
+		"eval",
+		"Function",
+		"Generator"
+	]
+}

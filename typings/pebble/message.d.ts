@@ -42,5 +42,6 @@ declare class Message {
   get input(): number;
   get output(): number;
 }
+interface Message extends Disposable {}
 
 export default Message;

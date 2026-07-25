@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2025  Moddable Tech, Inc.
+ * Copyright (c) 2016-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Tools.
  * 
@@ -24,7 +24,8 @@
 
 extern int fuzz(int argc, char* argv[]);
 extern void fx_print(xsMachine* the);
-extern void fxBuildAgent(xsMachine* the);
+extern void modInstallTextDecoder(xsMachine *the);
+extern void modInstallTextEncoder(xsMachine *the);
 extern void fxBuildFuzz(xsMachine* the);
 extern void fxRunLoop(txMachine* the);
 extern void fxRunModuleFile(txMachine* the, txString path);
@@ -45,6 +46,9 @@ static void fx_assert_throws(xsMachine *the);
 #if FUZZILLI
 static void fx_memoryFail(txMachine *the);
 static void fx_fuzzilli(xsMachine* the);
+extern int fxBundleIs(const char *buffer, size_t size);
+extern void fxBundleRun(txMachine *the, char *buffer, size_t size);
+extern void fxBundleMapReset(void);
 #endif
 extern int gxStress;
 int gxMemoryFail;		// not thread safe
@@ -71,6 +75,10 @@ void fxBuildFuzz(xsMachine* the)
 	xsDefine(xsGlobal, xsID("petrify"), xsResult, xsDontEnum);
 	xsResult = xsNewHostFunction(fx_mutabilities, 1);
 	xsDefine(xsGlobal, xsID("mutabilities"), xsResult, xsDontEnum);
+
+	// these are installed by fxBuildAgent
+//	modInstallTextDecoder(the);
+//	modInstallTextEncoder(the);
 
 	gxStress = 0;
 	gxMemoryFail = 0;
@@ -504,6 +512,10 @@ int fuzz(int argc, char* argv[])
 				xsResult = xsNewHostFunction(fx_memoryFail, 1);
 				xsSet(xsGlobal, xsID("memoryFail"), xsResult);
 
+				// TextEncoder/TextDecoder
+				modInstallTextDecoder(the);
+				modInstallTextEncoder(the);
+
 				// wait for the script
 				char action[4];
 				ssize_t nread = read(REPRL_CRFD, action, 4);
@@ -525,16 +537,20 @@ int fuzz(int argc, char* argv[])
 				}
 				buffer[script_size] = 0;	// required when debugger active
 
-				// run the script
-				txSlot* realm = mxProgram.value.reference->next->value.module.realm;
-				txStringCStream aStream;
-				aStream.buffer = buffer;
-				aStream.offset = 0;
-				aStream.size = script_size;
-				the->script = fxParseScript(the, &aStream, fxStringCGetter, mxProgramFlag | mxDebugFlag);
-				fxRunScript(the, the->script, mxRealmGlobal(realm), C_NULL, mxRealmClosures(realm)->value.reference, C_NULL, mxProgram.value.reference);
-				the->script = NULL;
-				mxPullSlot(mxResult);
+				if (fxBundleIs(buffer, script_size)) 
+					fxBundleRun(the, buffer, script_size);
+				else {
+					// run the script
+					txSlot* realm = mxProgram.value.reference->next->value.module.realm;
+					txStringCStream aStream;
+					aStream.buffer = buffer;
+					aStream.offset = 0;
+					aStream.size = script_size;
+					the->script = fxParseScript(the, &aStream, fxStringCGetter, mxProgramFlag | mxDebugFlag);
+					fxRunScript(the, the->script, mxRealmGlobal(realm), C_NULL, mxRealmClosures(realm)->value.reference, C_NULL, mxProgram.value.reference);
+					the->script = NULL;
+					mxPullSlot(mxResult);
+				}
 
 				fxRunLoop(the);
 			}
@@ -548,6 +564,7 @@ int fuzz(int argc, char* argv[])
 		xsEndHost(machine);
 		}
 		xsEndMetering(machine);
+		fxBundleMapReset();
 		gxMemoryFail = 0;
 		fxDeleteScript(machine->script);
 		int status = (machine->exitStatus & 0xff) << 8;
@@ -594,8 +611,6 @@ static xsBooleanValue xsWithinComputeLimit(xsMachine* machine, uint64_t index)
 	return 1;
 }
 #endif
-
-extern void modInstallTextDecoder(xsMachine *the);
 
 int fuzz_oss(const uint8_t *Data, size_t script_size)
 {

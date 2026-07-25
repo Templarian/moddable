@@ -38,5 +38,6 @@ declare class Dictation {
   read(): string | undefined;
   readonly format: "string";
 }
+interface Dictation extends Disposable {}
 
 export default Dictation;

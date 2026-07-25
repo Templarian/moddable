@@ -76,6 +76,5 @@ class Console @ "xs_console_destructor" {
 		this.write(...items, "\r\n");
 	}
 }
-Object.freeze(Console.prototype);
 
 export default Console;

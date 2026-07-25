@@ -152,17 +152,15 @@ void xs_directorystorage_open(xsMachine *the)
 	xsDirectoryRecord d = {0};
 
 	xsmcVars(1);
-	if (!xsmcHas(xsArg(0), xsID_path))
+	if (!xsmcGet(xsVar(0), xsArg(0), xsID_path))
 		xsUnknownError("no path");
-	xsmcGet(xsVar(0), xsArg(0), xsID_path);
 	xsmcToStringBuffer(xsVar(0), domain, sizeof(domain));
 	size_t length = c_strlen(domain);
 	if (0 == length) xsUnknownError("invalid");
 	if ('/' == domain[length - 1])
 		domain[length - 1] = 0;
 
-	if (xsmcHas(xsArg(0), xsID_mode)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_mode);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_mode)) {
 		char *modeStr = xsmcToString(xsVar(0));
 		if (0 == c_strcmp(modeStr, "r"))
 			d.readOnly = true;
@@ -172,10 +170,8 @@ void xs_directorystorage_open(xsMachine *the)
 			xsUnknownError("invalid mode");
 	}
 
-	if (xsmcHas(xsArg(0), xsID_pebble)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_pebble);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_pebble))
 		d.isPebbleNative = xsmcTest(xsVar(0));
-	}
 
 	d.format = builtinInitializeFormat(the, kIOFormatBuffer);
 	if ((kIOFormatInvalid == d.format) || ((kIOFormatBuffer != d.format) && d.isPebbleNative))

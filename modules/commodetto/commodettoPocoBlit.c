@@ -3599,8 +3599,11 @@ int PocoDrawingEnd(Poco poco, PocoPixel *pixels, int byteLength, PocoRenderedPix
 	poco->rowBytes = rowBytes;
  
 	int canAsync = ((byteLength >> 1) >= rowBytes) && (kPocoFlagDoubleBuffer & poco->flags);
-	if (canAsync)
+	if (canAsync) {
 		displayLines = (byteLength >> 1) / rowBytes;
+		if (displayLines > 2)
+			displayLines = displayLines & ~1;		// force even 
+	}
 	else
 		displayLines = byteLength / rowBytes;
 	if (displayLines <= 0) return 4;

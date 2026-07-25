@@ -106,4 +106,3 @@ export default class HMAC {
 	};
 };
 
-Object.freeze(HMAC.prototype);

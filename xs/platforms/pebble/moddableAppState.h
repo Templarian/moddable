@@ -41,8 +41,6 @@ typedef struct {
 
 	// pebblebutton
 	void					*buttons;
-	EventServiceInfo		eventServiceDown;
-	EventServiceInfo		eventServiceUp;
 
 	// pebble-accelerometer
 	void					*accelerometer;
@@ -73,6 +71,7 @@ typedef struct {
 	void					*fxBuildFFI;
 
 	DebugFragment		debugFragments;
+	char					*abortReason;
 } ModdablePebbleAppStateRecord, *ModdablePebbleAppState;
 
 #define getModdableAppState(FIELD) (((ModdablePebbleAppState)app_state_get_js_memory_api_context())->FIELD)

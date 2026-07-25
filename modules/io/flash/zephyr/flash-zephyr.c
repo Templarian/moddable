@@ -126,10 +126,8 @@ void xs_flashstorage_close(xsMachine *the)
 
 void xs_flashstorage_open(xsMachine *the)
 {
-	if (!xsmcHas(xsArg(0), xsID_path))
+	if (!xsmcGet(xsResult, xsArg(0), xsID_path))
 		xsUnknownError("no path");
-
-	xsmcGet(xsResult, xsArg(0), xsID_path);
 	char *partitionName = xsmcToString(xsResult);
 	xsFlashRecord flash = {0};
 
@@ -143,8 +141,7 @@ void xs_flashstorage_open(xsMachine *the)
 	if (!flash.partition)
 		xsUnknownError("can't find partition");
 
-	if (xsmcHas(xsArg(0), xsID_mode)) {
-		xsmcGet(xsResult, xsArg(0), xsID_mode);
+	if (xsmcGet(xsResult, xsArg(0), xsID_mode)) {
 		char *modeStr = xsmcToString(xsResult);
 		if (0 == c_strcmp(modeStr, "r"))
 			flash.readOnly = 1;

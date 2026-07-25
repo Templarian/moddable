@@ -138,6 +138,5 @@ export class DS18X20 {
 
 }
 
-Object.freeze(DS18X20.prototype);
 
 export default DS18X20;

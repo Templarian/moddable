@@ -133,8 +133,7 @@ void xs_accelerometer_configure(xsMachine *the)
 	/* PebbleAccelerometer pa = */ xsmcGetHostDataValidate(xsThis, (void *)&xsAccelerometerHooks);
 	xsSlot tmp;
 
-	if (xsmcHas(xsArg(0), xsID_hz)) {
-		xsmcGet(tmp, xsArg(0), xsID_hz);
+	if (xsmcGet(tmp, xsArg(0), xsID_hz)) {
 		int hz = xsmcToInteger(tmp);
 		AccelSamplingRate rate;
 		if (hz <= 15)

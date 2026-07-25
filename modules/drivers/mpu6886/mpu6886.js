@@ -186,7 +186,6 @@ class Gyro_Accelerometer extends SMBus {
         }
     }
 }
-Object.freeze(Gyro_Accelerometer.prototype);
 Object.freeze(GYRO_SCALER);
 Object.freeze(ACCEL_SCALER);
 

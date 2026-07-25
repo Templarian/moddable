@@ -48,8 +48,6 @@ export class Listener @ "xs_listener_destructor" {
 	// callback()		// new socket arrived
 };
 
-Object.freeze(Socket.prototype);
-Object.freeze(Listener.prototype);
 
 export default Object.freeze({
 	Socket,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025  Moddable Tech, Inc.
+ * Copyright (c) 2025-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -48,6 +48,10 @@ class GAPClient extends Native("BLEScanner_destructor") {
 	}
 	close() { return native("BLEScanner_close").call(this); }
 	read() { return native("BLEScanner_read").call(this); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 class GATTClient extends Native("BLEClient_destructor") {
@@ -155,6 +159,10 @@ class GATTClient extends Native("BLEClient_destructor") {
 		write: (1 << 3),
 		writeWithOutResponse: (1 << 2),
 	})
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export { GAPClient, GATTClient };

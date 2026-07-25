@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025  Moddable Tech, Inc.
+ * Copyright (c) 2025-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -61,6 +61,10 @@ class GAPClient extends Native("xs_gapclient_destructor") {
 	constructor(options) { super(); native("xs_gapclient").call(this, options, Advertisement); }
 	close() { return native("xs_gapclient_close").call(this); }
 	read() { return native("xs_gapclient_read").call(this); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 const features = Object.freeze({
@@ -218,6 +222,10 @@ class GATTClient extends Native("xs_gattclient_destructor") {
 		write: (1 << 3),
 		writeWithOutResponse: (1 << 2),
 	});
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 };
 
 export {GATTClient, GAPClient}

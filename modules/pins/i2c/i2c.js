@@ -24,6 +24,5 @@ export class I2C @ "xs_i2c_destructor" {
 	read(count) @ "xs_i2c_read";
 	write() @ "xs_i2c_write";
 }
-Object.freeze(I2C.prototype);
 
 export default I2C;

@@ -119,10 +119,8 @@ void xs_JPEG_constructor(xsMachine *the)
 	jpeg->the = the;
 
 	jpeg->pixelFormat = kCommodettoBitmapFormat;
-	if ((argc > 1) && (xsUndefinedType != xsmcTypeOf(xsArg(1))) && xsmcHas(xsArg(1), xsID_pixelFormat)) {
-		xsmcGet(xsVar(0), xsArg(1), xsID_pixelFormat);
+	if ((argc > 1) && (xsUndefinedType != xsmcTypeOf(xsArg(1))) && xsmcGet(xsVar(0), xsArg(1), xsID_pixelFormat))
 		jpeg->pixelFormat = xsmcToInteger(xsVar(0));
-	}
 
 #if (16 == kPocoPixelSize) || (8 == kPocoPixelSize)
 	jpeg->convert = (convertto)convertto_16and8;

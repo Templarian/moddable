@@ -59,7 +59,9 @@ interface WakeupEvent {
 
 type TimeEventType = "secondchange" | "minutechange" | "hourchange" | "daychange";
 
-type PebbleEventType = TimeEventType | "connected" | "resize" | "willFocus" | "didFocus" | "wakeup";
+type HealthEventSubtype = "significant" | "movement" | "sleep" | "metric" | "heart rate";
+
+type PebbleEventType = TimeEventType | "connected" | "resize" | "willFocus" | "didFocus" | "wakeup" | "health";
 
 type TimeChangeCallback = (event: TimeChangeEvent) => void;
 
@@ -71,6 +73,8 @@ type FocusCallback = (inFocus: boolean) => void;
 
 type WakeupCallback = (event: WakeupEvent) => void;
 
+type HealthCallback = (subtype: HealthEventSubtype) => void;
+
 interface watch {
   addEventListener(event: TimeEventType, callback: TimeChangeCallback): void;
   addEventListener(event: "connected", callback: ConnectedCallback): void;
@@ -78,13 +82,16 @@ interface watch {
   addEventListener(event: "willFocus", callback: FocusCallback): void;
   addEventListener(event: "didFocus", callback: FocusCallback): void;
   addEventListener(event: "wakeup", callback: WakeupCallback): void;
+  addEventListener(event: "health", callback: HealthCallback): void;
   removeEventListener(event: TimeEventType, callback: TimeChangeCallback): void;
   removeEventListener(event: "connected", callback: ConnectedCallback): void;
   removeEventListener(event: "resize", callback: ResizeCallback): void;
   removeEventListener(event: "willFocus", callback: FocusCallback): void;
   removeEventListener(event: "didFocus", callback: FocusCallback): void;
   removeEventListener(event: "wakeup", callback: WakeupCallback): void;
+  removeEventListener(event: "health", callback: HealthCallback): void;
   light(enable?: boolean): void;
+  exit(reason?: number): void;
   readonly connected: ConnectionState;
   readonly hour12: boolean;
   readonly model: number;

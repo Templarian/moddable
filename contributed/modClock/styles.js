@@ -1206,13 +1206,7 @@ ClockStyle.Special = Style_Special;
 ClockStyle.ColorWheel = Style_ColorWheel;
 
 
-Object.freeze(Style_OneColor.prototype, true);
-Object.freeze(Style_TwoColor.prototype, true);
-Object.freeze(Style_Rainbow.prototype, true);
-Object.freeze(Style_Special.prototype, true);
-Object.freeze(Style_ColorWheel.prototype, true);
 
-Object.freeze(ClockStyle.prototype, true);
 
 export default ClockStyle;
 

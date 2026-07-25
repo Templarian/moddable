@@ -113,15 +113,12 @@ void xs_tcp_constructor(xsMachine *the)
 		if (onError)
 			triggerable |= kTCPError;
 
-		if (xsmcHas(xsArg(0), xsID_nodelay)) {
-			xsmcGet(xsVar(0), xsArg(0), xsID_nodelay);
+		if (xsmcGet(xsVar(0), xsArg(0), xsID_nodelay))
 			nodelay = xsmcToBoolean(xsVar(0)) ? 2 : 1;
-		}
 
-		if (xsmcHas(xsArg(0), xsID_from)) {
+		if (xsmcGet(xsVar(0), xsArg(0), xsID_from)) {
 			TCP from;
 
-			xsmcGet(xsVar(0), xsArg(0), xsID_from);
 			from = xsmcGetHostDataValidate(xsVar(0), (void *)&xsTCPHooks);
 			if (!from->skt)
 				xsUnknownError("invalid from");
@@ -550,9 +547,8 @@ void xs_listener_constructor(xsMachine *the)
 
 	xsmcVars(1);
 
-	if (xsmcHas(xsArg(0), xsID_port)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_port);
-		port = builtinGetSignedInteger(the, &xsVar(0)); 
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_port)) {
+		port = builtinGetSignedInteger(the, &xsVar(0));
 		if ((port < 0) || (port > 65535))
 			xsRangeError("invalid port");
 	}

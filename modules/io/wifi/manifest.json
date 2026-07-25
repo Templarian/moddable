@@ -4,10 +4,7 @@
 	},
 	"platforms": {
 		"esp32": {
-			"include": "./esp32/manifest.json",
-			"dependency": [
-				{ "idf": "esp_wifi" }
-			]
+			"include": "./esp32/manifest.json"
 		},
 		"esp": {
 			"include": "./esp/manifest.json"

@@ -64,6 +64,7 @@ declare module "embedded:io/digital" {
     get format(): "number"
     set format(value: "number")
   }
+  interface Digital extends Disposable {}
 
   export default Digital;
 }

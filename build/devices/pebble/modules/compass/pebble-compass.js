@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025  Moddable Tech, Inc.
+ * Copyright (c) 2025-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -24,6 +24,10 @@ class Compass extends Native("xs_compass_destructor") {
 
 	configure(options) { return native("xs_compass_configure").call(this, options); }
 	sample() { return native("xs_compass_sample").call(this); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default Compass;

@@ -31,5 +31,4 @@ export default class Radio @ "xs_Radio_destructor" {
 	getUnique() @ "xs_Radio_getUnique";
 };
 
-Object.freeze(Radio.prototype);
 

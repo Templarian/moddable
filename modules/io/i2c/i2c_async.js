@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025  Moddable Tech, Inc.
+ * Copyright (c) 2022-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -25,6 +25,7 @@ I2C.Async = class extends Native("_xs_i2casync_destructor") {
 	close() { return native("_xs_i2casync_close").call(this); }
 	read(count) { return native("_xs_i2casync_read").call(this, count); }
 	write(buffer) { return native("_xs_i2casync_write").call(this, buffer); }
+	writeRead(buffer, count) { return native("_xs_i2casync_writeRead").call(this, buffer, count); }
 }
 
 export default I2C;

@@ -1883,4 +1883,7 @@ const txString gxIDStrings[XS_ID_COUNT] = {
 	"rawJSON",
 	"sumPrecise",
 #endif
+#if mxImmutableArrayBuffers
+	"sliceToImmutable",
+#endif
 };

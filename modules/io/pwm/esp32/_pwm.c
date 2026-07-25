@@ -1,4 +1,4 @@
-/* * Copyright (c) 2019-2024  Moddable Tech, Inc.
+/* * Copyright (c) 2019-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -24,15 +24,20 @@
 #include "xsmc.h"			// xs bindings for microcontroller
 #include "xsHost.h"			// esp platform support
 #include "mc.xs.h"			// for xsID_* values
+#include "mc.defines.h"
 
 #include "builtinCommon.h"
 
 #include "driver/gpio.h"
 #include "driver/ledc.h"
 
-// default is channels 4 through 7
-#ifndef MODDEF_PWM_LEDC_CHANNEL
-	#define MODDEF_PWM_LEDC_CHANNEL_MAP 0xF0
+#ifndef MODDEF_PWM_LEDC_CHANNEL_MAP
+	#if SOC_LED_CHANNEL_NUM > 6
+		// default is channels 4 through 7
+		#define MODDEF_PWM_LEDC_CHANNEL_MAP 0xF0
+	#else	// c3, c6 have 6 channels. expose all
+		#define MODDEF_PWM_LEDC_CHANNEL_MAP 0x3F
+	#endif
 #endif
 
 // #if CONFIG_IDF_TARGET_ESP32
@@ -98,8 +103,7 @@ void xs_pwm_constructor_(xsMachine *the)
 
 	xsmcVars(2);
 
-    if (xsmcHas(xsArg(0), xsID_from)) {
-		xsmcGet(xsVar(1), xsArg(0), xsID_from);
+    if (xsmcGet(xsVar(1), xsArg(0), xsID_from)) {
 		pwm = xsmcGetHostDataValidate(xsVar(1), xs_pwm_destructor_);
 		pin = pwm->pin;
 		ledc = pwm->ledc;
@@ -114,8 +118,7 @@ void xs_pwm_constructor_(xsMachine *the)
 		if (!builtinIsPinFree(pin))
 			xsUnknownError("in use");
 
-		if (xsmcHas(xsArg(0), xsID_port)) {
-			xsmcGet(xsVar(0), xsArg(0), xsID_port);
+		if (xsmcGet(xsVar(0), xsArg(0), xsID_port)) {
 			ledc = builtinGetSignedInteger(the, &xsVar(0));
 			if ((ledc < 0) || (ledc >= LEDC_CHANNEL_MAX))
 				xsRangeError("invalid port");
@@ -124,15 +127,13 @@ void xs_pwm_constructor_(xsMachine *the)
 		}
 	}
 
-    if (xsmcHas(xsArg(0), xsID_hz)) {
-        xsmcGet(xsVar(0), xsArg(0), xsID_hz);
+    if (xsmcGet(xsVar(0), xsArg(0), xsID_hz)) {
         hz = xsmcToInteger(xsVar(0));
         if (hz <= 0)
 			xsRangeError("invalid hz");
     }
 
-    if (xsmcHas(xsArg(0), xsID_resolution)) {
-        xsmcGet(xsVar(0), xsArg(0), xsID_resolution);
+    if (xsmcGet(xsVar(0), xsArg(0), xsID_resolution)) {
         resolution = xsmcToInteger(xsVar(0));
         if ((resolution <= 0) || (resolution >= LEDC_TIMER_BIT_MAX))
 			xsRangeError("invalid resolution");

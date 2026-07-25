@@ -451,13 +451,11 @@ Server.handshake = 2;
 Server.receive = 3;
 Server.disconnect = 4;
 Server.subprotocol = 5;
-Object.freeze(Server.prototype);
 
 Client.connect = 1;
 Client.handshake = 2;
 Client.receive = 3;
 Client.disconnect = 4;
-Object.freeze(Client.prototype);
 
 export default Object.freeze({
 	Client, Server

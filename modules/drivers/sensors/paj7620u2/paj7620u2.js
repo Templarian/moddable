@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2022  Moddable Tech, Inc.
+ * Copyright (c) 2016-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -294,6 +294,10 @@ class PAJ7620U2 {
         break;
     }
     return result;
+  }
+
+  static {
+    this.prototype[Symbol.dispose] = this.prototype.close;
   }
 }
 

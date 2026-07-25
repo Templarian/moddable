@@ -29,17 +29,12 @@ static xsHostHooks PiuViewHooks = {
 	NULL
 };
 
-static EventServiceInfo	eventServiceDown;
-static EventServiceInfo	eventServiceUp;
-
 void PiuViewAdjust(PiuView* self) 
 {
 }
 
 void PiuViewDelete(void* it)
 {
-	event_service_client_unsubscribe(&eventServiceUp);
-	event_service_client_unsubscribe(&eventServiceDown);
 }
 
 void PiuViewDictionary(xsMachine* the, void* it)

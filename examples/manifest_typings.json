@@ -4,8 +4,7 @@
 	},
 	"modules": {
 		"*": [
-			"$(TYPINGS)/*", "$(TYPINGS)/ble/*",
-			"$(TYPINGS)/web/*"
+			"$(TYPINGS)/*", "$(TYPINGS)/ble/*"
 		],
 		"commodetto/*": [
 			"$(TYPINGS)/commodetto/*"
@@ -37,6 +36,9 @@
 		"embedded:io/bluetoothle/*": [
 			"$(TYPINGS)/embedded_io/ble/*"
 		],
+		"embedded:io/crypt/*": [
+			"$(TYPINGS)/embedded_io/crypt/*"
+		],
 		"embedded:io/socket/*": [
 			"$(TYPINGS)/embedded_io/socket/*"
 		],
@@ -67,6 +69,30 @@
 		],
 		"mqtt/js": [
 			"$(TYPINGS)/mqtt/js"
+		],
+		"headers": [
+			"$(TYPINGS)/web/headers"
+		],
+		"fetch": [
+			"$(TYPINGS)/web/fetch"
+		],
+		"structuredClone": [
+			"$(TYPINGS)/web/structuredClone"
+		],
+		"url": [
+			"$(TYPINGS)/web/url"
+		],
+		"webstorage": [
+			"$(TYPINGS)/web/webstorage"
+		],
+		"web/eventsource": [
+			"$(TYPINGS)/web/eventsource"
+		],
+		"web/websocket": [
+			"$(TYPINGS)/web/websocket"
+		],
+		"worker": [
+			"$(TYPINGS)/web/worker"
 		]
 	}, 
 	"platforms": {
@@ -79,6 +105,7 @@
 				"embedded:provider/builtin": "$(TYPINGS)/pebble/device",
 				"pebble/button": "$(TYPINGS)/pebble/button",
 				"pebble/dictation": "$(TYPINGS)/pebble/dictation",
+				"pebble/health": "$(TYPINGS)/pebble/health",
 				"pebble/message": "$(TYPINGS)/pebble/message",
 				"pebble/vibes": "$(TYPINGS)/pebble/vibes",
 				"pebble/wakeup": "$(TYPINGS)/pebble/wakeup"

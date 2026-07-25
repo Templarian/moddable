@@ -41,6 +41,7 @@ declare module "embedded:storage/key-value" {
 
 		format: StorageFormat;
 	}
+	export interface Storage extends Disposable {}
 
 	const KeyValueStorage: {
 		open(options: StorageOpenOptions): Storage;

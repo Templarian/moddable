@@ -48,7 +48,7 @@ declare module "embedded:network/mqtt/client" {
     items?: any[], // being lazy here
   }
 
-  export default class MQTTClient {
+  class MQTTClient {
     constructor(options: Options)
     read(count: number): ArrayBuffer
     read(buffer: ByteBuffer): number
@@ -68,6 +68,8 @@ declare module "embedded:network/mqtt/client" {
     static UNSUBACK: 11
     static PINGREQ: 12
     static PINGRESP: 13
-    static DISCONNECT: 14  
+    static DISCONNECT: 14
   }
+  interface MQTTClient extends Disposable {}
+  export default MQTTClient;
 }

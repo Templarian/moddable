@@ -99,49 +99,64 @@ void _ghash_fix128(uint128_t *v)
     v->_64[1] = t;
 }
 
+static void
+ghash_data_block(ghash_t *ghash, const uint8_t *p16)
+{
+	uint128_t c;
+	c._64[0] = ((const uint64_t *)p16)[0];
+	c._64[1] = ((const uint64_t *)p16)[1];
+
+	uint64_t t = SWAP64(c._64[0]);
+	c._64[0] = SWAP64(c._64[1]);
+	c._64[1] = t;
+
+	ghash->y._64[0] ^= c._64[0];
+	ghash->y._64[1] ^= c._64[1];
+
+	ghash_mul(&ghash->y, &ghash->h, &ghash->y);
+}
+
 void _ghash_update(ghash_t *ghash, const void *data, size_t sz)
 {
-    const uint8_t *p = data;
-    uint128_t c;
+	const uint8_t *p = data;
 
-    ghash->len += sz;
+	ghash->len += sz;
 
-    while (sz >= sizeof(uint128_t)) {
-        // Inline memcpy for 16 bytes
-        c._64[0] = ((uint64_t *)p)[0];
-        c._64[1] = ((uint64_t *)p)[1];
+	if (ghash->partial_len > 0) {
+		size_t need = GHASH_BLKSIZE - ghash->partial_len;
+		if (sz < need) {
+			c_memcpy(ghash->partial + ghash->partial_len, p, sz);
+			ghash->partial_len += sz;
+			return;
+		}
+		c_memcpy(ghash->partial + ghash->partial_len, p, need);
+		ghash_data_block(ghash, ghash->partial);
+		ghash->partial_len = 0;
+		p += need;
+		sz -= need;
+	}
 
-		// inline _ghash_fix128
-		uint64_t t = SWAP64(c._64[0]);
-		c._64[0] = SWAP64(c._64[1]);
-		c._64[1] = t;
+	while (sz >= GHASH_BLKSIZE) {
+		ghash_data_block(ghash, p);
+		p += GHASH_BLKSIZE;
+		sz -= GHASH_BLKSIZE;
+	}
 
-		// inline xor128
-        ghash->y._64[0] ^= c._64[0];
-        ghash->y._64[1] ^= c._64[1];
+	if (sz > 0) {
+		c_memcpy(ghash->partial, p, sz);
+		ghash->partial_len = sz;
+	}
+}
 
-        ghash_mul(&ghash->y, &ghash->h, &ghash->y);
-
-        p += sizeof(uint128_t);
-        sz -= sizeof(uint128_t);
-    }
-
-    if (sz > 0) {
-        c._64[0] = 0;
-        c._64[1] = 0;
-        c_memcpy(&c, p, sz);
-
-		// inline _ghash_fix128
-		uint64_t t = SWAP64(c._64[0]);
-		c._64[0] = SWAP64(c._64[1]);
-		c._64[1] = t;
-
-		// inline xor128
-        ghash->y._64[0] ^= c._64[0];
-        ghash->y._64[1] ^= c._64[1];
-
-        ghash_mul(&ghash->y, &ghash->h, &ghash->y);
-    }
+void
+_ghash_flush_partial(ghash_t *ghash)
+{
+	if (0 == ghash->partial_len)
+		return;
+	uint8_t block[GHASH_BLKSIZE] = {0};
+	c_memcpy(block, ghash->partial, ghash->partial_len);
+	ghash_data_block(ghash, block);
+	ghash->partial_len = 0;
 }
 
 void
@@ -149,11 +164,20 @@ _ghash_create(ghash_t *ghash)
 {
 	c_memcpy(&ghash->y, &ghash->y0, sizeof(ghash->y));
 	ghash->len = 0;
+	ghash->partial_len = 0;
 }
 
 void
 _ghash_fin(ghash_t *ghash, uint8_t *result)
 {
+	if (ghash->partial_len > 0) {
+		uint8_t block[GHASH_BLKSIZE] = {0};
+		c_memcpy(block, ghash->partial, ghash->partial_len);
+		ghash_data_block(ghash, block);
+		// don't reset partial_len: _fin operates on a disposable clone in ECMA-419,
+		// and legacy GCM doesn't reuse the context after _fin
+	}
+
 	uint128_t l;
 
 	/* len(A) || len(C) */

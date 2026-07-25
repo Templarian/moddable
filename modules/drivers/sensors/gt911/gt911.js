@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2025  Moddable Tech, Inc.
+ * Copyright (c) 2016-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -25,7 +25,8 @@ const NEXT = Object.freeze(Uint8Array.of(0x81, 0x4E, 0).buffer);
 
 class GT911 {
 	#io;
-	#one = new Uint8Array(1);
+	#data;
+	#length;
 
 	constructor(options) {
 		const {sensor, interrupt, onSample, config} = options;
@@ -93,38 +94,41 @@ class GT911 {
 		}
 
 		io.write(NEXT);		// ready for next reading
+
+		this.configure({length: 2});
 	}
 	close() {
 		this.#io?.close();
 		this.#io.interrupt?.close();
 		this.#io = undefined;
 	}
-	configure() {
-		//@@ set length...
-		//@@ other config?
+	configure(options) {
+		let {length} = options;
+		if (undefined !== length) {
+			length = parseInt(length);
+			if ((length < 1) || (length > 15))
+				throw new RangeError("invalid length");
+			this.#length = length;
+			this.#data = new Uint8Array(1 + (length << 3));
+		}
 	}
 	sample() {
-		const io = this.#io;
+		const io = this.#io, data = this.#data;
 
-		io.write(ADDR); 		// GOODIX_READ_COOR_ADDR
-		io.read(this.#one)
-		const status = this.#one[0];
+		io.writeRead(ADDR, data);
+		const status = data[0];
 		if (!(0x80 & status))	// not-ready
 			return;
 
-		const touchCount = status & 0b0000_1111;
+		const touchCount = Math.min(status & 0b0000_1111, this.#length);
 		if (!touchCount) {
-			delete this.#io.last;		//@@ remove .last
 			io.write(NEXT);	// ready for next reading
 			return [];
 		}
 
-		const data = this.#io.last = (this.#io.last?.length == (touchCount << 3)) ? this.#io.last : new Uint8Array(touchCount << 3) 
-		io.read(data);
-
 		const result = new Array(touchCount);
 		for (let i = 0; i < touchCount; i++) {
-			const offset = i * 8;
+			const offset = i * 8 + 1;
 			const id = data[offset];
 
 			const x = (data[offset + 1] | (data[offset + 2] << 8));
@@ -140,8 +144,13 @@ class GT911 {
 	}
 	get configuration() {
 		return {
-			interrupt: !!this.#io.interrupt
+			interrupt: !!this.#io.interrupt,
+			length: this.#length
 		};
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

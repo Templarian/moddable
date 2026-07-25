@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2025  Moddable Tech, Inc.
+ * Copyright (c) 2016-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -1174,7 +1174,7 @@ void fx_Array(txMachine* the)
 
 void fx_Array_from(txMachine* the)
 {
-	txSlot* function = (mxArgc > 1) ? fxArgToCallback(the, 1) : C_NULL;
+	txSlot* function = (mxArgc > 1) && !mxIsUndefined(mxArgv(1)) ? fxArgToCallback(the, 1) : C_NULL;
 	txIndex length = 0;
 	txSlot* iterator;
 	txSlot* next;
@@ -1272,7 +1272,7 @@ void fx_Array_fromAsync(txMachine* the)
 	mxPullSlot(promise);
     {
 		mxTry(the) {
-			txSlot* function = (mxArgc > 1) ? fxArgToCallback(the, 1) : C_NULL;
+			txSlot* function = (mxArgc > 1) && !mxIsUndefined(mxArgv(1)) ? fxArgToCallback(the, 1) : C_NULL;
 			txNumber length = 0;
 			
 			if (mxArgc == 0)

@@ -106,6 +106,5 @@ class BMPSpooler extends PixelsOut {
 		return buffer;
 	}
 }
-Object.freeze(BMPSpooler.prototype);
 
 export default BMPSpooler;

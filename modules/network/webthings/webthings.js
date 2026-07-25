@@ -55,7 +55,6 @@ class WebThing {
     	return this.controllers;
     }
 }
-Object.freeze(WebThing.prototype);
 
 class WebThings {
 	constructor(mdns, dictionary = {}) {
@@ -278,6 +277,5 @@ class WebThings {
 		}
 	}
 }
-Object.freeze(WebThings.prototype);
 
 export {WebThings, WebThing};

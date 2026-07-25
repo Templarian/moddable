@@ -86,6 +86,5 @@ class BM8563 extends RTC {
 	}
 
 }
-Object.freeze(BM8563.prototype);
 
 export default BM8563;

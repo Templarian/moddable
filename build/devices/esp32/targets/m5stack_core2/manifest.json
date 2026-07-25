@@ -8,23 +8,20 @@
 	"include": [
 		"$(MODDABLE)/modules/io/manifest.json",
 		"$(MODDABLE)/modules/drivers/ili9341/manifest.json",
-		"$(MODDABLE)/modules/drivers/ft6206/manifest.json",
+		"$(MODDABLE)/modules/drivers/sensors/ft6206/manifest.json",
 		"$(MODDABLE)/modules/drivers/sensors/bmi270/manifest.json",
 		"$(MODDABLE)/modules/drivers/sensors/mpu6886/manifest.json",
-		"$(MODDABLE)/modules/drivers/axp192/manifest.json",
-		"$(MODDABLE)/modules/drivers/axp2101/manifest.json"
+		"$(MODDABLE)/modules/drivers/peripherals/bm8563/manifest.json",
+		"$(MODDABLE)/modules/drivers/peripherals/axp192/manifest.json",
+		"$(MODDABLE)/modules/drivers/peripherals/axp2101/manifest.json"
 	],
 	"config": {
 		"screen": "ili9341",
-		"touch": "M5StackCoreTouch",
 		"startupSound": "bflatmajor.maud",
-		"startupVibration": 600
+		"startupVibration": 600,
+		"enablePowerButton": false
 	},
 	"defines": {
-		"i2c": {
-			"sda_pin": 32,
-			"scl_pin": 33
-		},
 		"spi": {
 			"mosi_pin": 23,
 			"miso_pin": 38,
@@ -55,18 +52,6 @@
 				"0xFF, 0"
 			]
 		},
-		"ft6206": {
-			"width": 320,
-			"height": 280,
-			"hz": 400000,
-			"sda": 21,
-			"scl": 22,
-			"threshold": 128,
-			"flipX": false,
-			"flipY": false,
-			"fitX": false,
-			"fitY": false
-		},
 		"audioOut": {
 			"bitsPerSample": 16,
 			"numChannels": 1,
@@ -94,18 +79,18 @@
 	"modules": {
 		"setup/target": "./setup-target",
 		"pins/audioout": "$(MODULES)/pins/i2s/*",
-		"pins/smbus": "$(MODULES)/pins/smbus/smbus",
 		"*": [
-			"$(MODULES)/drivers/mpu6886/*",
-			"./M5StackCoreTouch"
+			"./M5StackCoreTouch",
+			"./Core2Power",
+			"./Core2IMU"
 		]
 	},
 	"preload": [
 		"pins/audioout",
 		"setup/target",
-		"mpu6886",
-		"pins/smbus",
-		"M5StackCoreTouch"
+		"M5StackCoreTouch",
+		"Core2Power",
+		"Core2IMU"
 	],
 	"resources": {
 		"*": "$(MODDABLE)/examples/assets/sounds/bflatmajor"

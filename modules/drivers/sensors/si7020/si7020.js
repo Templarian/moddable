@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021  Moddable Tech, Inc.
+ * Copyright (c) 2016-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -92,6 +92,10 @@ class SI7020  {
 			this.#onError?.("bad checksum");
 
 		return ((vBuf[0] << 8) + vBuf[1]) & 0xfffc;
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

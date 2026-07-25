@@ -567,10 +567,8 @@ void BLEScanner_constructor(xsMachine* the)
 	scanner->delegate = [delegate retain];
 	delegate.scanner = scanner;
 	
-	if (xsmcHas(xsArg(0), xsID_services)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_services);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_services))
 		scanner->services = [xsToCBUUIDArray(the) retain];
-	}
 	scanner->already = [[NSMutableDictionary dictionaryWithCapacity:16] retain];
 	if (scanner->central.state == CBManagerStatePoweredOn)
 		[scanner->central scanForPeripheralsWithServices:scanner->services options:nil];
@@ -632,8 +630,7 @@ void BLEClient_constructor(xsMachine *the)
 		xsUnknownError("no central");
 		
 	CBPeripheral* peripheral = nil;
-	if (xsmcHas(xsArg(0), xsID_address)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_address);
+	if (xsmcGet(xsVar(0), xsArg(0), xsID_address)) {
 		const char *address = xsmcToString(xsVar(0));
 		NSString *uuidString = [NSString stringWithUTF8String:address];
 		NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:uuidString];

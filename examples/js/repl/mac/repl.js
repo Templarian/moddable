@@ -28,6 +28,5 @@ class REPL extends REPLCore {
 			this.poll();
 	}
 }
-Object.freeze(REPL.prototype);
 
 export default REPL;

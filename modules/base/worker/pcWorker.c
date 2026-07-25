@@ -37,7 +37,7 @@ struct sxWorker {
 #if mxLinux
 	GMainLoop* main_loop;
 #endif
-#if defined(mxInstrument) && mxMacOSX
+#if mxMacOSX
 	CFRunLoopTimerRef cfTimer;
 #endif
 	char name[1];

@@ -31,7 +31,6 @@ export * from "piu/All";
 export class CLUT extends Resource {
 	get colors() { return native("PiuCLUT_get_colors").call(this); }
 }
-Object.freeze(CLUT.prototype);
 globalThis.CLUT = CLUT;
 
 // PiuTexture.c
@@ -104,7 +103,6 @@ export class Texture extends Native("PiuTextureDelete") {
 		}
 	}
 }
-Object.freeze(Texture.prototype);
 globalThis.Texture = Texture;
 
 // PiuDie.c
@@ -189,5 +187,4 @@ class View extends Native("PiuViewDelete") {
 	onTouchEnded(index, x, y, ticks) { native("PiuView_onTouchEnded").call(this, index, x, y, ticks); }
 	onTouchMoved(index, x, y, ticks) { native("PiuView_onTouchMoved").call(this, index, x, y, ticks); }
 }
-Object.freeze(View.prototype);
 

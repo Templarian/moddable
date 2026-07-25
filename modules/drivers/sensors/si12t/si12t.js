@@ -170,7 +170,9 @@ class Si12T {
 		return points;
 	}
 
-
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export default Si12T;

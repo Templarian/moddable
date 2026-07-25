@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023  Moddable Tech, Inc.
+ * Copyright (c) 2021-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -164,6 +164,10 @@ class PCF85063 {
 		io.writeBuffer(Register.TIME, b);
 
 		io.writeUint8(Register.CTRL1, 0);			// enable
+	}
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
 	}
 }
 

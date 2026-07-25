@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025  Moddable Tech, Inc.
+ * Copyright (c) 2025-2026  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -22,6 +22,10 @@ class GATTServerConnection extends Native("BLEServerConnection_destructor") {
 	constructor() {throw new Error};
 	close() { return native("BLEServerConnection_close").call(this); }
 	notify(characteristic, value) { return native("BLEServerConnection_notify").call(this, characteristic, value); }
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 class GATTServerCharacteristic extends Native("BLEServerCharacteristic_destructor") {
@@ -77,6 +81,10 @@ class GATTServer extends Native("BLEServer_destructor") {
 		writeEncrypted: (1 << 11) | (1 << 3),
 		writeAuthenticated: (1 << 11) | (1 << 3), // same as writeEncrypted on macOS
 	});
+
+	static {
+		this.prototype[Symbol.dispose] = this.prototype.close;
+	}
 }
 
 export {GATTServer}
