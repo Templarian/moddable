@@ -3,6 +3,8 @@
 ## Run
 
 ```sh
+cd %MODDABLE%\build\makefiles\win
+build
 cd $MODDABLE/examples/teststorage
 mcconfig -d -m -p esp32
 ```
@@ -79,8 +81,13 @@ The display shows an uptime counter (increments every second, so we know the app
 			"width": 400,
 			"height": 240,
 			"cs_pin": 4,
-			"spi_port": "HSPI_HOST"
+			"spi_port": "SPI2_HOST"
 		},
+		"spi": {
+			"miso_pin": 21,
+			"mosi_pin": 19,
+			"sck_pin": 5
+		}
 	},
 	"preload": [
 		"Resource",

@@ -1,4 +1,5 @@
-examples/teststorage/wifi.js
+examples/teststorage/wificreds.js
+examples/teststorage/args.txt
 build/bin/
 build/tmp/
 build/devices/esp32/xsProj/sdkconfig.defaults.prior

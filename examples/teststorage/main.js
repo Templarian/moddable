@@ -4,7 +4,6 @@ import Poco from "commodetto/Poco";
 import Resource from "Resource";
 import parseBMP from "commodetto/parseBMP";
 import parseBMF from "commodetto/parseBMF";
-import AudioOut from "pins/audioout";
 // import Sleep from "sleep";
 import Timer from "timer";
 import Digital from "pins/digital";
@@ -16,11 +15,11 @@ import config from "mc/config";
 import { Request } from "http";
 import SecureSocket from "securesocket";
 
-import { WIFI_NAME, WIFI_PASS } from "./wifi";
+import { WIFI_NAME, WIFI_PASS } from "wificreds";
 
-const DATA_URL = 'https://gist.githubusercontent.com/Templarian/48566d3a22b8dc21dde54e251aa7d9d3/raw/b9d5cad547e1d488740b3f83b25258b573252d51/testdata.json';
+const DATA_URL = 'https://gist.githubusercontent.com/Templarian/48566d3a22b8dc21dde54e251aa7d9d3/raw/fc56162bb996cb97abe8a9a2106bd2b691a4c020/testdata.json';
 
-const BUTTON_PIN = 0;
+const BUTTON_PIN = 38;
 
 trace("App Started\n");
 
@@ -59,6 +58,9 @@ class App {
 		Timer.repeat(() => this.#checkButton(), 100);
 
 		this.#connectWiFi();
+
+		const sum = new Function("a", "b", "return a + b");
+		trace(sum(4, 5));
 	}
 
 	#drawStatus() {
@@ -123,6 +125,11 @@ class App {
 		const current = this.#button.read();
 		if ((current !== this.#previous) && !current) {
 			if (this.#data) {
+				const poco = this.#poco;
+
+				poco.begin(0, 0, poco.width, poco.height);
+				poco.fillRectangle(this.#black, 50, 50, 100, 100);
+				poco.end();
 				for (const key of Object.keys(this.#data))
 					trace(`${key}\n`);
 			}
@@ -134,5 +141,10 @@ class App {
 }
 
 export default function () {
+	// Fix display
+	Timer.set(() => {
+        Digital.write(4, 1);
+    }, 10);
+	// Run app
 	new App;
 }
