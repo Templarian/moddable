@@ -3,11 +3,15 @@
 
 On the microcontroller there is very minimal ram.
 
-All entities are referenced via a 8 character hex. The microcontroller stores.
+All entities are referenced via a 8 character hex.
 
 ## Entity Objects and Schemas
 
-All data is stored in entities.
+The entities are stored in a key value pair and recieved as required from a server request. 
+
+Keys pulled from the server will always include a "hash" property with a CRC16 number.
+
+**Note:** Entities are stored in flash or the SD card.
 
 ```json
 {
@@ -21,6 +25,7 @@ All data is stored in entities.
     "9f3a1c02": { "name": "state.quest", "schema": { "value": { "type": "enum", "enumValues": ["started", "completed"] } } },
     "a4c81f06": { "name": "state.string", "schema": { "value": { "type": "string", "required": true } } },
     "564f1799": { "name": "state.number", "schema": { "value": { "type": "i8", "required": true } } },
+    "17624d1f": { "name": "state.boolean", "schema": { "value": { "type": "boolean", "required": true } } },
     "eb7cb92e": { "564f1799": { "value": 100 } },
     "b2e5f719": { "9f3a1c02": { "value": 1 } }
 }
@@ -32,5 +37,41 @@ State names mapped to entities storage.
 {
     "player.health": "eb7cb92e",
     "quest.city.rat": "b2e5f719"
+}
+```
+
+## Server
+
+```
+GET /key/<hex>
+```
+
+## JSON Stringify
+
+The server must always calculate the entity CRC16 using:
+
+```typescript
+function canonicalStringify(obj) {
+  if (obj === null || typeof obj !== 'object') {
+    return JSON.stringify(obj);
+  }
+
+  if (Array.isArray(obj)) {
+    return '[' + obj.map(canonicalStringify).join(',') + ']';
+  }
+
+  const keys = Object.keys(obj).sort();
+  const pairs = keys.map(key => JSON.stringify(key) + ':' + canonicalStringify(obj[key]));
+  return '{' + pairs.join(',') + '}';
+}
+```
+
+To generate the 8 character hex key.
+
+```typescript
+function createEntity() {
+  return ((Math.random() * 0x100000000) >>> 0)
+    .toString(16)
+    .padStart(8, '0');
 }
 ```
