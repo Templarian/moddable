@@ -15,7 +15,6 @@ Keys pulled from the server will always include a "hash" property with a CRC16 n
 
 ```json
 {
-    "00000000": { "e67e14e5": { "name": "Character Name" }, "1b6614d2": { "tile": "87679768" } },
     "1b6614d2": { "name": "state.tile", "schema": { "value": { "type": "ref", "ref": "2ba24965" } } },
     "2ba24965": { "name": "tile", "schema": { "north": { "type": "ref", "ref": "2ba24965" }, "east": { "type": "ref", "ref": "2ba24965" }, "south": { "type": "ref", "ref": "2ba24965" }, "west": { "type": "ref", "ref": "2ba24965" } } },
     "e67e14e5": { "name": "identity", "schema": { "name": { "type": "string", "required": true } } },

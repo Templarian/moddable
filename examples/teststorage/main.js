@@ -14,6 +14,7 @@ import Time from "time";
 import config from "mc/config";
 import { Request } from "http";
 import SecureSocket from "securesocket";
+import * as store from "data";
 
 import { WIFI_NAME, WIFI_PASS } from "wificreds";
 
@@ -59,8 +60,25 @@ class App {
 
 		this.#connectWiFi();
 
-		const sum = new Function("a", "b", "return a + b");
-		trace(sum(4, 5));
+
+		if (!store.storeExists()) {
+			store.initStore(10_000);
+		}
+		if (!store.stateStoreExists()) {
+			store.initStateStore(500);
+		}
+		store.ensureIndex();      // cheap no-op on later calls
+		store.ensureStateIndex(); // same
+
+		// Store Known Entities
+		store.putEntity("564f1799", { "name": "state.number", "schema": { "value": { "type": "i8", "required": true } } });
+		store.putEntity("eb7cb92e", { "564f1799": { "value": 42 } });
+		store.setStateId("player.health", "eb7cb92e");
+		// 2. Resolve a state name to its entity.
+		const health = store.getState("player.health");
+		trace(health);
+		//const sum = new Function("a", "b", "return a + b");
+		//trace(sum(4, 5));
 	}
 
 	#drawStatus() {

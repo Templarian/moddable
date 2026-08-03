@@ -1,0 +1,16 @@
+{
+  "extends": "@moddable/typings/tsconfig.es2024.json",
+  "compilerOptions": {
+    "incremental": true,
+    "rootDir": ".",
+    "outDir": "dist",
+    "sourceMap": true,
+    "types": [
+      "./node_modules/@moddable/typings/xs",
+      "./node_modules/@moddable/typings/mcpack"
+    ]
+  },
+  "include": [
+    "*.ts"
+  ]
+}
