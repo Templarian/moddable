@@ -62,7 +62,7 @@ class App {
 
 
 		if (!store.storeExists()) {
-			store.initStore(10_000);
+			store.initStore(1000);
 		}
 		if (!store.stateStoreExists()) {
 			store.initStateStore(500);
