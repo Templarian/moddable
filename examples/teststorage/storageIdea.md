@@ -48,12 +48,23 @@ ToDo: Figure out how to quickly store and reference state in flash.
 
 ## ESP32 Storage
 
-Lookup table. Binary search by sorted `serverId`.
+Lookup table stored as a hash table in flash, sized upfront with headroom for the expected entity count (e.g. 16k-32k slots for 10k+ entities, ~50-65% load factor).
+
+- `serverId` is already uniformly random, so it's used directly as the hash: slot = `serverId mod tableSize`
+- Collisions resolved with linear probing
+- Empty slots use flash's erased `0xFF` state as the sentinel, no separate valid bit
+- Growing the table is a rare, explicit rebuild/compaction step, not part of normal inserts
+
+Record (12 bytes, packed, no alignment padding):
 
 - 32bit, 8 hex character, Id from JSON (Server)
 - 32 bit offset
 - 16 bit length
 - 16bit CRC16 hash of entity data
+
+ToDo: small RAM LRU cache for actively-referenced entities (state.* bindings) to avoid repeated flash probes on hot lookups.
+
+ToDo: entity data blob is append-only; handle updates that change an entity's size via compaction, separate from the index structure.
 
 ## Server
 
