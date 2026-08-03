@@ -33,7 +33,7 @@ Keys pulled from the server will always include a "hash" property with a CRC16 n
 }
 ```
 
-State names mapped to entities storage.
+State names mapped to entities storage. Scripts will reference state values by the string and get the normalized object.
 
 ```json
 {
@@ -44,15 +44,16 @@ State names mapped to entities storage.
 }
 ```
 
+ToDo: Figure out how to quickly store and reference state in flash.
+
 ## ESP32 Storage
 
-To make data access faster across entities the lookup table uses a sequential id locally on the device linked to the server's 8 character hex id.
+Lookup table. Binary search by sorted `serverId`.
 
-- 16bit Sequential Index (Local)
-- 16bit, 8 hex character, Id from JSON (Server)
+- 32bit, 8 hex character, Id from JSON (Server)
+- 32 bit offset
+- 16 bit length
 - 16bit CRC16 hash of entity data
-
-ToDo: decide if storing offset and length here would make storage of entity data fast.
 
 ## Server
 
