@@ -1,11 +1,11 @@
 // Entity/state storage library implementing the design in STORAGE.md and
 // examples/teststorage/storageIdea.md: a PSRAM-cached hash-table index over
 // a single LittleFS file, keyed by 8 hex character entity ids.
-import { File, Directory } from "file";
+import { File } from "file";
 import { CRC16 } from "crc";
 export const STORE_DIR = "/store";
-export const STORE_PATH = "/store/data.bin";
-export const STATE_PATH = "/store/state.bin";
+export const STORE_PATH = "/data.bin";
+export const STATE_PATH = "/state.bin";
 export const HEADER_SIZE = 8; // uint32 entryCount + uint32 tableSize
 export const SLOT_SIZE = 12; // id(4) + offset(4) + length(2) + crc16(2)
 export const DEFAULT_LOAD_FACTOR = 0.6;
@@ -220,7 +220,7 @@ function writeStore(records, expectedCount = records.length, loadFactor = DEFAUL
             bytes[dataPos + i] = r.text.charCodeAt(i);
         dataPos += r.text.length;
     }
-    Directory.create(STORE_DIR);
+    //Directory.create(STORE_DIR);
     if (File.exists(STORE_PATH))
         File.delete(STORE_PATH);
     const file = new File(STORE_PATH, true);
@@ -466,7 +466,7 @@ function writeStateStore(entries, expectedCount = entries.length, loadFactor = D
             bytes[dataPos + i] = r.text.charCodeAt(i);
         dataPos += r.text.length;
     }
-    Directory.create(STORE_DIR);
+    //Directory.create(STORE_DIR);
     if (File.exists(STATE_PATH))
         File.delete(STATE_PATH);
     const file = new File(STATE_PATH, true);
