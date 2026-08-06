@@ -13,6 +13,25 @@ Keys pulled from the server will always include a "hash" property with a CRC16 n
 
 **Note:** Entities are stored in flash or the SD card.
 
+## Schema Types
+
+Entities can be grouped into two types:
+- Schema entities, these define a name and properties with data types.
+  - Type data is used by storage to allocate space for the values.
+- Data entities, these store references to schema entities and define types.
+
+| Type | Storage | Notes |
+|---|---|---|
+| `u8` `u16` `u32` | `Uint8/16/32Array` | Integers, range-checked on write |
+| `i8` `i16` `i32` | `Int8/16/32Array` | Integers, range-checked on write |
+| `f32` `f64` | `Float32/64Array` | Any number |
+| `bool` | `Uint8Array` | Round-trips as `true`/`false` |
+| `enum` | `Uint8Array` | Values interned as index into `enumValues` (max 255 values); reads back as the string |
+| `ref` | `Uint32Array` | Entity id; target must be alive, and carry `refComponent` if set |
+| `string` | plain array | The only non-packed field type |
+
+## Example Entities
+
 ```json
 {
     "1b6614d2": { "name": "state.tile", "schema": { "value": { "type": "ref", "ref": "2ba24965" } } },

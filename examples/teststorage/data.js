@@ -3,9 +3,57 @@
 // a single LittleFS file, keyed by 8 hex character entity ids.
 import { File } from "file";
 import { CRC16 } from "crc";
+
+class PreloadableMap {
+	#state = {};
+
+	constructor(...args) {
+		if (Object.isFrozen(PreloadableMap))
+			return new Map(...args);					// post-lockdown/preload – use Map instance directly
+		this.#state.map = new Map(...args);
+	}
+	#getMap(mutable = false) {
+		let map = this.#state.map;
+		if (mutable && Object.isFrozen(map))
+			map = this.#state.map = new Map(map);		// clone to RAM
+		return map;
+	}
+	set(key, value) {
+		this.#getMap(true).set(key, value);
+		return this;
+	}
+	get(key) {
+		return this.#getMap().get(key);
+	}
+	has(key) {
+		return this.#getMap().has(key);
+	}
+	delete(key) {
+		return this.#getMap(true).delete(key);
+	}
+	clear() {
+		return this.#getMap(true).clear();
+	}
+	keys() {
+		return this.#getMap().keys();
+	}
+	values() {
+		return this.#getMap().values();
+	}
+	entries() {
+		return this.#getMap().entries();
+	}
+	[Symbol.iterator]() {
+		return this.#getMap()[Symbol.iterator]();
+	}
+	get size() {
+		return this.#getMap().size;
+	}
+}
+
 export const STORE_DIR = "/store";
-export const STORE_PATH = "/data.bin";
-export const STATE_PATH = "/state.bin";
+export const STORE_PATH = "/mod/data.bin";
+export const STATE_PATH = "/mod/state.bin";
 export const HEADER_SIZE = 8; // uint32 entryCount + uint32 tableSize
 export const SLOT_SIZE = 12; // id(4) + offset(4) + length(2) + crc16(2)
 export const DEFAULT_LOAD_FACTOR = 0.6;
@@ -313,7 +361,7 @@ let stateIndexBuffer = null;
 let stateIndexView = null;
 let stateTableSize = 0;
 let stateEntryCount = 0;
-const stateCache = new Map();
+const stateCache = new PreloadableMap();
 export function stateStoreExists() {
     return File.exists(STATE_PATH);
 }
