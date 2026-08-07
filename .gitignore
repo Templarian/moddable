@@ -1,4 +1,5 @@
 examples/teststorage/wificreds.js
+examples/keyvalue/wificreds.js
 examples/teststorage/args.txt
 build/bin/
 build/tmp/
