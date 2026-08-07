@@ -7,8 +7,8 @@ export const STORE_PATH = "/mod/data.bin";
 // key values in binary data.bin file and keep a
 // cache of the last accessed keys.
 // - 8 character keys
-// - values are json strings
 // - CRC16 hash of values
+// - values are json strings
 // Due to limited memory this cache should
 // clear out keys based LRU (Least Recently Used).
 //
