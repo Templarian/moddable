@@ -14,6 +14,7 @@ import Time from "time";
 import config from "mc/config";
 import { Request } from "http";
 import SecureSocket from "securesocket";
+import { Storage } from 'data';
 
 import { WIFI_NAME, WIFI_PASS } from "wificreds";
 
@@ -48,6 +49,12 @@ class App {
 		this.#statusHeight = (this.#font.height * 2) + 6;
 
 		this.#drawStatus();
+
+		const storage = new Storage(10000);
+		storage.set('00000000', 'hello');
+		storage.set('00000001', 'hello world!');
+		trace(storage.get('00000000'));
+
 		Timer.repeat(() => {
 			this.#seconds += 1;
 			this.#drawStatus();

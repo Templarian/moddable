@@ -10,7 +10,9 @@
 		"$(MODULES)/drivers/ls013b4dn04/manifest.json",
 		"$(MODULES)/pins/digital/manifest.json",
 		"$(MODULES)/pins/i2c/manifest.json",
-		"$(MODULES)/drivers/mcp230xx/manifest.json"
+		"$(MODULES)/drivers/mcp230xx/manifest.json",
+		"$(MODULES)/data/crc/manifest.json",
+		"$(MODDABLE)/modules/files/file/manifest.json"
 	],
 	"modules": {
 		"Resource": "$(MODDABLE)/modules/files/resource/Resource",
@@ -23,6 +25,7 @@
 		"commodetto/cfe": "$(COMMODETTO)/cfeBMF",
 		"*": [
 			"./main",
+			"./data",
 			"./wificreds"
 		]
 	},
