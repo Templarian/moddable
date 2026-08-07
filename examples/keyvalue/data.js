@@ -6,7 +6,8 @@ export const STORE_PATH = "/mod/data.bin";
 const KEY_LENGTH = 8;
 const META_LENGTH = 4; // crc16(2) + value length(2)
 const HEADER_LENGTH = KEY_LENGTH + META_LENGTH;
-const MAX_VALUE_LENGTH = 0xFFFF; // length field is a uint16
+const DELETED_LENGTH = 0xFFFF; // sentinel marking a tombstone record (no payload)
+const MAX_VALUE_LENGTH = 0xFFFE; // length field is a uint16, minus the tombstone sentinel
 
 function stringToBytes(text) {
 	const bytes = new Uint8Array(text.length);
@@ -58,9 +59,10 @@ export class Storage {
 			const key = bytesToString(header.subarray(0, KEY_LENGTH));
 			const crc = (header[KEY_LENGTH] << 8) | header[KEY_LENGTH + 1];
 			const length = (header[KEY_LENGTH + 2] << 8) | header[KEY_LENGTH + 3];
+			const payloadLength = (length === DELETED_LENGTH) ? 0 : length;
 
 			visit(key, offset, length, crc);
-			offset += HEADER_LENGTH + length;
+			offset += HEADER_LENGTH + payloadLength;
 		}
 
 		file.close();
@@ -68,12 +70,12 @@ export class Storage {
 
 	// Scans data.bin for `key`, returning its most recent record (a later
 	// write always overrides an earlier one for the same key) or
-	// undefined if it has never been written.
+	// undefined if it has never been written or was last deleted().
 	#find(key) {
 		let found;
 		this.#eachRecord((recordKey, offset, length, crc) => {
 			if (recordKey === key)
-				found = { offset, length, crc };
+				found = (length === DELETED_LENGTH) ? undefined : { offset, length, crc };
 		});
 		return found;
 	}
@@ -143,11 +145,39 @@ export class Storage {
 		this.#cacheSet(key, value);
 	}
 
-	#cacheSet(key, value) {
+	// Removes `key` from the cache and appends a tombstone record to
+	// data.bin, so it reads back as undefined even though its old record
+	// (if any) is still physically present -- compact() is what actually
+	// reclaims that space.
+	delete(key) {
+		if (key.length !== KEY_LENGTH)
+			throw new RangeError(`key must be exactly ${KEY_LENGTH} characters`);
+
+		this.#cacheDelete(key);
+
+		if (this.#find(key) === undefined)
+			return;
+
+		const meta = new ArrayBuffer(META_LENGTH);
+		const metaView = new DataView(meta);
+		metaView.setUint16(0, 0, false); // crc unused for tombstones
+		metaView.setUint16(2, DELETED_LENGTH, false);
+
+		const file = new File(this.#path, true);
+		file.position = file.length;
+		file.write(key, meta);
+		file.close();
+	}
+
+	#cacheDelete(key) {
 		if (this.#cache.has(key)) {
 			this.#cacheLength -= this.#cache.get(key).length;
 			this.#cache.delete(key);
 		}
+	}
+
+	#cacheSet(key, value) {
+		this.#cacheDelete(key);
 		this.#cache.set(key, value);
 		this.#cacheLength += value.length;
 		this.#evictIfNeeded();
@@ -171,8 +201,16 @@ export class Storage {
 
 		// Same idea as #find, but for every key at once: keep the last
 		// record seen per key, so the rewrite below only copies live data.
+		// A tombstone drops the key entirely -- deletes don't need to
+		// survive compaction, since an absent key and a deleted key both
+		// read back as undefined.
 		const live = new Map();
-		this.#eachRecord((key, offset, length, crc) => live.set(key, { offset, length, crc }));
+		this.#eachRecord((key, offset, length, crc) => {
+			if (length === DELETED_LENGTH)
+				live.delete(key);
+			else
+				live.set(key, { offset, length, crc });
+		});
 		const records = [...live].sort((a, b) => a[1].offset - b[1].offset);
 
 		const file = new File(this.#path);
@@ -198,5 +236,32 @@ export class Storage {
 
 		File.delete(this.#path);
 		File.rename(tempPath, this.#path);
+	}
+
+	// Debug helper: returns every record currently in data.bin, in file
+	// order. Includes stale records left behind by set()'s appends (i.e.
+	// what compact() would reclaim), not just the live ones.
+	debug() {
+		const file = new File(this.#path);
+		this.#eachRecord((key, offset, length, crc) => {
+			if (length === DELETED_LENGTH) {
+				trace(key, offset, "deleted", '\n');
+				return;
+			}
+			file.position = offset + HEADER_LENGTH;
+			const bytes = new Uint8Array(file.read(ArrayBuffer, length));
+			trace(key, offset, length, crc, bytesToString(bytes), '\n');
+		});
+		file.close();
+	}
+
+	// Deletes data.bin outright (e.g. to start over). Named apart from
+	// delete(key), which removes a single key, to keep the two from
+	// being confused.
+	erase() {
+		if (File.exists(this.#path))
+			File.delete(this.#path);
+		this.#cache.clear();
+		this.#cacheLength = 0;
 	}
 }
