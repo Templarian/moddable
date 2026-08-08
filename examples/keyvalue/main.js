@@ -65,17 +65,20 @@ class App {
 		this.#drawStatus();
 
 		const storage = new Storage(10000);
-		for (let i = 0; i < 1000; i++) {
-			storage.set(nextId(), randomString());			
+		//storage.erase();
+		for (let i = 0; i < 100; i++) {
+			storage.set(nextId(), randomString());
+			trace(i, ' ');
 		}
 		storage.clearCache();
 		const time = new Date();
-		trace(storage.get('00000001'));
-		trace(new Date() - time);
-		trace(storage.get('00000999'));
-		trace(new Date() - time);
+		trace(storage.get('00000001'), '\n');
+		trace(new Date() - time, '\n');
+		trace(storage.get('00000098'), '\n');
+		trace(new Date() - time, '\n');
 
 		Timer.repeat(() => {
+			trace(storage.get('00000098'), '\n');
 			this.#seconds += 1;
 			this.#drawStatus();
 		}, 1000);
