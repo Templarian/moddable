@@ -29,6 +29,20 @@ function parseURL(url) {
 	return { host: match[1], path: match[2] };
 }
 
+const nextId = (() => {
+	let count = 0;
+	return () => {
+		count += 1;
+		return String(count).padStart(8, '0');
+	};
+})();
+
+function randomString() {
+	return Math.random() > 0.5
+		? 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+		: '12345678';
+}
+
 class App {
 	#poco;
 	#white;
@@ -51,9 +65,15 @@ class App {
 		this.#drawStatus();
 
 		const storage = new Storage(10000);
-		storage.set('00000000', 'hello');
-		storage.set('00000001', 'hello world!');
-		trace(storage.get('00000000'));
+		for (let i = 0; i < 1000; i++) {
+			storage.set(nextId(), randomString());			
+		}
+		storage.clearCache();
+		const time = new Date();
+		trace(storage.get('00000001'));
+		trace(new Date() - time);
+		trace(storage.get('00000999'));
+		trace(new Date() - time);
 
 		Timer.repeat(() => {
 			this.#seconds += 1;
@@ -73,9 +93,9 @@ class App {
 		const poco = this.#poco;
 
 		poco.begin(0, 0, poco.width, this.#statusHeight);
-			poco.fillRectangle(this.#black, 0, 0, poco.width, this.#statusHeight);
-			poco.drawText(uptimeLine, this.#font, this.#white, 2, 2);
-			poco.drawText(wifiLine, this.#font, this.#white, 2, this.#font.height + 4);
+		poco.fillRectangle(this.#black, 0, 0, poco.width, this.#statusHeight);
+		poco.drawText(uptimeLine, this.#font, this.#white, 2, 2);
+		poco.drawText(wifiLine, this.#font, this.#white, 2, this.#font.height + 4);
 		poco.end();
 	}
 
@@ -147,8 +167,8 @@ class App {
 export default function () {
 	// Fix display
 	Timer.set(() => {
-        Digital.write(4, 1);
-    }, 10);
+		Digital.write(4, 1);
+	}, 10);
 	// Run app
 	new App;
 }

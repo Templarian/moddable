@@ -264,4 +264,9 @@ export class Storage {
 		this.#cache.clear();
 		this.#cacheLength = 0;
 	}
+
+    clearCache() {
+        this.#cache.clear();
+        this.#cacheLength = 0;
+    }
 }
