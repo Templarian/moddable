@@ -72,10 +72,10 @@ class App {
 		}
 		storage.clearCache();
 		const time = new Date();
-		trace(storage.get('00000001'), '\n');
-		trace(new Date() - time, '\n');
-		trace(storage.get('00000098'), '\n');
-		trace(new Date() - time, '\n');
+		//trace(storage.get('00000001'), '\n');
+		//trace(new Date() - time, '\n');
+		//trace(storage.get('00000098'), '\n');
+		//trace(new Date() - time, '\n');
 
 		Timer.repeat(() => {
 			trace(storage.get('00000098'), '\n');
