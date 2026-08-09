@@ -47,6 +47,14 @@ export class Storage {
 	#path;
 	#crc = new CRC16(0x1021);
 
+	// Held open across calls instead of opening/closing a new File per
+	// get()/set()/tombstone write -- fopen/fclose per operation is real
+	// overhead on flash filesystems. Opened lazily (not in the
+	// constructor) so a fresh store doesn't create data.bin before the
+	// first set(). compact()/erase() close and clear it since they
+	// replace or remove the underlying file out from under it.
+	#file;
+
 	#capacity;
 	#indexBuffer;
 	#indexView;
@@ -146,11 +154,25 @@ export class Storage {
 	#findSlot(key) {
 		let slot = this.#head;
 		while (slot !== NONE) {
-			if (this.#slotKey(slot) === key)
+			if (this.#slotKeyEquals(slot, key))
 				return slot;
 			slot = this.#indexView.getUint16(slot * SLOT_SIZE + SLOT_NEXT, false);
 		}
 		return NONE;
+	}
+
+	// Compares a slot's key bytes directly against `key`, with no string
+	// allocation -- unlike #slotKey(), which builds a JS string. Every
+	// slot #findSlot() walks past pays this cost, so avoiding the
+	// allocation there matters; the handful of callers that need the key
+	// as a string (compact(), #evictLRU()) use #slotKey() instead.
+	#slotKeyEquals(slot, key) {
+		const base = slot * SLOT_SIZE + SLOT_KEY;
+		const bytes = this.#indexBytes;
+		for (let i = 0; i < KEY_LENGTH; i++)
+			if (bytes[base + i] !== (key.charCodeAt(i) & 0xFF))
+				return false;
+		return true;
 	}
 
 	#slotKey(slot) {
@@ -274,10 +296,26 @@ export class Storage {
 		metaView.setUint16(0, 0, false); // crc unused for tombstones
 		metaView.setUint16(2, DELETED_LENGTH, false);
 
-		const file = new File(this.#path, true);
+		const file = this.#openFile();
 		file.position = file.length;
 		file.write(key, meta);
-		file.close();
+	}
+
+	// Opened in write mode ("rb+") so the same handle serves both get()'s
+	// reads and set()/delete()'s writes -- safe because every caller sets
+	// `position` explicitly before each read/write, so there's no shared-
+	// cursor hazard from interleaving the two.
+	#openFile() {
+		if (!this.#file)
+			this.#file = new File(this.#path, true);
+		return this.#file;
+	}
+
+	#closeFile() {
+		if (this.#file) {
+			this.#file.close();
+			this.#file = undefined;
+		}
 	}
 
 	has(key) {
@@ -304,10 +342,9 @@ export class Storage {
 		const length = this.#indexView.getUint16(base + SLOT_LENGTH, false);
 		const crc = this.#indexView.getUint16(base + SLOT_CRC, false);
 
-		const file = new File(this.#path);
+		const file = this.#openFile();
 		file.position = offset + HEADER_LENGTH;
 		const bytes = new Uint8Array(file.read(ArrayBuffer, length));
-		file.close();
 
 		this.#crc.reset();
 		if (this.#crc.checksum(bytes.buffer) !== crc)
@@ -332,7 +369,7 @@ export class Storage {
 		const crc = this.#crc.checksum(bytes.buffer);
 
 		const existingSlot = this.#findSlot(key);
-		const file = new File(this.#path, true);
+		const file = this.#openFile();
 
 		// Same length overwrites the existing record in place. Any other
 		// length (grow or shrink) appends a fresh record instead, since a
@@ -356,7 +393,6 @@ export class Storage {
 
 		file.position = offset;
 		file.write(key, meta, bytes.buffer);
-		file.close();
 
 		const { slot, evicted } = this.#indexPut(key, offset, bytes.length, crc, existingSlot);
 		if (evicted !== undefined)
@@ -419,6 +455,12 @@ export class Storage {
 	compact() {
 		if (!File.exists(this.#path))
 			return;
+
+		// The rewrite below deletes and replaces this.#path -- close the
+		// persistent handle first so it isn't left open on a file that's
+		// about to be deleted out from under it. Reopened lazily on the
+		// next get()/set().
+		this.#closeFile();
 
 		const slots = [];
 		let slot = this.#head;
@@ -483,6 +525,7 @@ export class Storage {
 	// delete(key), which removes a single key, to keep the two from
 	// being confused.
 	erase() {
+		this.#closeFile();
 		if (File.exists(this.#path))
 			File.delete(this.#path);
 		this.#cache.clear();

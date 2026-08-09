@@ -70,7 +70,6 @@ class App {
 			storage.set(nextId(), randomString());
 			trace(i, ' ');
 		}
-		storage.clearCache();
 		const time = new Date();
 		//trace(storage.get('00000001'), '\n');
 		//trace(new Date() - time, '\n');
