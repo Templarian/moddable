@@ -38,7 +38,7 @@
 	"resources": {
 		"*-mask": [
 			"$(MODDABLE)/examples/assets/fonts/myFont"
-	   	],
+		],
 		"*": [
 			"$(MODULES)/crypt/data/ca109"
 		]
@@ -50,10 +50,17 @@
 			"cs_pin": 4,
 			"spi_port": "SPI2_HOST"
 		},
-        "spi": {
+		"spi": {
 			"miso_pin": 21,
 			"mosi_pin": 19,
 			"sck_pin": 5
+		},
+		"defines": {
+			"file": {
+				"lfs": {
+					"partition_size": 524288
+				}
+			}
 		}
 	},
 	"preload": [

@@ -54,6 +54,7 @@ class App {
 	#data = null;
 	#button;
 	#previous;
+	#storage;
 
 	constructor() {
 		this.#poco = new Poco(screen, { displayListLength: 2048 });
@@ -64,20 +65,20 @@ class App {
 
 		this.#drawStatus();
 
-		const storage = new Storage(10000);
+		this.#storage = new Storage(10000);
 		//storage.erase();
-		for (let i = 0; i < 100; i++) {
-			storage.set(nextId(), randomString());
-			trace(i, ' ');
-		}
+		//for (let i = 0; i < 100; i++) {
+		//	this.#storage.set(nextId(), randomString());
+		//	trace(i, ' ');
+		//}
 		const time = new Date();
-		//trace(storage.get('00000001'), '\n');
-		//trace(new Date() - time, '\n');
-		//trace(storage.get('00000098'), '\n');
-		//trace(new Date() - time, '\n');
+		trace(this.#storage.get('00000001'), '\n');
+		trace(new Date() - time, '\n');
+		trace(this.#storage.get('00000098'), '\n');
+		trace(new Date() - time, '\n');
 
 		Timer.repeat(() => {
-			trace(storage.get('00000098'), '\n');
+			trace(this.#storage.get('00000098'), '\n');
 			this.#seconds += 1;
 			this.#drawStatus();
 		}, 1000);
@@ -151,6 +152,7 @@ class App {
 		const current = this.#button.read();
 		if ((current !== this.#previous) && !current) {
 			if (this.#data) {
+				this.#storage.erase();
 				const poco = this.#poco;
 
 				poco.begin(0, 0, poco.width, poco.height);
