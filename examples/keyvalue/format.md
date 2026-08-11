@@ -48,11 +48,13 @@ In JSON entities could be viewed like:
 
 ```json
 {
-    "00000003": {
-        "x": 0,
-        "y": 0,
-        "width": 12,
-        "height": 12
+    "00000001": {
+        "00000000": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 12
+        }
     }
 }
 ```
