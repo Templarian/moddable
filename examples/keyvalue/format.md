@@ -1,4 +1,4 @@
-# Storage Arrays
+# Storage Format
 
 ## Schema Entity
 
@@ -13,20 +13,19 @@ Schema entities are referenced via a 8 character hex string. They can be thought
       - `enum` - List of enums
 - version
 
-In JSON this looks like:
+In JSON stores the schemas with `[name, type, config]` format.
 
 ```json
 {
-    "00000000": {
-        "name": "image",
-        "schema": {
-            "x": { "type": "i8" },
-            "y": { "type": "i8" },
-            "width": { "type": "i8" },
-            "height": { "type": "i8" }
-        },
-        "version": 1
-    }
+    "id": "00000000",
+    "name": "image",
+    "schema": [
+        ["x", "i8"],
+        ["y", "i8"],
+        ["width", "i8"],
+        ["height", "i8"]
+    ],
+    "version": 1
 }
 ```
 
@@ -37,10 +36,10 @@ In JSON this looks like:
 | `f32` `f64` | `Float32/64Array` | Any number |
 | `bool` | `Uint8Array` | Round-trips as `true`/`false` |
 | `enum` | `Uint8Array` | Values interned as index into `values` (max 255 values); reads back as the string |
-| `ref` | `Uint32Array` | Entity id; target must be alive, and carry `ref` if set |
+| `ref` | `Uint32Array` | Entity id; target must be alive, and carry `ref` if set. 8 character hex strings are parsed. |
 | `s32` `s64` `s128` `s256` `s512` `s1024` | `Uint8Array` | Fixed-width UTF-8 buffer, zero-padded; writes longer than the byte width are truncated |
 
-## Entity
+## Entity Data
 
 Since every property type now has a fixed byte width, a component's body length is fully determined by its schema (`sum` of its properties' widths, in declared order) — no length prefix is needed, only the schema id to know how to decode it.
 
@@ -68,6 +67,8 @@ Worked example, using the `image` schema (`00000000`) from above — `x`, `y`, `
 
 13 bytes total, vs. the JSON equivalent below. A reader just looks up schema `00000000`, replays its property list in order, and slices the fixed widths off the buffer — no keys, no delimiters.
 
+Strings will always ignore trailing `0x00` and return empty if all bytes are `0x00`.
+
 In JSON entities could be viewed like:
 
 ```json
@@ -83,9 +84,11 @@ In JSON entities could be viewed like:
 }
 ```
 
-When getting a entity by the key the data is normalized. 
+When getting an entity by the key the data is normalized. One can safely assume schemas with the same name will never be assigned, so conflicts cannot happen.
 
 ```typescript
-const result = storage.get('00000001');
+const result = storage.get("00000001"); // entity key
 // { image: { x: 0, y: 0, width: 12, height: 12 } }
 ```
+
+**Note:** `ref` will always return key when normalizing data.
