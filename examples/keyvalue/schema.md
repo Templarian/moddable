@@ -97,9 +97,9 @@ Images requested from the server contain a `data` property. While the `data` pro
     "id": "2ba24965",
     "name": "tile",
     "schema": [
-        ["north", "ref", { "ref": "2ba24965" }], ["east", "ref", { "ref": "2ba24965" }],
-        ["south", "ref", { "ref": "2ba24965" }], 
-        ["west", "ref", { "ref": "2ba24965" }], 
+        ["north", "ref", { "ref": "2ba24965" }],["east", "ref", { "ref": "2ba24965" }],
+        ["south", "ref", { "ref": "2ba24965" }],
+        ["west", "ref", { "ref": "2ba24965" }]
     ],
     "version": 1
 }
