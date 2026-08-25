@@ -22,6 +22,13 @@ const DATA_URL = 'https://gist.githubusercontent.com/Templarian/48566d3a22b8dc21
 
 const BUTTON_PIN = 38;
 
+// MCP23017 GPIO expander over I2C. On the Adafruit breakout, the GPIO pins
+// are silkscreened A0-A7 / B0-B7 (distinct from the D0-D2 address-select
+// pins). Those map directly to expander pin indexes 0-7 (port A, "A0"-"A7")
+// and 8-15 (port B, "B0"-"B7").
+const EXPANDER_BUTTON_PINS = [0, 1, 2]; // A0, A1, A2; add 8 for B0, etc.
+const EXPANDER_BUTTON_MASK = EXPANDER_BUTTON_PINS.reduce((mask, pin) => mask | (1 << pin), 0);
+
 trace("App Started\n");
 
 function parseURL(url) {
@@ -55,6 +62,8 @@ class App {
 	#button;
 	#previous;
 	#storage;
+	#expander;
+	#expanderPrevious;
 
 	constructor() {
 		this.#poco = new Poco(screen, { displayListLength: 2048 });
@@ -81,11 +90,22 @@ class App {
 			trace(this.#storage.get('00000098'), '\n');
 			this.#seconds += 1;
 			this.#drawStatus();
-		}, 1000);
+		}, 5000);
 
 		this.#button = new Digital(BUTTON_PIN, Digital.InputPullUp);
 		this.#previous = this.#button.read();
 		Timer.repeat(() => this.#checkButton(), 100);
+
+		try {
+			this.#expander = new MCP23017({
+				pullups: 0xFFFF
+			});
+			this.#expanderPrevious = this.#expander.read();
+			Timer.repeat(() => this.#checkExpanderButtons(), 100);
+		}
+		catch (e) {
+			trace(`MCP23017 not available: ${e}\n`);
+		}
 
 		this.#connectWiFi();
 	}
@@ -166,6 +186,31 @@ class App {
 		}
 		this.#previous = current;
 	}
+
+	#checkExpanderButtons() {
+		const current = this.#expander.read();
+		const justPressed = this.#expanderPrevious & ~current & EXPANDER_BUTTON_MASK;
+		this.#expanderPrevious = current;
+
+		if (!justPressed)
+			return;
+
+		const pressed = EXPANDER_BUTTON_PINS.filter(pin => justPressed & (1 << pin));
+		trace(pressed);
+		this.#drawPressed(pressed);
+	}
+
+	#drawPressed(pins) {
+		const poco = this.#poco;
+		const y = this.#statusHeight + 2;
+		const height = this.#font.height + 4;
+		const text = `Pressed ${pins.join(", ")}`;
+
+		poco.begin(0, y, poco.width, height);
+		poco.fillRectangle(this.#black, 0, y, poco.width, height);
+		poco.drawText(text, this.#font, this.#white, 2, y + 2);
+		poco.end();
+	}
 }
 
 export default function () {
@@ -173,6 +218,7 @@ export default function () {
 	Timer.set(() => {
 		Digital.write(4, 1);
 	}, 10);
+
 	// Run app
 	new App;
 }
