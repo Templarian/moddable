@@ -189,22 +189,22 @@ class App {
 
 	#checkExpanderButtons() {
 		const current = this.#expander.read();
-		const justPressed = this.#expanderPrevious & ~current & EXPANDER_BUTTON_MASK;
+		const changed = (current ^ this.#expanderPrevious) & EXPANDER_BUTTON_MASK;
 		this.#expanderPrevious = current;
 
-		if (!justPressed)
+		if (!changed)
 			return;
 
-		const pressed = EXPANDER_BUTTON_PINS.filter(pin => justPressed & (1 << pin));
-		trace(pressed);
-		this.#drawPressed(pressed);
+		const heldMask = ~current & EXPANDER_BUTTON_MASK;
+		const held = EXPANDER_BUTTON_PINS.filter(pin => heldMask & (1 << pin));
+		this.#drawPressed(held);
 	}
 
 	#drawPressed(pins) {
 		const poco = this.#poco;
 		const y = this.#statusHeight + 2;
 		const height = this.#font.height + 4;
-		const text = `Pressed ${pins.join(", ")}`;
+		const text = pins.length ? `Pressed: ${pins.join(", ")}` : "Pressed: none";
 
 		poco.begin(0, y, poco.width, height);
 		poco.fillRectangle(this.#black, 0, y, poco.width, height);
